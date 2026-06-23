@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P28 退单审核 · 原型</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<div class="page-head">
+  <a class="back" href="index.html">← 返回原型总览</a>
+  <h1>P28 · 管理后台 · 退单审核</h1>
+  <div class="sub">通过/驳回 + 退款上限校验 + 管理员直退 ｜ 接口：PUT /api/refunds/{id}/audit、POST /api/refunds/direct</div>
+</div>
+
+<div class="frame">
+  <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">admin.petshop.com/refunds</span></div>
+  <div class="screen">
+    <div class="admin">
+      <div class="aside">
+        <div class="brand">🐾 宠物商城后台</div>
+        <div class="menu-group">数据</div><a>📊 数据看板</a>
+        <div class="menu-group">商品</div><a>🏬 商店管理</a><a>📦 商品管理</a><a>⭐ 评价管理</a>
+        <div class="menu-group">交易</div><a>🧾 订单管理</a><a class="active">↩ 退单审核</a>
+        <div class="menu-group">运营</div><a>🎬 视频管理</a><a>🔔 消息推送</a>
+      </div>
+
+      <div class="amain">
+        <div class="atop"><span>交易 / 退单审核</span><div class="spacer"></div><span>👤 admin</span></div>
+        <div class="acontent">
+          <div class="tabs"><span class="tab on">待审核 <b style="color:var(--danger)">4</b></span><span class="tab">已通过</span><span class="tab">已驳回</span><span class="tab">管理员直退</span></div>
+
+          <div class="card" style="padding:0;overflow:hidden">
+            <table class="tbl">
+              <tr><th>退单号</th><th>订单号</th><th>买家</th><th>退款金额</th><th>上限</th><th>原因</th><th style="width:90px">状态</th><th style="width:160px">操作</th></tr>
+              <tr><td class="small">REF260623001</td><td class="small">ORD...0012</td><td>大黄</td><td class="price">¥988.00</td><td class="small muted">¥988.00</td><td class="small">商品有瑕疵</td><td><span class="tag warn">待审核</span></td><td class="small"><b style="color:var(--ok)">通过</b> · <b style="color:var(--danger)">驳回</b></td></tr>
+              <tr><td class="small">REF260622008</td><td class="small">ORD...0021</td><td>花花</td><td class="price">¥200.00</td><td class="small muted">¥458.00</td><td class="small">不想要了</td><td><span class="tag warn">待审核</span></td><td class="small"><b style="color:var(--ok)">通过</b> · <b style="color:var(--danger)">驳回</b></td></tr>
+              <tr><td class="small">REF260620003</td><td class="small">ORD...0005</td><td>球球</td><td class="price">¥315.00</td><td class="small muted">¥315.00</td><td class="small">尺寸不符</td><td><span class="tag ok">已通过</span></td><td class="small"><span style="color:var(--accent)">详情</span></td></tr>
+            </table>
+          </div>
+          <div class="pager"><span>‹</span><span class="on">1</span><span>2</span><span>›</span></div>
+
+          <div class="row">
+            <!-- 审核弹窗 -->
+            <div class="card col" style="border:2px dashed var(--accent)">
+              <h3>退单审核（弹窗）</h3>
+              <div class="small muted mb8">退单 REF260623001 · 订单 ORD...0012</div>
+              <div class="card small" style="background:#fafbfc;padding:10px">
+                <div class="row between mb8"><span class="muted">退款商品</span><span>皇家猫粮 10kg × 2</span></div>
+                <div class="row between mb8"><span class="muted">申请金额</span><span class="price">¥988.00</span></div>
+                <div class="row between mb8"><span class="muted">可退上限(分摊实付)</span><span>¥988.00</span></div>
+                <div class="row between"><span class="muted">退款原因</span><span>商品有瑕疵，申请全额退款</span></div>
+              </div>
+              <div class="field mt12"><label>审核意见</label><div class="input area"><span class="ph-text">同意退款，金额已返回您的余额账号</span></div></div>
+              <div class="row gap8"><div class="btn danger">驳回（恢复原状态）</div><div class="btn primary" style="background:var(--ok);border-color:var(--ok)">通过退款</div></div>
+              <div class="small muted mt8">⚠ 通过时校验退款金额 ≤ 上限，退回余额并视情况恢复优惠券/回滚积分。</div>
+            </div>
+
+            <!-- 管理员直退 -->
+            <div class="card col" style="border:2px dashed var(--warn)">
+              <h3>管理员直接退款</h3>
+              <div class="small muted mb8">无需用户申请，商家主动全额退款（→ -4 管理员退款）</div>
+              <div class="field"><label>订单号</label><div class="input"><span class="ph-text">ORD...</span></div></div>
+              <div class="field"><label>退款理由</label><div class="input"><span class="ph-text">系统缺货，商家主动取消并退款</span></div></div>
+              <div class="btn primary" style="background:var(--warn);border-color:var(--warn)">确认直接退款</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note"><b>审核逻辑：</b>通过→refund=1、订单 -3已退款、退回余额；驳回→refund=2、恢复 prev_status（2或3）可再次申请；金额必须 ≤ realPayAmount 上限。仅 ADMIN/MERCHANT。</div>
+</body>
+</html>

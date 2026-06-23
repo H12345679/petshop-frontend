@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P24 数据看板 · 原型</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<div class="page-head">
+  <a class="back" href="index.html">← 返回原型总览</a>
+  <h1>P24 · 管理后台 · 数据可视化看板</h1>
+  <div class="sub">销量趋势 / 订单状态 / 会员分布 / 热销 Top10（ECharts） ｜ 接口：GET /api/stats/*</div>
+</div>
+
+<div class="frame">
+  <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">admin.petshop.com/dashboard</span></div>
+  <div class="screen">
+    <div class="admin">
+      <!-- 侧边栏 -->
+      <div class="aside">
+        <div class="brand">🐾 宠物商城后台</div>
+        <div class="menu-group">数据</div>
+        <a class="active">📊 数据看板</a>
+        <div class="menu-group">商品</div>
+        <a>🏬 商店管理</a><a>📦 商品管理</a><a>⭐ 评价管理</a>
+        <div class="menu-group">交易</div>
+        <a>🧾 订单管理</a><a>↩ 退单审核</a>
+        <div class="menu-group">运营</div>
+        <a>🎬 视频管理</a><a>🔔 消息推送</a>
+      </div>
+
+      <div class="amain">
+        <div class="atop"><span>首页 / 数据看板</span><div class="spacer"></div><span>📅 最近 7 天 ▾</span><span>👤 admin</span></div>
+        <div class="acontent">
+          <!-- KPI -->
+          <div class="grid c4 mb16">
+            <div class="kpi"><div class="k">今日营业额</div><div class="v">¥2410 <small>↑12%</small></div></div>
+            <div class="kpi"><div class="k">今日订单数</div><div class="v">4 <small>↑3</small></div></div>
+            <div class="kpi"><div class="k">总用户数</div><div class="v">810</div></div>
+            <div class="kpi"><div class="k">在售商品</div><div class="v">256</div></div>
+          </div>
+
+          <!-- 销量趋势折线 -->
+          <div class="card">
+            <h3>📈 销量 & 订单趋势（最近7天）<span class="anno">GET /api/stats/sales</span></h3>
+            <div class="chart" style="height:220px"><span class="label">营业额(元) / 下单量</span>
+              <div class="bars">
+                <i style="height:38%"></i><i style="height:48%"></i><i style="height:30%"></i><i style="height:70%"></i><i style="height:58%"></i><i style="height:96%"></i><i style="height:12%"></i>
+              </div>
+            </div>
+            <div class="row between small muted mt8"><span>06-17</span><span>06-18</span><span>06-19</span><span>06-20</span><span>06-21</span><span>06-22</span><span>06-23</span></div>
+          </div>
+
+          <div class="row">
+            <!-- 订单状态分布 -->
+            <div class="card col">
+              <h3>🥧 订单状态分布 <span class="anno">/api/stats/order-status</span></h3>
+              <div class="donut"></div>
+              <div class="row wrap gap8 small" style="justify-content:center">
+                <span class="tag accent">待支付 5</span><span class="tag ok">待发货 15</span><span class="tag warn">待收货 8</span>
+                <span class="tag">待评价 10</span><span class="tag">已完成 120</span><span class="tag danger">退款 6</span>
+              </div>
+            </div>
+            <!-- 会员分布 -->
+            <div class="card col">
+              <h3>👥 会员等级分布 <span class="anno">/api/stats/member-level</span></h3>
+              <div class="donut" style="background:conic-gradient(#dfe3e9 0 25%,#5b8def 25% 85%,#f6c453 85% 96%,#e6a23c 96% 100%)"></div>
+              <div class="row wrap gap8 small" style="justify-content:center">
+                <span class="tag">非会员 200</span><span class="tag accent">普通 500</span><span class="tag" style="background:#eef3fb">银卡 80</span><span class="tag warn">金卡 30</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 热销 Top10 -->
+          <div class="card">
+            <h3>🏆 热门商品销量 Top 10 <span class="anno">/api/stats/product-sales</span></h3>
+            <div class="chart" style="height:200px"><span class="label">销量(件)</span>
+              <div class="bars" style="align-items:flex-end">
+                <i style="height:96%"></i><i style="height:80%"></i><i style="height:72%"></i><i style="height:60%"></i><i style="height:54%"></i><i style="height:48%"></i><i style="height:40%"></i><i style="height:34%"></i><i style="height:28%"></i><i style="height:20%"></i>
+              </div>
+            </div>
+            <div class="small muted mt8">蓝猫 · 皇家猫粮 · 逗猫棒 · 金毛 · 猫砂 · 美短 · 喂食器 · 布偶 · 猫爬架 · 饮水机</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note"><b>D 加分项：</b>看板用 ECharts 渲染，数据来自 E 提供的统计接口（仅 ADMIN 可访问）；支持按天数（days）切换；折线/饼图/柱状图多维展示。</div>
+</body>
+</html>

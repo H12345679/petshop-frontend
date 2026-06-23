@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P03 首页 · 原型</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<div class="page-head">
+  <a class="back" href="index.html">← 返回原型总览</a>
+  <h1>P03 · 首页（含展示策略）</h1>
+  <div class="sub">轮播 / 分类导航 / 热销·上新·推荐分区 ｜ 接口：GET /api/home/products?strategy=HOT|NEW|RECOMMEND</div>
+</div>
+
+<div class="frame">
+  <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">petshop.com</span></div>
+  <div class="screen">
+    <!-- 顶栏 -->
+    <div class="topbar">
+      <div class="logo"><span class="paw">🐾</span>宠物商城</div>
+      <div class="nav"><span class="active">首页</span><span>全部商品</span><span>找门店</span><span>萌宠视频</span></div>
+      <div class="search"><input placeholder="搜索宠物 / 用品..."><button class="go">搜索</button></div>
+      <div class="right"><span>🛒 购物车</span><span>消息 <span class="badge">3</span></span><span>👤 我的</span></div>
+    </div>
+
+    <div class="screen pad">
+      <!-- 轮播 + 分类 -->
+      <div class="row mb16">
+        <div style="width:170px;flex-shrink:0" class="card">
+          <div class="small muted mb8">商品分类</div>
+          <div class="mb8">🐱 猫咪 ›</div><div class="mb8">🐶 狗狗 ›</div>
+          <div class="mb8">🐟 水族 ›</div><div class="mb8">🐰 小宠 ›</div>
+          <div class="mb8">🍖 猫粮狗粮 ›</div><div class="mb8">🧸 玩具用品 ›</div>
+          <div class="mb8">🧼 清洁洗护 ›</div><div>💊 医疗保健 ›</div>
+        </div>
+        <div class="col img" style="height:240px">首页轮播 Banner（自动播放）</div>
+        <div style="width:200px;flex-shrink:0" class="card">
+          <div class="row center mb8"><div class="avatar">头</div><div><div class="small">未登录</div><div style="color:var(--accent);font-size:12px">登录 / 注册</div></div></div>
+          <div class="line m mb8"></div>
+          <div class="img" style="height:70px">活动入口</div>
+          <div class="img mt8" style="height:70px">领券中心</div>
+        </div>
+      </div>
+
+      <!-- 策略分区：热销 -->
+      <div class="section-title">🔥 热销榜单 <span class="tag accent">strategy=HOT</span><span class="more">查看更多 ›</span></div>
+      <div class="grid c5 mb16">
+        <div class="pcard"><div class="img pimg">商品图</div><div class="pbody"><div class="pname">英国短毛猫 蓝猫 纯种</div><div><span class="price"><span class="cur">¥</span>2500</span><span class="del">¥3000</span></div><div class="small muted mt8">已售 88 件</div></div></div>
+        <div class="pcard"><div class="img pimg">商品图</div><div class="pbody"><div class="pname">皇家猫粮 10kg 成猫</div><div><span class="price"><span class="cur">¥</span>520</span></div><div class="small muted mt8">已售 72 件</div></div></div>
+        <div class="pcard"><div class="img pimg">商品图</div><div class="pbody"><div class="pname">逗猫棒 耐咬羽毛玩具</div><div><span class="price"><span class="cur">¥</span>19.9</span></div><div class="small muted mt8">已售 65 件</div></div></div>
+        <div class="pcard"><div class="img pimg">商品图</div><div class="pbody"><div class="pname">金毛幼犬 疫苗已打</div><div><span class="price"><span class="cur">¥</span>1800</span></div><div class="small muted mt8">已售 40 件</div></div></div>
+        <div class="pcard"><div class="img pimg">商品图</div><div class="pbody"><div class="pname">猫砂 膨润土 除臭</div><div><span class="price"><span class="cur">¥</span>45</span></div><div class="small muted mt8">已售 120 件</div></div></div>
+      </div>
+
+      <!-- 策略分区：上新 -->
+      <div class="section-title">✨ 新鲜上架 <span class="tag accent">strategy=NEW</span><span class="more">查看更多 ›</span></div>
+      <div class="grid c5 mb16">
+        <div class="pcard"><div class="img pimg">商品图</div><div class="pbody"><div class="pname">布偶猫 海双 蓝眼</div><div><span class="price"><span class="cur">¥</span>6800</span></div><div class="small muted mt8">3 天前上架</div></div></div>
+        <div class="pcard"><div class="img pimg">商品图</div><div class="pbody"><div class="pname">智能自动喂食器</div><div><span class="price"><span class="cur">¥</span>299</span></div><div class="small muted mt8">2 天前上架</div></div></div>
+        <div class="pcard"><div class="img pimg">商品图</div><div class="pbody"><div class="pname">猫爬架 实木大型</div><div><span class="price"><span class="cur">¥</span>458</span></div><div class="small muted mt8">1 天前上架</div></div></div>
+        <div class="pcard"><div class="img pimg">商品图</div><div class="pbody"><div class="pname">宠物饮水机 静音</div><div><span class="price"><span class="cur">¥</span>129</span></div><div class="small muted mt8">今天上架</div></div></div>
+        <div class="pcard"><div class="img pimg">商品图</div><div class="pbody"><div class="pname">狗狗雨衣 防水</div><div><span class="price"><span class="cur">¥</span>69</span></div><div class="small muted mt8">今天上架</div></div></div>
+      </div>
+
+      <!-- 策略分区：推荐（E 协同过滤） -->
+      <div class="section-title">💡 为你推荐 <span class="tag accent">strategy=RECOMMEND</span><span class="anno">E：协同过滤个性化</span></div>
+      <div class="grid c5">
+        <div class="pcard"><div class="img pimg">商品图</div><div class="pbody"><div class="pname">猫咪营养膏 化毛</div><div><span class="price"><span class="cur">¥</span>58</span></div></div></div>
+        <div class="pcard"><div class="img pimg">商品图</div><div class="pbody"><div class="pname">猫窝 加厚保暖</div><div><span class="price"><span class="cur">¥</span>89</span></div></div></div>
+        <div class="pcard"><div class="img pimg">商品图</div><div class="pbody"><div class="pname">驱虫滴剂 体外</div><div><span class="price"><span class="cur">¥</span>78</span></div></div></div>
+        <div class="pcard"><div class="img pimg">商品图</div><div class="pbody"><div class="pname">猫抓板 瓦楞纸</div><div><span class="price"><span class="cur">¥</span>25</span></div></div></div>
+        <div class="pcard"><div class="img pimg">商品图</div><div class="pbody"><div class="pname">宠物指甲剪 套装</div><div><span class="price"><span class="cur">¥</span>32</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- AI 悬浮入口 -->
+    <div style="position:absolute"></div>
+    <div class="foot">关于我们 ｜ 帮助中心 ｜ 联系客服 ｜ © 2026 宠物商城 · 程序设计实训</div>
+  </div>
+</div>
+
+<div class="note"><b>展示策略（A 加分项）：</b>HOT 按销量、NEW 按上架时间、RECOMMEND 走 E 的协同过滤推荐（未登录回退热销）。右下角常驻 <b>AI 客服悬浮按钮</b>（见 P23）。</div>
+</body>
+</html>

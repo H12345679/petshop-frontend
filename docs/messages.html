@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P19 消息中心 · 原型</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<div class="page-head">
+  <a class="back" href="index.html">← 返回原型总览</a>
+  <h1>P19 · 消息中心</h1>
+  <div class="sub">系统/订单/活动/资讯消息 + 已读标记 ｜ 接口：GET /api/messages/my、PUT .../read、.../read-all</div>
+</div>
+
+<div class="frame narrow">
+  <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">petshop.com/user/messages</span></div>
+  <div class="screen">
+    <div class="topbar"><div class="logo"><span class="paw">🐾</span>宠物商城</div><div class="spacer"></div><div class="right"><span>消息 <span class="badge">3</span></span><span>👤 我的</span></div></div>
+
+    <div class="screen pad">
+      <div class="row between center mb12">
+        <div class="section-title" style="margin:0">消息中心</div>
+        <div class="btn sm">全部标为已读</div>
+      </div>
+      <div class="tabs"><span class="tab on">全部</span><span class="tab">系统通知</span><span class="tab">订单消息</span><span class="tab">活动</span><span class="tab">宠物资讯</span></div>
+
+      <!-- 未读消息（高亮 + 红点） -->
+      <div class="card row" style="border-left:4px solid var(--accent)">
+        <div style="font-size:22px;margin-right:12px">🔔</div>
+        <div class="col">
+          <div class="row center"><b>系统维护通知</b><span class="tag accent" style="margin-left:8px">系统</span><span style="width:8px;height:8px;border-radius:50%;background:var(--danger);margin-left:8px"></span></div>
+          <div class="small muted mt8">系统将于今晚24:00进行版本更新升级，届时请尽量避免下单付款。</div>
+          <div class="small muted mt8">2026-06-23 12:00</div>
+        </div>
+      </div>
+      <div class="card row" style="border-left:4px solid var(--accent)">
+        <div style="font-size:22px;margin-right:12px">📦</div>
+        <div class="col">
+          <div class="row center"><b>您的订单已发货</b><span class="tag ok" style="margin-left:8px">订单</span><span style="width:8px;height:8px;border-radius:50%;background:var(--danger);margin-left:8px"></span></div>
+          <div class="small muted mt8">订单 ORD20260622090012 已由顺丰发出，单号 SF1234567890。</div>
+          <div class="small muted mt8">2026-06-22 16:30</div>
+        </div>
+      </div>
+      <div class="card row" style="border-left:4px solid var(--accent)">
+        <div style="font-size:22px;margin-right:12px">🎁</div>
+        <div class="col">
+          <div class="row center"><b>新人专享券已到账</b><span class="tag warn" style="margin-left:8px">活动</span><span style="width:8px;height:8px;border-radius:50%;background:var(--danger);margin-left:8px"></span></div>
+          <div class="small muted mt8">满200减20 优惠券已发放至您的账户，快去使用吧！</div>
+          <div class="small muted mt8">2026-06-21 10:00</div>
+        </div>
+      </div>
+
+      <!-- 已读消息（灰色） -->
+      <div class="card row" style="opacity:.6">
+        <div style="font-size:22px;margin-right:12px">🐾</div>
+        <div class="col">
+          <div class="row center"><span>夏季养猫小贴士</span><span class="tag" style="margin-left:8px">宠物资讯</span></div>
+          <div class="small muted mt8">天气炎热，注意给猫咪准备充足饮水，避免中暑...</div>
+          <div class="small muted mt8">2026-06-20 09:00 · 已读</div>
+        </div>
+      </div>
+
+      <div class="pager"><span>‹</span><span class="on">1</span><span>2</span><span>›</span></div>
+    </div>
+    <div class="foot">© 2026 宠物商城 · 程序设计实训</div>
+  </div>
+</div>
+
+<div class="note"><b>说明：</b>未读高亮 + 红点 + 顶栏角标数；点击单条调 PUT .../read 置已读；广播消息首次读取时落 user_message 已读行。管理端推送见 P30。</div>
+</body>
+</html>

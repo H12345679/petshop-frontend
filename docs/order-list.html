@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P10 订单列表页 · 原型</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<div class="page-head">
+  <a class="back" href="index.html">← 返回原型总览</a>
+  <h1>P10 · 我的订单列表</h1>
+  <div class="sub">按状态分类 Tab + 操作按钮 ｜ 接口：GET /api/orders/my?status=</div>
+</div>
+
+<div class="frame">
+  <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">petshop.com/orders</span></div>
+  <div class="screen">
+    <div class="topbar"><div class="logo"><span class="paw">🐾</span>宠物商城</div><div class="spacer"></div><div class="right"><span>🛒 购物车</span><span>👤 我的</span></div></div>
+
+    <div class="screen pad">
+      <div class="section-title">我的订单</div>
+      <div class="tabs">
+        <span class="tab on">全部</span><span class="tab">待支付</span><span class="tab">待发货</span>
+        <span class="tab">待收货</span><span class="tab">待评价</span><span class="tab">退款/售后</span>
+      </div>
+
+      <!-- 订单卡：待支付 -->
+      <div class="card" style="padding:0">
+        <div class="row between center small" style="background:#f7f8fa;padding:10px 14px;border-bottom:1px solid var(--line)">
+          <span class="muted">订单号 ORD20260623120001 · 极客宠物南山店 · 2026-06-23 12:00</span>
+          <span class="tag warn">待支付（剩 28:50 自动取消）</span>
+        </div>
+        <div style="padding:14px">
+          <div class="row center gap8 mb8"><div class="img" style="width:54px;height:54px">图</div><div class="col"><div class="small">英国短毛猫 蓝猫</div><div class="small muted">性别:母/已驱 × 1</div></div><div class="price">¥2700</div></div>
+          <div class="row between center">
+            <span class="small muted">共 1 件 实付 <span class="price">¥2410.00</span></span>
+            <span class="row gap8"><span class="btn sm">取消订单</span><span class="btn sm primary">立即支付</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 订单卡：待收货 -->
+      <div class="card" style="padding:0">
+        <div class="row between center small" style="background:#f7f8fa;padding:10px 14px;border-bottom:1px solid var(--line)">
+          <span class="muted">订单号 ORD20260622090012 · 萌宠之家 · 2026-06-22 09:00</span>
+          <span class="tag accent">待收货</span>
+        </div>
+        <div style="padding:14px">
+          <div class="row center gap8 mb8"><div class="img" style="width:54px;height:54px">图</div><div class="col"><div class="small">皇家猫粮 10kg × 2</div><div class="small muted">已发货 · 顺丰 SF1234567890</div></div><div class="price">¥1040</div></div>
+          <div class="row between center">
+            <span class="small muted">共 2 件 实付 <span class="price">¥988.00</span></span>
+            <span class="row gap8"><span class="btn sm">查看物流</span><span class="btn sm">申请退款</span><span class="btn sm primary">确认收货</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 订单卡：待评价 -->
+      <div class="card" style="padding:0">
+        <div class="row between center small" style="background:#f7f8fa;padding:10px 14px;border-bottom:1px solid var(--line)">
+          <span class="muted">订单号 ORD20260618143300 · 极客宠物南山店 · 2026-06-18 14:33</span>
+          <span class="tag ok">待评价</span>
+        </div>
+        <div style="padding:14px">
+          <div class="row center gap8 mb8"><div class="img" style="width:54px;height:54px">图</div><div class="col"><div class="small">逗猫棒 套装 × 1</div><div class="small muted">已收货</div></div><div class="price">¥19.9</div></div>
+          <div class="row between center">
+            <span class="small muted">共 1 件 实付 <span class="price">¥19.90</span></span>
+            <span class="row gap8"><span class="btn sm">申请退款</span><span class="btn sm primary">去评价</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 订单卡：已完成 -->
+      <div class="card" style="padding:0">
+        <div class="row between center small" style="background:#f7f8fa;padding:10px 14px;border-bottom:1px solid var(--line)">
+          <span class="muted">订单号 ORD20260601100000 · 水族世界 · 2026-06-01 10:00</span>
+          <span class="tag">已完成</span>
+        </div>
+        <div style="padding:14px">
+          <div class="row center gap8 mb8"><div class="img" style="width:54px;height:54px">图</div><div class="col"><div class="small">观赏鱼套餐 × 1</div><div class="small muted">已评价</div></div><div class="price">¥350</div></div>
+          <div class="row between center">
+            <span class="small muted">共 1 件 实付 <span class="price">¥315.00</span></span>
+            <span class="row gap8"><span class="btn sm">删除订单</span><span class="btn sm">再次购买</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pager"><span>‹</span><span class="on">1</span><span>2</span><span>3</span><span>›</span></div>
+    </div>
+    <div class="foot">© 2026 宠物商城 · 程序设计实训</div>
+  </div>
+</div>
+
+<div class="note"><b>状态机：</b>0待支付→1待发货→2待收货→3待评价→4已完成；操作按钮随状态变化（支付/取消/收货/退款/评价）。点击卡片进订单详情 P11。</div>
+</body>
+</html>

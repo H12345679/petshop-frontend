@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P18 我的收藏 · 原型</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<div class="page-head">
+  <a class="back" href="index.html">← 返回原型总览</a>
+  <h1>P18 · 我的收藏</h1>
+  <div class="sub">收藏商品列表 + 取消收藏 ｜ 接口：GET /api/favorites、DELETE /api/favorites/{productId}</div>
+</div>
+
+<div class="frame">
+  <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">petshop.com/user/favorites</span></div>
+  <div class="screen">
+    <div class="topbar"><div class="logo"><span class="paw">🐾</span>宠物商城</div><div class="spacer"></div><div class="right"><span>🛒 购物车</span><span>👤 我的</span></div></div>
+
+    <div class="screen pad">
+      <div class="row between center mb12"><div class="section-title" style="margin:0">我的收藏（12）</div><div class="row gap8 small"><span class="muted">☐ 管理</span></div></div>
+
+      <div class="grid c4">
+        <div class="pcard"><div class="img pimg">图　<span style="position:absolute;top:6px;right:6px">❤️</span></div><div class="pbody"><div class="pname">英国短毛猫 蓝猫 纯种</div><div class="price">¥2500</div><div class="row gap8 mt8"><span class="btn sm primary">加购物车</span><span class="btn sm">取消</span></div></div></div>
+        <div class="pcard"><div class="img pimg">图</div><div class="pbody"><div class="pname">布偶猫 海双 蓝眼</div><div class="price">¥6800</div><div class="row gap8 mt8"><span class="btn sm primary">加购物车</span><span class="btn sm">取消</span></div></div></div>
+        <div class="pcard"><div class="img pimg">图</div><div class="pbody"><div class="pname">皇家猫粮 10kg</div><div class="price">¥520</div><div class="row gap8 mt8"><span class="btn sm primary">加购物车</span><span class="btn sm">取消</span></div></div></div>
+        <div class="pcard"><div class="img pimg">图</div><div class="pbody"><div class="pname">猫爬架 实木大型</div><div class="price">¥458</div><div class="row gap8 mt8"><span class="btn sm primary">加购物车</span><span class="btn sm">取消</span></div></div></div>
+        <div class="pcard"><div class="img pimg">图</div><div class="pbody"><div class="pname">自动喂食器 智能</div><div class="price">¥299</div><div class="row gap8 mt8"><span class="btn sm primary">加购物车</span><span class="btn sm">取消</span></div></div></div>
+        <div class="pcard"><div class="img pimg">图 <span class="tag danger" style="position:absolute;top:6px;left:6px">已下架</span></div><div class="pbody"><div class="pname muted">猫窝 加厚保暖</div><div class="muted">商品已下架</div><div class="row gap8 mt8"><span class="btn sm" style="opacity:.5">加购物车</span><span class="btn sm">取消</span></div></div></div>
+        <div class="pcard"><div class="img pimg">图</div><div class="pbody"><div class="pname">逗猫棒 羽毛款</div><div class="price">¥19.9</div><div class="row gap8 mt8"><span class="btn sm primary">加购物车</span><span class="btn sm">取消</span></div></div></div>
+        <div class="pcard"><div class="img pimg">图</div><div class="pbody"><div class="pname">驱虫滴剂 体外</div><div class="price">¥78</div><div class="row gap8 mt8"><span class="btn sm primary">加购物车</span><span class="btn sm">取消</span></div></div></div>
+      </div>
+
+      <div class="pager"><span>‹</span><span class="on">1</span><span>2</span><span>›</span></div>
+    </div>
+    <div class="foot">© 2026 宠物商城 · 程序设计实训</div>
+  </div>
+</div>
+
+<div class="note"><b>说明：</b>收藏列表返回 PageResult&lt;Product&gt;；取消收藏物理删除该行；已下架商品标注并禁止加购，引导取消。收藏行为同时写入 user_behavior 供 E 推荐使用。</div>
+</body>
+</html>

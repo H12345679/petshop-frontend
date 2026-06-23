@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P09 结算下单页 · 原型</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<div class="page-head">
+  <a class="back" href="index.html">← 返回原型总览</a>
+  <h1>P09 · 结算下单页</h1>
+  <div class="sub">选地址 / 用券 / 会员折扣 / 金额试算 / 提交订单（幂等） ｜ 接口：POST /api/orders/pre-settle、POST /api/orders</div>
+</div>
+
+<div class="frame">
+  <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">petshop.com/checkout</span></div>
+  <div class="screen">
+    <div class="topbar"><div class="logo"><span class="paw">🐾</span>宠物商城</div><div class="spacer"></div><div class="right"><span>👤 我的</span></div></div>
+
+    <div class="screen pad">
+      <div class="steps">
+        <span class="step"><span class="dot">1</span>购物车</span><span class="bar"></span>
+        <span class="step on"><span class="dot">2</span>确认订单</span><span class="bar"></span>
+        <span class="step"><span class="dot">3</span>支付</span><span class="bar"></span>
+        <span class="step"><span class="dot">4</span>完成</span>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <!-- 收货地址 -->
+          <div class="card">
+            <h3>收货地址 <span class="more" style="color:var(--accent)">管理地址 ›</span></h3>
+            <div class="row gap8">
+              <div style="flex:1;border:2px solid var(--accent);border-radius:6px;padding:10px;background:var(--accent-soft)">
+                <div><b>张三</b>　138****8000　<span class="tag accent">默认</span></div>
+                <div class="small muted mt8">广东省 深圳市 南山区 科兴科学园A栋</div>
+              </div>
+              <div style="flex:1;border:1px solid var(--line);border-radius:6px;padding:10px">
+                <div><b>李四</b>　139****8888</div>
+                <div class="small muted mt8">北京市 海淀区 中关村大街1号</div>
+              </div>
+              <div class="ph" style="width:90px">＋ 新增</div>
+            </div>
+          </div>
+
+          <!-- 商品清单（按店拆单） -->
+          <div class="card">
+            <h3>商品清单 <span class="small muted">（跨店将自动拆为多张订单）</span></h3>
+            <div class="small muted mb8">🏬 极客宠物南山店</div>
+            <table class="tbl">
+              <tr><th>商品</th><th>规格</th><th style="width:90px">单价</th><th style="width:60px">数量</th><th style="width:90px">小计</th></tr>
+              <tr><td><div class="row center gap8"><div class="img" style="width:44px;height:44px">图</div>英国短毛猫 蓝猫</div></td><td class="small muted">性别:母/已驱</td><td class="price">¥2700</td><td>1</td><td class="price">¥2700</td></tr>
+              <tr><td><div class="row center gap8"><div class="img" style="width:44px;height:44px">图</div>皇家猫粮 10kg</div></td><td class="small muted">成猫</td><td class="price">¥520</td><td>2</td><td class="price">¥1040</td></tr>
+            </table>
+          </div>
+
+          <!-- 优惠券 -->
+          <div class="card">
+            <h3>优惠券 <span class="anno">C：优惠券</span></h3>
+            <div class="row gap8 wrap">
+              <div style="border:2px solid var(--accent);border-radius:6px;padding:8px 14px;background:var(--accent-soft)">满200减20 <span class="small muted">· 已选用</span></div>
+              <div style="border:1px solid var(--line);border-radius:6px;padding:8px 14px">9折券 <span class="small muted">· 不满足</span></div>
+              <div style="border:1px dashed var(--line);border-radius:6px;padding:8px 14px;color:var(--muted)">不使用优惠券</div>
+            </div>
+          </div>
+
+          <div class="card"><h3>买家留言</h3><div class="input"><span class="ph-text">选填：对本次交易的备注（限50字）</span></div></div>
+        </div>
+
+        <!-- 右侧金额试算 -->
+        <div style="width:300px;flex-shrink:0">
+          <div class="card" style="position:sticky;top:10px">
+            <h3>金额明细 <span class="anno">pre-settle 试算</span></h3>
+            <div class="row between mb8"><span class="muted">商品总额</span><span>¥3740.00</span></div>
+            <div class="row between mb8"><span class="muted">会员优惠（金卡9折）</span><span style="color:var(--ok)">−¥374.00</span></div>
+            <div class="row between mb8"><span class="muted">优惠券（满200减20）</span><span style="color:var(--ok)">−¥20.00</span></div>
+            <div class="row between mb8"><span class="muted">运费</span><span>¥0.00</span></div>
+            <div style="border-top:1px solid var(--line);margin:10px 0;padding-top:10px" class="row between center">
+              <span>应付总额</span><span class="price" style="font-size:26px">¥3346.00</span>
+            </div>
+            <div class="small muted mb12">共 3 件 · 预计赠送 3346 积分</div>
+            <div class="btn primary block lg">提交订单</div>
+            <div class="small muted mt8" style="text-align:center">提交即生成 requestId 幂等键，防止重复下单</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="foot">© 2026 宠物商城 · 程序设计实训</div>
+  </div>
+</div>
+
+<div class="note"><b>下单逻辑：</b>金额由 B 会员折扣 + C 优惠券共同试算；进入本页生成 UUID 作 requestId 随 POST /api/orders 提交（幂等防重）；跨店自动拆单；下单成功跳支付（见订单详情 P11 的待支付态）。</div>
+</body>
+</html>

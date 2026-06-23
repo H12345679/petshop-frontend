@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P22 地图找附近 · 原型</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<div class="page-head">
+  <a class="back" href="index.html">← 返回原型总览</a>
+  <h1>P22 · 地图找附近门店</h1>
+  <div class="sub">定位打点 + 半径筛选 + 导航 ｜ 接口：GET /api/map/shops?longitude=&latitude=&radius=</div>
+</div>
+
+<div class="frame">
+  <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">petshop.com/map</span></div>
+  <div class="screen">
+    <div class="topbar"><div class="logo"><span class="paw">🐾</span>宠物商城</div><div class="nav"><span>首页</span><span>全部商品</span><span class="active">找门店</span></div><div class="spacer"></div><div class="right"><span>👤 我的</span></div></div>
+
+    <div class="screen" style="display:flex;height:480px">
+      <!-- 左侧门店列表 -->
+      <div style="width:320px;flex-shrink:0;border-right:1px solid var(--line);overflow:auto;padding:14px">
+        <div class="input mb12"><span class="ph-text">🔍 搜索附近门店 / 地点</span></div>
+        <div class="row center gap8 mb12 small">
+          <span class="muted">半径</span><span class="tag accent">5km</span><span class="tag">10km</span><span class="tag">全部</span>
+          <span class="spacer"></span><span style="color:var(--accent)">📍 重新定位</span>
+        </div>
+        <div class="small muted mb8">附近找到 6 家营业中门店</div>
+
+        <div class="card" style="border-left:4px solid var(--accent);padding:12px">
+          <div class="row between"><b>极客宠物南山店</b><span class="tag ok">营业中</span></div>
+          <div class="small muted mt8">📍 科苑路1号 · 距您 0.8km</div>
+          <div class="row gap8 mt8"><span class="btn sm">☎ 电话</span><span class="btn sm primary">🧭 导航</span><span class="btn sm">进店</span></div>
+        </div>
+        <div class="card" style="padding:12px">
+          <div class="row between"><b>萌宠之家</b><span class="tag ok">营业中</span></div>
+          <div class="small muted mt8">📍 高新南区 · 距您 1.5km</div>
+          <div class="row gap8 mt8"><span class="btn sm">☎ 电话</span><span class="btn sm primary">🧭 导航</span><span class="btn sm">进店</span></div>
+        </div>
+        <div class="card" style="padding:12px">
+          <div class="row between"><b>汪星人乐园</b><span class="tag ok">营业中</span></div>
+          <div class="small muted mt8">📍 科技园路 · 距您 2.3km</div>
+          <div class="row gap8 mt8"><span class="btn sm">☎ 电话</span><span class="btn sm primary">🧭 导航</span><span class="btn sm">进店</span></div>
+        </div>
+        <div class="card" style="padding:12px">
+          <div class="row between"><b>水族世界</b><span class="tag ok">营业中</span></div>
+          <div class="small muted mt8">📍 滨海大道 · 距您 3.7km</div>
+          <div class="row gap8 mt8"><span class="btn sm">☎ 电话</span><span class="btn sm primary">🧭 导航</span><span class="btn sm">进店</span></div>
+        </div>
+      </div>
+
+      <!-- 右侧地图 -->
+      <div class="col" style="position:relative;background:
+        linear-gradient(transparent 97%,#d7dde4 97%) 0 0/100% 40px,
+        linear-gradient(90deg,transparent 97%,#d7dde4 97%) 0 0/40px 100%,#eef1f4">
+        <div style="position:absolute;top:14px;left:14px;background:#fff;border:1px solid var(--line);border-radius:6px;padding:6px 10px" class="small muted">高德/百度地图 SDK 渲染区域</div>
+        <!-- 打点 -->
+        <div style="position:absolute;top:42%;left:38%;text-align:center"><div style="font-size:24px">📍</div><div class="small" style="background:#fff;border-radius:4px;padding:0 4px">南山店</div></div>
+        <div style="position:absolute;top:30%;left:60%;text-align:center"><div style="font-size:24px">📍</div></div>
+        <div style="position:absolute;top:58%;left:55%;text-align:center"><div style="font-size:24px">📍</div></div>
+        <div style="position:absolute;top:50%;left:50%;color:var(--accent)"><div style="font-size:22px">🔵</div><div class="small anno" style="background:#fff">我的位置</div></div>
+        <!-- 选中气泡卡 -->
+        <div style="position:absolute;bottom:18px;left:50%;transform:translateX(-50%);width:300px" class="card">
+          <div class="row between"><b>极客宠物南山店</b><span class="tag ok">营业中</span></div>
+          <div class="small muted mt8">广东省深圳市南山区科苑路1号 · 0.8km</div>
+          <div class="row gap8 mt8"><span class="btn sm primary col">🧭 到这里去</span><span class="btn sm col">进店逛逛</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="foot">© 2026 宠物商城 · 程序设计实训</div>
+  </div>
+</div>
+
+<div class="note"><b>说明：</b>获取浏览器定位后调 /api/map/shops 拿附近营业门店经纬度打点（半径默认5km，限制返回数量防卡死）；点标注弹卡片，「导航」唤起地图 SDK 路线规划（D4）。</div>
+</body>
+</html>

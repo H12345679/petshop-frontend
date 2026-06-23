@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P31 评价管理 · 原型</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<div class="page-head">
+  <a class="back" href="index.html">← 返回原型总览</a>
+  <h1>P31 · 管理后台 · 评价管理</h1>
+  <div class="sub">查看评价 + 商家回复 ｜ 接口：GET /api/products/{id}/reviews、PUT /api/reviews/{id}/reply</div>
+</div>
+
+<div class="frame">
+  <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">admin.petshop.com/reviews</span></div>
+  <div class="screen">
+    <div class="admin">
+      <div class="aside">
+        <div class="brand">🐾 宠物商城后台</div>
+        <div class="menu-group">数据</div><a>📊 数据看板</a>
+        <div class="menu-group">商品</div><a>🏬 商店管理</a><a>📦 商品管理</a><a class="active">⭐ 评价管理</a>
+        <div class="menu-group">交易</div><a>🧾 订单管理</a><a>↩ 退单审核</a>
+        <div class="menu-group">运营</div><a>🎬 视频管理</a><a>🔔 消息推送</a>
+      </div>
+
+      <div class="amain">
+        <div class="atop"><span>商品 / 评价管理</span><div class="spacer"></div><span>👤 admin</span></div>
+        <div class="acontent">
+          <div class="card row center wrap gap8" style="padding:12px 16px">
+            <span class="small muted">商品</span><div class="input" style="width:180px"><span class="ph-text">商品名搜索</span></div>
+            <span class="small muted">评分</span><div class="input select" style="width:120px"><span class="ph-text">全部</span></div>
+            <span class="small muted">回复状态</span><div class="input select" style="width:120px"><span class="ph-text">全部</span></div>
+            <div class="btn primary sm">查询</div>
+          </div>
+
+          <div class="row mb16">
+            <div class="kpi col"><div class="k">总评价数</div><div class="v">342</div></div>
+            <div class="kpi col"><div class="k">平均评分</div><div class="v">4.8 <small>★</small></div></div>
+            <div class="kpi col"><div class="k">好评率</div><div class="v">96%</div></div>
+            <div class="kpi col"><div class="k">待回复</div><div class="v" style="color:var(--danger)">12</div></div>
+          </div>
+
+          <!-- 评价卡片列表 -->
+          <div class="card">
+            <div class="row center mb8"><div class="avatar">头</div>
+              <div style="margin-left:10px"><div><b>旺财主人</b> <span style="color:#f5a623">★★★★★</span></div><div class="small muted">英国短毛猫 蓝猫 · 性别:母/已驱 · 2026-06-20</div></div>
+              <span class="spacer"></span><span class="tag warn">待回复</span>
+            </div>
+            <div class="small mb8">小猫很乖，到家活蹦乱跳的！卖家很负责，疫苗本齐全。</div>
+            <div class="row gap8 mb8"><div class="img" style="width:56px;height:56px">晒图</div><div class="img" style="width:56px;height:56px">晒图</div></div>
+            <div class="row gap8"><div class="input col" style="padding:6px 10px"><span class="ph-text">回复买家评价...</span></div><div class="btn primary">回复</div></div>
+          </div>
+
+          <div class="card">
+            <div class="row center mb8"><div class="avatar">头</div>
+              <div style="margin-left:10px"><div><b>小喵</b> <span style="color:#f5a623">★★★★☆</span></div><div class="small muted">皇家猫粮 10kg · 2026-06-19</div></div>
+              <span class="spacer"></span><span class="tag ok">已回复</span>
+            </div>
+            <div class="small mb8">猫粮不错，猫咪爱吃，就是包装有点压坏了。</div>
+            <div style="background:var(--fill);border-radius:6px;padding:8px 12px" class="small"><b>商家回复：</b>感谢反馈，已联系物流改进包装，赠您一张优惠券～</div>
+          </div>
+
+          <div class="pager"><span>‹</span><span class="on">1</span><span>2</span><span>3</span><span>›</span><span>共 342 条</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note"><b>说明：</b>商家/管理员对评价回复调 PUT /api/reviews/{id}/reply；回复后展示在商品详情评价区（P05）。需对应商家或 ADMIN 权限。</div>
+</body>
+</html>

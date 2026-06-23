@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P05 商品详情页 · 原型</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<div class="page-head">
+  <a class="back" href="index.html">← 返回原型总览</a>
+  <h1>P05 · 商品详情页</h1>
+  <div class="sub">图册 / SKU 选规格 / 会员价 / 加购下单 / 收藏 / 评价 ｜ 接口：GET /api/products/{id}、/reviews</div>
+</div>
+
+<div class="frame">
+  <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">petshop.com/product/180479402837490001</span></div>
+  <div class="screen">
+    <div class="topbar">
+      <div class="logo"><span class="paw">🐾</span>宠物商城</div>
+      <div class="search"><input placeholder="搜索商品..."><button class="go">搜索</button></div>
+      <div class="right"><span>🛒 购物车</span><span>👤 我的</span></div>
+    </div>
+
+    <div class="screen pad">
+      <div class="small muted mb12">首页 / 猫咪 / 英国短毛猫 蓝猫</div>
+
+      <!-- 上半：图册 + 信息 -->
+      <div class="row mb16">
+        <!-- 左图册 -->
+        <div style="width:380px;flex-shrink:0">
+          <div class="img" style="height:340px">商品主图</div>
+          <div class="row mt8 gap8">
+            <div class="img" style="width:64px;height:64px">缩</div>
+            <div class="img" style="width:64px;height:64px">缩</div>
+            <div class="img" style="width:64px;height:64px">缩</div>
+            <div class="img" style="width:64px;height:64px">缩</div>
+          </div>
+        </div>
+
+        <!-- 右信息 -->
+        <div class="col card" style="margin:0">
+          <h3 style="font-size:18px">英国短毛猫 蓝猫 纯种健康 两针疫苗已打</h3>
+          <div class="small muted mb12">精品纯种英短蓝猫，活泼黏人 · 商品编号 #4901</div>
+
+          <div style="background:#fbeef0;border-radius:6px;padding:14px;margin-bottom:14px">
+            <div class="row center gap8">
+              <span class="muted small">会员价</span>
+              <span class="price" style="font-size:26px"><span class="cur">¥</span>2410</span>
+              <span class="del">原价 ¥2700</span>
+              <span class="tag warn">金卡 9 折 <span class="anno" style="border:0;background:0;padding:0">B：会员价</span></span>
+            </div>
+            <div class="row gap8 small muted mt8"><span>销量 3</span><span>库存 1</span><span>极客宠物南山店</span></div>
+          </div>
+
+          <!-- 规格 SKU -->
+          <div class="field">
+            <label>选择规格（SKU）</label>
+            <div class="row gap8 wrap">
+              <span class="tag accent">性别:母 / 已驱虫</span>
+              <span class="tag">性别:公 / 已驱虫</span>
+              <span class="tag">性别:母 / 未驱虫</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>购买数量</label>
+            <div class="row center gap8">
+              <span class="btn sm">−</span><span class="input" style="width:60px;justify-content:center">1</span><span class="btn sm">＋</span>
+              <span class="small muted">（宠物类库存通常为 1）</span>
+            </div>
+          </div>
+
+          <div class="row gap8 mt16">
+            <div class="btn lg" style="background:#ffb96b;border-color:#ffb96b;color:#fff">加入购物车</div>
+            <div class="btn primary lg">立即购买</div>
+            <div class="btn lg">♡ 收藏</div>
+            <span class="anno" style="align-self:center">E：收藏 + 行为日志</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 下半：详情 + 评价 -->
+      <div class="row">
+        <div style="width:180px;flex-shrink:0" class="card">
+          <h3>本店其他</h3>
+          <div class="pcard mb12"><div class="img pimg" style="height:90px">图</div><div class="pbody"><div class="small">银渐层 美短</div><div class="price small">¥3200</div></div></div>
+          <div class="pcard"><div class="img pimg" style="height:90px">图</div><div class="pbody"><div class="small">布偶猫 海双</div><div class="price small">¥6800</div></div></div>
+        </div>
+
+        <div class="col">
+          <div class="tabs">
+            <span class="tab on">商品详情</span>
+            <span class="tab">用户评价 (24)</span>
+            <span class="tab">售后保障</span>
+          </div>
+          <div class="card">
+            <div class="img mb12" style="height:120px">详情图文 1（图片描述）</div>
+            <div class="line f mb8"></div><div class="line l mb8"></div><div class="line m"></div>
+          </div>
+
+          <!-- 评价区 -->
+          <div class="card">
+            <div class="row center mb12"><b>用户评价</b><span class="tag accent" style="margin-left:10px">好评率 96%</span><span class="more" style="margin-left:auto;color:var(--muted)">全部 24 条 ›</span></div>
+            <div class="row center mb8"><div class="avatar">头</div><div style="margin-left:10px"><div class="small">旺财主人 ★★★★★</div><div class="small muted">2026-06-20 · 性别:母/已驱虫</div></div></div>
+            <div class="small mb8">小猫很乖，到家活蹦乱跳的！卖家很负责，疫苗本齐全。</div>
+            <div class="row gap8 mb12"><div class="img" style="width:60px;height:60px">晒图</div><div class="img" style="width:60px;height:60px">晒图</div></div>
+            <div style="background:var(--fill);border-radius:6px;padding:8px 12px" class="small"><b>商家回复：</b>感谢支持，养宠问题随时联系客服哦～</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="foot">© 2026 宠物商城 · 程序设计实训</div>
+  </div>
+</div>
+
+<div class="note"><b>要点：</b>会员价由 B 模块按当前登录用户等级折扣实时计算；切换 SKU 联动价格/库存；库存为 0 时按钮置灰；加购调用 POST /api/cart，收藏调用 POST /api/favorites/{productId}。</div>
+</body>
+</html>

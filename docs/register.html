@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P02 注册页 · 原型</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<div class="page-head">
+  <a class="back" href="index.html">← 返回原型总览</a>
+  <h1>P02 · 注册页</h1>
+  <div class="sub">用户自助注册，密码后端 BCrypt 加密 ｜ 接口：POST /api/auth/register</div>
+</div>
+
+<div class="frame narrow">
+  <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">petshop.com/register</span></div>
+  <div class="screen">
+    <div class="topbar">
+      <div class="logo"><span class="paw">🐾</span>宠物商城</div>
+      <div class="spacer"></div>
+      <div class="right"><span>已有账号？<b style="color:var(--accent)">去登录</b></span></div>
+    </div>
+
+    <div class="screen pad">
+      <div class="section-title">创建新账号</div>
+      <div class="card">
+        <div class="field">
+          <label><span class="req">*</span> 用户名</label>
+          <div class="input"><span class="ph-text">4-16 位字母 / 数字，唯一</span></div>
+        </div>
+        <div class="field">
+          <label><span class="req">*</span> 密码</label>
+          <div class="input"><span class="ph-text">至少 6 位</span></div>
+        </div>
+        <div class="field">
+          <label><span class="req">*</span> 确认密码</label>
+          <div class="input"><span class="ph-text">再次输入密码</span></div>
+        </div>
+        <div class="row">
+          <div class="field col"><label>昵称（选填）</label><div class="input"><span class="ph-text">如：旺财主人</span></div></div>
+          <div class="field col"><label>手机号（选填）</label><div class="input"><span class="ph-text">13800138000</span></div></div>
+        </div>
+        <div class="field">
+          <label>邮箱（选填）</label>
+          <div class="input"><span class="ph-text">user@example.com</span></div>
+        </div>
+        <div class="small muted mb12">☑ 我已阅读并同意 <span style="color:var(--accent)">《用户协议》</span> 与 <span style="color:var(--accent)">《隐私政策》</span></div>
+        <div class="btn primary block lg">注 册</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note"><b>前端校验：</b>用户名/密码必填，两次密码一致，手机号/邮箱格式校验；提交后若用户名已存在返回 400，前端高亮提示。注册成功跳转登录页。</div>
+</body>
+</html>

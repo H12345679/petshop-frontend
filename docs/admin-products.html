@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P26 商品管理 · 原型</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<div class="page-head">
+  <a class="back" href="index.html">← 返回原型总览</a>
+  <h1>P26 · 管理后台 · 商品管理（含多 SKU）</h1>
+  <div class="sub">商品列表 + 上下架 + 多规格表单 ｜ 接口：POST/PUT/DELETE /api/products</div>
+</div>
+
+<div class="frame">
+  <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">admin.petshop.com/products</span></div>
+  <div class="screen">
+    <div class="admin">
+      <div class="aside">
+        <div class="brand">🐾 宠物商城后台</div>
+        <div class="menu-group">数据</div><a>📊 数据看板</a>
+        <div class="menu-group">商品</div><a>🏬 商店管理</a><a class="active">📦 商品管理</a><a>⭐ 评价管理</a>
+        <div class="menu-group">交易</div><a>🧾 订单管理</a><a>↩ 退单审核</a>
+        <div class="menu-group">运营</div><a>🎬 视频管理</a><a>🔔 消息推送</a>
+      </div>
+
+      <div class="amain">
+        <div class="atop"><span>商品 / 商品管理</span><div class="spacer"></div><span>👤 admin</span></div>
+        <div class="acontent">
+          <div class="card row center wrap gap8" style="padding:12px 16px">
+            <span class="small muted">商品名</span><div class="input" style="width:160px"><span class="ph-text">搜索</span></div>
+            <span class="small muted">门店</span><div class="input select" style="width:130px"><span class="ph-text">全部</span></div>
+            <span class="small muted">分类</span><div class="input select" style="width:120px"><span class="ph-text">全部</span></div>
+            <span class="small muted">类型</span><div class="input select" style="width:110px"><span class="ph-text">全部</span></div>
+            <div class="btn primary sm">查询</div>
+            <div class="spacer"></div><div class="btn primary">＋ 发布商品</div>
+          </div>
+
+          <div class="card" style="padding:0;overflow:hidden">
+            <table class="tbl">
+              <tr><th style="width:50px">图</th><th>商品名称</th><th>分类/类型</th><th>价格</th><th>库存</th><th>销量</th><th style="width:80px">状态</th><th style="width:160px">操作</th></tr>
+              <tr><td><div class="img" style="width:36px;height:36px">图</div></td><td>英国短毛猫 蓝猫</td><td>猫咪 / <span class="tag">宠物</span></td><td class="price">¥2500</td><td>1</td><td>3</td><td><span class="tag ok">上架</span></td><td class="small"><span style="color:var(--accent)">编辑</span> · <span style="color:var(--accent)">下架</span> · <span style="color:var(--danger)">删除</span></td></tr>
+              <tr><td><div class="img" style="width:36px;height:36px">图</div></td><td>皇家猫粮 10kg</td><td>猫粮 / <span class="tag">周边</span></td><td class="price">¥520</td><td>200</td><td>72</td><td><span class="tag ok">上架</span></td><td class="small"><span style="color:var(--accent)">编辑</span> · <span style="color:var(--accent)">下架</span> · <span style="color:var(--danger)">删除</span></td></tr>
+              <tr><td><div class="img" style="width:36px;height:36px">图</div></td><td>猫爬架 实木大型</td><td>用品 / <span class="tag">周边</span></td><td class="price">¥458</td><td>0</td><td>41</td><td><span class="tag">下架</span></td><td class="small"><span style="color:var(--accent)">编辑</span> · <span style="color:var(--accent)">上架</span> · <span style="color:var(--danger)">删除</span></td></tr>
+            </table>
+          </div>
+          <div class="pager"><span>‹</span><span class="on">1</span><span>2</span><span>3</span><span>›</span><span>共 256 件</span></div>
+
+          <!-- 商品表单 -->
+          <div class="card" style="border:2px dashed var(--accent)">
+            <h3>发布 / 编辑商品</h3>
+            <div class="row"><div class="field col"><label><span class="req">*</span> 所属门店</label><div class="input select"><span class="ph-text">选择门店</span></div></div><div class="field col"><label><span class="req">*</span> 商品分类</label><div class="input select"><span class="ph-text">分类树选择</span></div></div><div class="field col"><label><span class="req">*</span> 商品类型</label><div class="input select">1 宠物（唯一）/ 2 周边</div></div></div>
+            <div class="field"><label><span class="req">*</span> 商品名称</label><div class="input"><span class="ph-text">如：英国短毛猫 蓝猫 纯种健康</span></div></div>
+            <div class="row"><div class="field col"><label><span class="req">*</span> 售价</label><div class="input"><span class="ph-text">¥2500</span></div></div><div class="field col"><label>原价</label><div class="input"><span class="ph-text">¥3000</span></div></div><div class="field col"><label>库存（宠物=1）</label><div class="input"><span class="ph-text">1</span></div></div></div>
+            <div class="row"><div class="field col"><label>主图</label><div class="ph" style="height:70px">＋ 主图</div></div><div class="field col" style="flex:2"><label>商品图册（多张）</label><div class="row gap8"><div class="img" style="width:60px;height:60px">图</div><div class="img" style="width:60px;height:60px">图</div><div class="ph" style="width:60px;height:60px">＋</div></div></div></div>
+            <div class="field"><label>商品描述（富文本）</label><div class="input area"><span class="ph-text">详情图文...</span></div></div>
+
+            <!-- SKU 表格 -->
+            <div class="field">
+              <label>规格 SKU（周边商品可多规格，宠物可不填）<span class="btn sm" style="margin-left:8px">＋ 添加规格</span></label>
+              <table class="tbl" style="border:1px solid var(--line)">
+                <tr><th>规格名（如 性别:母;驱虫:已驱）</th><th style="width:110px">规格价</th><th style="width:90px">库存</th><th style="width:70px">图</th><th style="width:60px">操作</th></tr>
+                <tr><td><div class="input" style="padding:5px 8px"><span class="ph-text">性别:母;驱虫:已驱</span></div></td><td><div class="input" style="padding:5px 8px"><span class="ph-text">2700</span></div></td><td><div class="input" style="padding:5px 8px"><span class="ph-text">1</span></div></td><td><div class="ph" style="width:34px;height:34px">＋</div></td><td class="small" style="color:var(--danger)">删除</td></tr>
+              </table>
+            </div>
+            <div class="row gap8"><div class="btn">取消</div><div class="btn primary">保存商品</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note"><b>说明：</b>type=1 宠物为唯一商品（库存通常 1、可不填 SKU）；type=2 周边可多 SKU；权限仅 ADMIN/MERCHANT；删除为逻辑删除。商品只读接口同时供 E 推荐/统计使用。</div>
+</body>
+</html>

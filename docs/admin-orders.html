@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P27 订单管理/发货 · 原型</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<div class="page-head">
+  <a class="back" href="index.html">← 返回原型总览</a>
+  <h1>P27 · 管理后台 · 订单管理 / 发货</h1>
+  <div class="sub">单号查询 + 状态筛选 + 发货操作 ｜ 接口：GET /api/orders/manage、PUT /api/orders/{id}/ship</div>
+</div>
+
+<div class="frame">
+  <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">admin.petshop.com/orders</span></div>
+  <div class="screen">
+    <div class="admin">
+      <div class="aside">
+        <div class="brand">🐾 宠物商城后台</div>
+        <div class="menu-group">数据</div><a>📊 数据看板</a>
+        <div class="menu-group">商品</div><a>🏬 商店管理</a><a>📦 商品管理</a><a>⭐ 评价管理</a>
+        <div class="menu-group">交易</div><a class="active">🧾 订单管理</a><a>↩ 退单审核</a>
+        <div class="menu-group">运营</div><a>🎬 视频管理</a><a>🔔 消息推送</a>
+      </div>
+
+      <div class="amain">
+        <div class="atop"><span>交易 / 订单管理</span><div class="spacer"></div><span>👤 admin</span></div>
+        <div class="acontent">
+          <div class="card row center wrap gap8" style="padding:12px 16px">
+            <span class="small muted">订单号</span><div class="input" style="width:200px"><span class="ph-text">精确单号</span></div>
+            <span class="small muted">门店</span><div class="input select" style="width:130px"><span class="ph-text">全部</span></div>
+            <span class="small muted">状态</span><div class="input select" style="width:120px"><span class="ph-text">全部</span></div>
+            <div class="btn primary sm">查询</div><div class="btn sm">导出</div>
+          </div>
+
+          <div class="tabs">
+            <span class="tab on">全部</span><span class="tab">待支付 5</span><span class="tab">待发货 <b style="color:var(--danger)">15</b></span><span class="tab">待收货 8</span><span class="tab">待评价 10</span><span class="tab">已完成 120</span><span class="tab">退款/取消</span>
+          </div>
+
+          <div class="card" style="padding:0;overflow:hidden">
+            <table class="tbl">
+              <tr><th>订单号</th><th>买家</th><th>商品</th><th>实付</th><th style="width:90px">状态</th><th style="width:150px">下单时间</th><th style="width:150px">操作</th></tr>
+              <tr><td class="small">ORD20260623120001</td><td>旺财主人</td><td class="small">蓝猫 等1件</td><td class="price">¥2410</td><td><span class="tag warn">待支付</span></td><td class="small muted">06-23 12:00</td><td class="small"><span style="color:var(--accent)">详情</span></td></tr>
+              <tr><td class="small">ORD20260623100023</td><td>小喵</td><td class="small">猫粮 等2件</td><td class="price">¥988</td><td><span class="tag accent">待发货</span></td><td class="small muted">06-23 10:00</td><td class="small"><span style="color:var(--accent)">详情</span> · <b style="color:var(--accent)">发货</b></td></tr>
+              <tr><td class="small">ORD20260622090012</td><td>大黄</td><td class="small">逗猫棒 等1件</td><td class="price">¥19.9</td><td><span class="tag accent">待发货</span></td><td class="small muted">06-22 09:00</td><td class="small"><span style="color:var(--accent)">详情</span> · <b style="color:var(--accent)">发货</b></td></tr>
+              <tr><td class="small">ORD20260621160000</td><td>花花</td><td class="small">猫爬架 等1件</td><td class="price">¥458</td><td><span class="tag">待收货</span></td><td class="small muted">06-21 16:00</td><td class="small"><span style="color:var(--accent)">详情</span> · <span style="color:var(--accent)">物流</span></td></tr>
+              <tr><td class="small">ORD20260601100000</td><td>球球</td><td class="small">观赏鱼套餐</td><td class="price">¥315</td><td><span class="tag">已完成</span></td><td class="small muted">06-01 10:00</td><td class="small"><span style="color:var(--accent)">详情</span></td></tr>
+            </table>
+          </div>
+          <div class="pager"><span>‹</span><span class="on">1</span><span>2</span><span>3</span><span>›</span><span>共 158 单</span></div>
+
+          <!-- 发货弹窗 -->
+          <div class="card" style="border:2px dashed var(--accent);max-width:480px">
+            <h3>发货（弹窗）</h3>
+            <div class="small muted mb12">订单 ORD20260623100023 · 待发货 → 待收货</div>
+            <div class="field"><label>物流公司</label><div class="input select"><span class="ph-text">顺丰 / 中通 / 圆通 ...</span></div></div>
+            <div class="field"><label>物流单号</label><div class="input"><span class="ph-text">SF1234567890</span></div></div>
+            <div class="row gap8"><div class="btn">取消</div><div class="btn primary">确认发货</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note"><b>权限：</b>仅 ADMIN/MERCHANT；发货将订单 1待发货→2待收货 并记录 order_status_log；商家仅能看到本店订单（shopId 过滤）。</div>
+</body>
+</html>
