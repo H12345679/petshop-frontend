@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P33 优惠券管理 · 原型</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<div class="page-head">
+  <a class="back" href="index.html">← 返回原型总览</a>
+  <h1>P33 · 管理后台 · 优惠券管理</h1>
+  <div class="sub">发券配置 + 列表 + 上下架 ｜ 接口：GET /api/coupons/manage、POST /api/coupons、PUT /api/coupons/{id}</div>
+</div>
+
+<div class="frame">
+  <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">admin.petshop.com/coupons</span></div>
+  <div class="screen">
+    <div class="admin">
+      <div class="aside">
+        <div class="brand">🐾 宠物商城后台</div>
+        <div class="menu-group">数据</div><a>📊 数据看板</a>
+        <div class="menu-group">商品</div><a>🏬 商店管理</a><a>📦 商品管理</a><a>⭐ 评价管理</a>
+        <div class="menu-group">交易</div><a>🧾 订单管理</a><a>↩ 退单审核</a><a class="active">🎫 优惠券管理</a>
+        <div class="menu-group">运营</div><a>🎬 视频管理</a><a>🔔 消息推送</a>
+        <div class="menu-group">用户</div><a>👥 用户与会员</a>
+      </div>
+
+      <div class="amain">
+        <div class="atop"><span>交易 / 优惠券管理</span><div class="spacer"></div><span>👤 admin</span></div>
+        <div class="acontent">
+          <!-- 筛选 + 新建 -->
+          <div class="card row center wrap gap8" style="padding:12px 16px">
+            <span class="small muted">券名</span><div class="input" style="width:180px"><span class="ph-text">券名模糊搜索</span></div>
+            <span class="small muted">类型</span><div class="input select" style="width:110px"><span class="ph-text">全部</span></div>
+            <span class="small muted">状态</span><div class="input select" style="width:110px"><span class="ph-text">全部</span></div>
+            <div class="btn primary sm">查询</div>
+            <span class="spacer"></span>
+            <div class="btn primary">＋ 新建优惠券</div>
+          </div>
+
+          <!-- 优惠券表 -->
+          <div class="card" style="padding:0;overflow:hidden">
+            <table class="tbl">
+              <tr><th>券名</th><th style="width:74px">类型</th><th>门槛</th><th>面额 / 折扣</th><th>发行 / 剩余</th><th>有效期</th><th style="width:78px">状态</th><th style="width:140px">操作</th></tr>
+              <tr><td>新人大礼包 满200减20</td><td><span class="tag accent">满减</span></td><td>满 ¥200</td><td class="price">减 ¥20</td><td class="small">1000 / 950</td><td class="small muted">06-23 ~ 07-23</td><td><span class="tag ok">上架</span></td><td class="small"><span style="color:var(--accent)">编辑</span> · <span style="color:var(--danger)">下架</span></td></tr>
+              <tr><td>会员专享 9折券</td><td><span class="tag warn">折扣</span></td><td>无门槛</td><td class="price">9.0 折</td><td class="small">500 / 318</td><td class="small muted">06-01 ~ 06-30</td><td><span class="tag ok">上架</span></td><td class="small"><span style="color:var(--accent)">编辑</span> · <span style="color:var(--danger)">下架</span></td></tr>
+              <tr><td>猫粮满300减50</td><td><span class="tag accent">满减</span></td><td>满 ¥300</td><td class="price">减 ¥50</td><td class="small">300 / 0</td><td class="small muted">05-01 ~ 05-31</td><td><span class="tag">已下架</span></td><td class="small"><span style="color:var(--accent)">编辑</span> · <b style="color:var(--ok)">上架</b></td></tr>
+            </table>
+          </div>
+          <div class="pager"><span>‹</span><span class="on">1</span><span>2</span><span>›</span><span>共 12 张</span></div>
+
+          <!-- 新建/编辑表单 弹窗 -->
+          <div class="card" style="border:2px dashed var(--accent);max-width:580px">
+            <h3>新建 / 编辑优惠券（弹窗）</h3>
+            <div class="row">
+              <div class="field col"><label>券名 <span class="req">*</span></label><div class="input"><span class="ph-text">如 新人大礼包 满200减20</span></div></div>
+              <div class="field col" style="max-width:160px"><label>类型 <span class="req">*</span></label><div class="input select"><span>满减</span></div></div>
+            </div>
+            <div class="row">
+              <div class="field col"><label>门槛金额（满 X 元可用）</label><div class="input"><span class="ph-text">200.00</span></div></div>
+              <div class="field col"><label>减免金额 / 折扣率</label><div class="input"><span class="ph-text">满减填减额(20)；折扣填 0.90</span></div></div>
+            </div>
+            <div class="row">
+              <div class="field col"><label>发行总量 <span class="req">*</span></label><div class="input"><span class="ph-text">1000</span></div></div>
+              <div class="field col" style="max-width:160px"><label>状态</label><div class="input select"><span>上架</span></div></div>
+            </div>
+            <div class="row">
+              <div class="field col"><label>生效时间</label><div class="input"><span class="ph-text">2026-06-23 00:00</span></div></div>
+              <div class="field col"><label>失效时间</label><div class="input"><span class="ph-text">2026-07-23 00:00</span></div></div>
+            </div>
+            <div class="row gap8"><div class="btn">取消</div><div class="btn primary">保存</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note"><b>权限：</b>仅 ADMIN。对应 coupon 表：券名 / type(1满减 2折扣) / threshold / amount / total / start_time / end_time / status。新建 POST /api/coupons、编辑与上下架 PUT /api/coupons/{id}、后台列表 GET /api/coupons/manage。<b>前台领券中心是另一张页 P14（用户领取用）。</b></div>
+</body>
+</html>

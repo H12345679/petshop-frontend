@@ -31,6 +31,7 @@
             <div class="mb8">优惠券</div>
             <div class="mb8">会员中心</div>
             <div class="mb8">消息中心</div>
+            <div class="mb8">🔒 修改密码</div>
             <div style="color:var(--danger)">退出登录</div>
           </div>
         </div>
@@ -72,6 +73,17 @@
               </div>
             </div>
           </div>
+
+          <!-- 修改密码 -->
+          <div class="card">
+            <h3>账号安全 · 修改密码 <span class="anno">PUT /api/users/me/password</span></h3>
+            <div style="max-width:420px">
+              <div class="field"><label>当前密码 <span class="req">*</span></label><div class="input"><span class="ph-text">输入当前密码</span></div></div>
+              <div class="field"><label>新密码 <span class="req">*</span></label><div class="input"><span class="ph-text">至少 6 位</span></div></div>
+              <div class="field"><label>确认新密码 <span class="req">*</span></label><div class="input"><span class="ph-text">再次输入新密码</span></div></div>
+              <div class="btn primary">保存新密码</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -79,6 +91,6 @@
   </div>
 </div>
 
-<div class="note"><b>说明：</b>左侧菜单为个人中心二级导航（订单/地址/收藏/券/会员/消息）；资产数据来自 /api/users/me；资料保存调 PUT /api/users/me。</div>
+<div class="note"><b>说明：</b>左侧菜单为个人中心二级导航（订单/地址/收藏/券/会员/消息/修改密码）；资产数据来自 /api/users/me；资料保存调 PUT /api/users/me；<b>修改密码调 PUT /api/users/me/password</b>（凭旧密码改，本项目不做邮箱找回）。</div>
 </body>
 </html>

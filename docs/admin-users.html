@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P32 用户与会员管理 · 原型</title>
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+<div class="page-head">
+  <a class="back" href="index.html">← 返回原型总览</a>
+  <h1>P32 · 管理后台 · 用户与会员管理</h1>
+  <div class="sub">用户列表 + 搜索 + 启用/禁用 + 角色授权（设为商家）｜ 接口：GET /api/users/manage、PUT /api/users/{id}/status、PUT /api/users/{id}/role</div>
+</div>
+
+<div class="frame">
+  <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">admin.petshop.com/users</span></div>
+  <div class="screen">
+    <div class="admin">
+      <div class="aside">
+        <div class="brand">🐾 宠物商城后台</div>
+        <div class="menu-group">数据</div><a>📊 数据看板</a>
+        <div class="menu-group">商品</div><a>🏬 商店管理</a><a>📦 商品管理</a><a>⭐ 评价管理</a>
+        <div class="menu-group">交易</div><a>🧾 订单管理</a><a>↩ 退单审核</a><a>🎫 优惠券管理</a>
+        <div class="menu-group">运营</div><a>🎬 视频管理</a><a>🔔 消息推送</a>
+        <div class="menu-group">用户</div><a class="active">👥 用户与会员</a>
+      </div>
+
+      <div class="amain">
+        <div class="atop"><span>用户 / 用户与会员管理</span><div class="spacer"></div><span>👤 admin</span></div>
+        <div class="acontent">
+          <!-- KPI -->
+          <div class="row mb16">
+            <div class="kpi col"><div class="k">总用户</div><div class="v">1,234</div></div>
+            <div class="kpi col"><div class="k">商家(MERCHANT)</div><div class="v">18</div></div>
+            <div class="kpi col"><div class="k">付费会员</div><div class="v">610</div></div>
+            <div class="kpi col"><div class="k">今日新增</div><div class="v">23 <small>+5%</small></div></div>
+          </div>
+
+          <!-- 筛选 -->
+          <div class="card row center wrap gap8" style="padding:12px 16px">
+            <span class="small muted">用户名</span><div class="input" style="width:170px"><span class="ph-text">用户名模糊搜索</span></div>
+            <span class="small muted">角色</span><div class="input select" style="width:120px"><span class="ph-text">全部</span></div>
+            <span class="small muted">会员等级</span><div class="input select" style="width:120px"><span class="ph-text">全部</span></div>
+            <span class="small muted">状态</span><div class="input select" style="width:110px"><span class="ph-text">全部</span></div>
+            <div class="btn primary sm">查询</div>
+          </div>
+
+          <!-- 用户表 -->
+          <div class="card" style="padding:0;overflow:hidden">
+            <table class="tbl">
+              <tr><th>用户名</th><th>昵称</th><th style="width:100px">角色</th><th>会员等级</th><th>余额</th><th>积分</th><th style="width:78px">状态</th><th style="width:120px">注册时间</th><th style="width:210px">操作</th></tr>
+              <tr>
+                <td>admin</td><td>管理员</td>
+                <td><span class="tag danger">ADMIN</span></td>
+                <td class="muted small">—</td><td class="price">¥0.00</td><td>0</td>
+                <td><span class="tag ok">正常</span></td><td class="small muted">2026-06-01</td>
+                <td class="small muted">系统账号</td>
+              </tr>
+              <tr>
+                <td>petlover</td><td>旺财主人</td>
+                <td><span class="tag">USER</span></td>
+                <td><span class="tag warn">金卡会员</span></td><td class="price">¥100.00</td><td>1050</td>
+                <td><span class="tag ok">正常</span></td><td class="small muted">2026-06-10</td>
+                <td class="small"><span style="color:var(--accent)">详情</span> · <b style="color:var(--accent)">设为商家</b> · <span style="color:var(--danger)">禁用</span></td>
+              </tr>
+              <tr>
+                <td>geekpet</td><td>极客宠物店主</td>
+                <td><span class="tag accent">MERCHANT</span></td>
+                <td><span class="tag">普通会员</span></td><td class="price">¥3200.00</td><td>320</td>
+                <td><span class="tag ok">正常</span></td><td class="small muted">2026-06-08</td>
+                <td class="small"><span style="color:var(--accent)">详情</span> · <span style="color:var(--accent)">改角色</span> · <span style="color:var(--danger)">禁用</span></td>
+              </tr>
+              <tr>
+                <td>spammer01</td><td>—</td>
+                <td><span class="tag">USER</span></td>
+                <td><span class="tag">普通会员</span></td><td class="price">¥0.00</td><td>0</td>
+                <td><span class="tag danger">已禁用</span></td><td class="small muted">2026-06-18</td>
+                <td class="small"><span style="color:var(--accent)">详情</span> · <b style="color:var(--ok)">启用</b></td>
+              </tr>
+            </table>
+          </div>
+          <div class="pager"><span>‹</span><span class="on">1</span><span>2</span><span>3</span><span>›</span><span>共 1,234 人</span></div>
+
+          <!-- 角色授权弹窗 -->
+          <div class="card" style="border:2px dashed var(--accent);max-width:430px">
+            <h3>变更用户角色（弹窗） <span class="anno">B13 · 商家入驻授权</span></h3>
+            <div class="small muted mb12">用户 <b>petlover</b> · 当前角色 USER</div>
+            <div class="field"><label>目标角色</label><div class="input select"><span>MERCHANT（商家）</span></div></div>
+            <div class="small muted mb12">设为 MERCHANT 后：该用户登录可创建并管理自己的店铺（建店 owner_id 自动绑定本人），且仅能看本店数据。</div>
+            <div class="row gap8"><div class="btn">取消</div><div class="btn primary">确认变更</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note"><b>权限：</b>仅 ADMIN。列表 GET /api/users/manage（用户名模糊 + 分页）；启用/禁用 PUT /api/users/{id}/status；<b>角色授权（设为商家）PUT /api/users/{id}/role</b>。会员等级由积分自动升级、此处只读。</div>
+</body>
+</html>
