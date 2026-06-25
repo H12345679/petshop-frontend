@@ -18,10 +18,9 @@ module.exports = {
                 //springbtoot:http://localhost:8088/test/get
                 //名字必须跟application context相同 否则404
                 target: 'http://localhost:8088',//spingboot 项目
-                changeOrigin: true, //  跨域
-                pathRewrite: {
-                    '^/api': ''
-                }
+                changeOrigin: true //  跨域
+                // 注意：后端接口本身就带 /api 前缀（@RequestMapping("/api/...")），
+                // 这里【不要】用 pathRewrite 去掉 /api，否则代理过去会 404。
             },
             '/image': {
                 target: 'http://localhost:8088',
