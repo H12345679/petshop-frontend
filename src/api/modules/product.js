@@ -10,6 +10,14 @@ export function searchProducts(params) {
 }
 
 /**
+ * 获取商品分类树
+ * GET /api/categories
+ */
+export function getCategories() {
+  return get("/categories");
+}
+
+/**
  * 获取商品详情
  * GET /api/products/{id}
  */
@@ -62,6 +70,7 @@ export function deleteProduct(id) {
  * POST /api/files/image
  */
 export function uploadImage(file) {
+  const { upload } = require("../axios.js");
   const formData = new FormData();
   formData.append("file", file);
   return upload("/files/image", formData);

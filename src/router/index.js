@@ -17,6 +17,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "video" */ '../views/VideoListView.vue')
   },
   {
+    path: '/video/:id',
+    name: 'video-detail',
+    component: () => import(/* webpackChunkName: "video" */ '../views/video/VideoDetailView.vue')
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import(/* webpackChunkName: "auth" */ '../views/auth/LoginView.vue')
@@ -52,10 +57,16 @@ const routes = [
     meta: { requiresAdmin: true },
     children: [
       {
-        path: 'shops',
-        name: 'admin-shops',
-        component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminShopsView.vue'),
-        meta: { title: '商店 / 商店管理' }
+        path: "shops",
+        name: "AdminShops",
+        component: () => import("../views/admin/AdminShopsView.vue"),
+        meta: { title: "后台管理 - 门店管理" },
+      },
+      {
+        path: "videos",
+        name: "AdminVideos",
+        component: () => import("../views/admin/AdminVideosView.vue"),
+        meta: { title: "后台管理 - 视频管理" },
       },
       {
         path: 'products',
