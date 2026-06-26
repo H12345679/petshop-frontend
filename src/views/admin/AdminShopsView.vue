@@ -154,8 +154,9 @@
             <div class="row gap16 mb16">
               <div class="field col flex1">
                 <label>门店 LOGO</label>
-                <div class="input-wrap">
-                  <input v-model="formData.logo" placeholder="请输入图片URL" />
+                <div class="img-upload-box" @click="triggerUpload">
+                  <div class="img-preview" v-if="formData.logo" :style="{backgroundImage: 'url(' + formData.logo + ')'}"></div>
+                  <span v-else>＋ 上传</span>
                 </div>
               </div>
               <div class="field col flex1">
@@ -197,6 +198,8 @@
     <!-- 地图选点弹窗 -->
     <MapPicker :visible.sync="mapPickerVisible" @select="onMapSelect" />
 
+    <!-- 隐藏的文件上传控件 -->
+    <input type="file" ref="fileInput" style="display: none;" @change="onFileSelected" accept="image/*" />
   </div>
 </template>
 
@@ -275,6 +278,9 @@ export default {
         console.warn("获取商店列表失败", e);
         alert(e.message || "获取商店列表失败");
       }
+    },
+    triggerUpload() {
+      this.$refs.fileInput.click();
     },
     onFileSelected(e) {
       const file = e.target.files[0];
@@ -462,4 +468,9 @@ export default {
 .modal-footer { padding: 16px 24px; border-top: 1px solid #eee; display: flex; }
 .field label { display: block; margin-bottom: 6px; font-size: 13px; color: #555; }
 .field .req { color: #d9534f; margin-right: 2px; }
+
+/* 图片上传框 */
+.img-upload-box { width: 70px; height: 70px; background-color: #f8f9fb; border: 1px dashed #d6dbe3; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 13px; cursor: pointer; position: relative; background-size: cover; background-position: center; }
+.img-upload-box:hover { border-color: #5b8def; color: #5b8def; }
+.img-preview { width: 100%; height: 100%; background-size: cover; background-position: center; border-radius: 4px; }
 </style>
