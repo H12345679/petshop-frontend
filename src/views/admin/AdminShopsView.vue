@@ -86,6 +86,7 @@
                 <div class="input-wrap">
                   <input v-model="formData.name" placeholder="如：极客宠物南山店" />
                 </div>
+                <div v-if="formErrors.name" style="color:#d9534f; font-size:12px; margin-top:4px;">{{formErrors.name}}</div>
               </div>
               <div class="field col flex1">
                 <label>联系电话</label>
@@ -170,6 +171,26 @@
         </div>
       </div>
     </div>
+    
+    <!-- 删除确认弹窗 -->
+    <div class="modal-mask" v-if="deleteModalVisible">
+      <div class="modal-wrapper" style="width: 400px;">
+        <div class="modal-container">
+          <div class="modal-header">
+            <h3>确认删除</h3>
+            <span class="close-btn" @click="deleteModalVisible = false">×</span>
+          </div>
+          <div class="modal-body" style="padding: 30px 24px; text-align: center; font-size: 16px; color: #555;">
+            确定要删除这个门店吗？此操作不可恢复。
+          </div>
+          <div class="modal-footer row gap8" style="justify-content: flex-end;">
+            <div class="btn" @click="deleteModalVisible = false">取消</div>
+            <div class="btn primary danger" style="background:#d9534f; border-color:#d9534f; color:#fff;" @click="confirmDelete">确定删除</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -190,9 +211,11 @@ export default {
         name: "",
         status: ""
       },
-      
       modalVisible: false,
       isEdit: false,
+      formErrors: {},
+      deleteModalVisible: false,
+      deleteTargetId: null,
       formData: {
         id: null,
         name: "",
@@ -272,10 +295,14 @@ export default {
         alert(e.message || "状态切换失败");
       }
     },
-    async handleDelete(id) {
-      if (!confirm("确定要删除这个门店吗？")) return;
+    handleDelete(id) {
+      this.deleteTargetId = id;
+      this.deleteModalVisible = true;
+    },
+    async confirmDelete() {
       try {
-        await deleteShop(id);
+        await deleteShop(this.deleteTargetId);
+        this.deleteModalVisible = false;
         this.fetchData();
       } catch (e) {
         alert(e.message || "删除失败");
@@ -283,6 +310,7 @@ export default {
     },
     openAddModal() {
       this.isEdit = false;
+      this.formErrors = {};
       this.formData = {
         id: null, name: "", phone: "", province: "", city: "", district: "",
         address: "", longitude: "", latitude: "", status: 1, logo: "", description: ""
@@ -291,6 +319,7 @@ export default {
     },
     openEditModal(shop) {
       this.isEdit = true;
+      this.formErrors = {};
       this.formData = {
         id: shop.id,
         name: shop.name || "",
@@ -308,8 +337,9 @@ export default {
       this.modalVisible = true;
     },
     async saveShop() {
-      if (!this.formData.name) {
-        alert("请输入门店名称");
+      this.formErrors = {};
+      if (!this.formData.name || !this.formData.name.trim()) {
+        this.formErrors = { name: "请输入门店名称" };
         return;
       }
       
