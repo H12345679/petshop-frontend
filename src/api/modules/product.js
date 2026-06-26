@@ -72,13 +72,8 @@ export function deleteProduct(id) {
  * POST /api/files/image
  */
 export function uploadImage(file) {
-  // eslint-disable-next-line
-  const { post } = require("../axios.js");
+  const { upload } = require("../axios.js");
   const formData = new FormData();
   formData.append("file", file);
-  return post("/files/image", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data"
-    }
-  });
+  return upload("/files/image", formData);
 }
