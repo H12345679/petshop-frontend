@@ -126,7 +126,10 @@
 
             <div class="row gap16 mb16">
               <div class="field col flex1">
-                <label>经度 longitude</label>
+                <label>
+                  经度 longitude
+                  <span class="action-btn" style="float:right; font-size:12px; font-weight:normal;" @click="mapPickerVisible = true">在地图上选择</span>
+                </label>
                 <div class="input-wrap">
                   <input v-model="formData.longitude" placeholder="113.943123" />
                 </div>
@@ -191,15 +194,20 @@
       </div>
     </div>
 
+    <!-- 地图选点弹窗 -->
+    <MapPicker :visible.sync="mapPickerVisible" @select="onMapSelect" />
+
   </div>
 </template>
 
 <script>
 import { searchShops, createShop, updateShop, deleteShop } from "@/api/modules/shop.js";
 import { getStore } from "@/libs/storage.js";
+import MapPicker from "@/components/MapPicker.vue";
 
 export default {
   name: "AdminShopsView",
+  components: { MapPicker },
   data() {
     return {
       userInfo: null,
@@ -216,6 +224,7 @@ export default {
       formErrors: {},
       deleteModalVisible: false,
       deleteTargetId: null,
+      mapPickerVisible: false,
       formData: {
         id: null,
         name: "",
@@ -266,6 +275,21 @@ export default {
         console.warn("获取商店列表失败", e);
         alert(e.message || "获取商店列表失败");
       }
+    },
+    onFileSelected(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      // TODO: 实际应调用后端文件上传接口
+      // 这里模拟一个线上URL
+      this.formData.logo = "https://img.zcool.cn/community/016e785c3454bba801213f26cf9cba.jpg@1280w_1l_2o_100sh.jpg";
+    },
+    onMapSelect(loc) {
+      this.formData.latitude = loc.lat;
+      this.formData.longitude = loc.lng;
+      if (loc.address && !this.formData.address) {
+        this.formData.address = loc.address;
+      }
+      this.mapPickerVisible = false;
     },
     doSearch() {
       this.query.page = 1;
