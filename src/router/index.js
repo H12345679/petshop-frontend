@@ -47,16 +47,23 @@ const routes = [
     component: () => import(/* webpackChunkName: "shop" */ '../views/shop/ShopDetailView.vue')
   },
   {
-    path: '/admin/shops',
-    name: 'admin-shops',
-    component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminShopsView.vue'),
-    meta: { requiresAdmin: true }
-  },
-  {
-    path: '/admin/products',
-    name: 'admin-products',
-    component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminProductsView.vue'),
-    meta: { requiresAdmin: true }
+    path: '/admin',
+    component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminLayout.vue'),
+    meta: { requiresAdmin: true },
+    children: [
+      {
+        path: 'shops',
+        name: 'admin-shops',
+        component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminShopsView.vue'),
+        meta: { title: '商店 / 商店管理' }
+      },
+      {
+        path: 'products',
+        name: 'admin-products',
+        component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminProductsView.vue'),
+        meta: { title: '商品 / 商品管理' }
+      }
+    ]
   }
 ]
 

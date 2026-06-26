@@ -1,33 +1,7 @@
 <template>
-  <div class="admin-layout">
-    <div class="aside">
-      <div class="brand">🐾 宠物商城后台</div>
-      <div class="menu-group">数据</div>
-      <a>📊 数据看板</a>
-      <div class="menu-group">商品</div>
-      <router-link to="/admin/shops">🏬 商店管理</router-link>
-      <router-link to="/admin/products" class="active">📦 商品管理</router-link>
-      <a>⭐ 评价管理</a>
-      <div class="menu-group">交易</div>
-      <a>🧾 订单管理</a>
-      <a>↩ 退单审核</a>
-      <div class="menu-group">运营</div>
-      <a>🎬 视频管理</a>
-      <a>🔔 消息推送</a>
-      <div style="flex: 1;"></div>
-      <router-link to="/" class="menu-group" style="margin-bottom: 20px; color: #888;">← 返回前台</router-link>
-    </div>
-
-    <div class="amain">
-      <div class="atop">
-        <span>商品 / 商品管理</span>
-        <div class="spacer"></div>
-        <span>👤 {{ userInfo ? (userInfo.nickname || userInfo.username) : '未登录' }}</span>
-      </div>
-
-      <div class="acontent">
-        <!-- 检索条 -->
-        <div class="card row center wrap gap8" style="padding:12px 16px; margin-bottom: 20px;">
+  <div class="acontent">
+    <!-- 检索条 -->
+    <div class="card row center wrap gap8" style="padding:12px 16px; margin-bottom: 20px;">
           <span class="small muted">商品名</span>
           <div class="input-wrap" style="width:160px">
             <input v-model="query.name" placeholder="搜索" @keyup.enter="doSearch"/>
@@ -122,8 +96,6 @@
           <span @click="changePage(query.page + 1)" :class="{ disabled: query.page >= totalPages }">›</span>
           <span class="total-text">共 {{ total }} 件</span>
         </div>
-      </div>
-    </div>
 
     <!-- 商品表单弹窗 -->
     <div class="modal-mask" v-if="modalVisible">
@@ -276,7 +248,6 @@
         </div>
       </div>
     </div>
-    
     <!-- 隐藏的文件上传控件 -->
     <input type="file" ref="fileInput" style="display: none;" @change="onFileSelected" accept="image/*" />
   </div>
@@ -527,19 +498,6 @@ export default {
 </script>
 
 <style scoped>
-/* Admin 基础布局复用 */
-.admin-layout { display: flex; height: 100vh; background: #f4f5f7; font-size: 14px; color: #333; }
-.aside { width: 280px; background: #2c303a; border-right: none; display: flex; flex-direction: column; flex-shrink: 0; color: #aeb9c2; }
-.brand { padding: 24px 20px; font-size: 22px; font-weight: 700; color: #fff; background: #242830; margin-bottom: 12px; display: flex; align-items: center; letter-spacing: 1px; }
-.menu-group { padding: 20px 20px 10px; font-size: 15px; color: #76838f; font-weight: 600; }
-.aside a { display: block; padding: 16px 24px; font-size: 16px; color: #aeb9c2; text-decoration: none; cursor: pointer; border-left: 4px solid transparent; transition: all 0.3s ease; }
-.aside a:hover { background: #343a46; color: #fff; padding-left: 28px; }
-.aside a.active { color: #fff; font-weight: 600; background: #3b4252; border-left-color: #5b8def; }
-
-.amain { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-.atop { height: 60px; background: #fff; border-bottom: 1px solid #e6e8eb; display: flex; align-items: center; padding: 0 24px; font-weight: 500; }
-.acontent { padding: 24px; overflow-y: auto; flex: 1; }
-
 /* 实用类 */
 .row { display: flex; }
 .col { display: flex; flex-direction: column; }
