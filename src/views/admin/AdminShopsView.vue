@@ -160,8 +160,8 @@
               </div>
               <div class="field col flex1">
                 <label>门店简介</label>
-                <div class="input-wrap">
-                  <textarea v-model="formData.description" placeholder="一句话简介" style="height: 64px; width: 100%; resize: none; border:none; outline:none; padding: 8px;"></textarea>
+                <div class="input-wrap" style="height: auto;">
+                  <textarea v-model="formData.description" placeholder="一句话简介" style="height: 64px; width: 100%; resize: none; border:none; outline:none; padding: 8px; font-family: inherit;"></textarea>
                 </div>
               </div>
             </div>
@@ -452,7 +452,7 @@ export default {
 
 /* 弹窗 */
 .modal-mask { position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; }
-.modal-wrapper { width: 640px; max-width: 90%; }
+.modal-wrapper { width: 720px; max-width: 90%; }
 .modal-container { background: #fff; border-radius: 8px; box-shadow: 0 4px 24px rgba(0,0,0,0.15); display: flex; flex-direction: column; max-height: 90vh; }
 .modal-header { padding: 16px 24px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
 .modal-header h3 { margin: 0; font-size: 16px; }
