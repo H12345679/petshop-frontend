@@ -4,11 +4,13 @@ import './registerServiceWorker'
 import router from './router'
 import store from './store'
 import AppFooter from './components/AppFooter.vue'
+import AppHeader from './components/AppHeader.vue'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
 Vue.config.productionTip = false
 Vue.component('AppFooter', AppFooter)
+Vue.component('AppHeader', AppHeader)
 Vue.use(ElementUI)
 
 new Vue({

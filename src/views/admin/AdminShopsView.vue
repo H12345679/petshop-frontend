@@ -86,6 +86,7 @@
                 <div class="input-wrap">
                   <input v-model="formData.name" placeholder="如：极客宠物南山店" />
                 </div>
+                <div v-if="formErrors.name" style="color:#d9534f; font-size:12px; margin-top:4px;">{{formErrors.name}}</div>
               </div>
               <div class="field col flex1">
                 <label>联系电话</label>
@@ -125,7 +126,10 @@
 
             <div class="row gap16 mb16">
               <div class="field col flex1">
-                <label>经度 longitude</label>
+                <label>
+                  经度 longitude
+                  <span class="action-btn" style="float:right; font-size:12px; font-weight:normal;" @click="mapPickerVisible = true">在地图上选择</span>
+                </label>
                 <div class="input-wrap">
                   <input v-model="formData.longitude" placeholder="113.943123" />
                 </div>
@@ -156,8 +160,8 @@
               </div>
               <div class="field col flex1">
                 <label>门店简介</label>
-                <div class="input-wrap">
-                  <textarea v-model="formData.description" placeholder="一句话简介" style="height: 64px; width: 100%; resize: none; border:none; outline:none; padding: 8px;"></textarea>
+                <div class="input-wrap" style="height: auto;">
+                  <textarea v-model="formData.description" placeholder="一句话简介" style="height: 64px; width: 100%; resize: none; border:none; outline:none; padding: 8px; font-family: inherit;"></textarea>
                 </div>
               </div>
             </div>
@@ -170,15 +174,40 @@
         </div>
       </div>
     </div>
+    
+    <!-- 删除确认弹窗 -->
+    <div class="modal-mask" v-if="deleteModalVisible">
+      <div class="modal-wrapper" style="width: 400px;">
+        <div class="modal-container">
+          <div class="modal-header">
+            <h3>确认删除</h3>
+            <span class="close-btn" @click="deleteModalVisible = false">×</span>
+          </div>
+          <div class="modal-body" style="padding: 30px 24px; text-align: center; font-size: 16px; color: #555;">
+            确定要删除这个门店吗？此操作不可恢复。
+          </div>
+          <div class="modal-footer row gap8" style="justify-content: flex-end;">
+            <div class="btn" @click="deleteModalVisible = false">取消</div>
+            <div class="btn primary danger" style="background:#d9534f; border-color:#d9534f; color:#fff;" @click="confirmDelete">确定删除</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 地图选点弹窗 -->
+    <MapPicker :visible.sync="mapPickerVisible" @select="onMapSelect" />
+
   </div>
 </template>
 
 <script>
 import { searchShops, createShop, updateShop, deleteShop } from "@/api/modules/shop.js";
 import { getStore } from "@/libs/storage.js";
+import MapPicker from "@/components/MapPicker.vue";
 
 export default {
   name: "AdminShopsView",
+  components: { MapPicker },
   data() {
     return {
       userInfo: null,
@@ -190,9 +219,12 @@ export default {
         name: "",
         status: ""
       },
-      
       modalVisible: false,
       isEdit: false,
+      formErrors: {},
+      deleteModalVisible: false,
+      deleteTargetId: null,
+      mapPickerVisible: false,
       formData: {
         id: null,
         name: "",
@@ -230,6 +262,10 @@ export default {
         if (this.query.name) params.name = this.query.name;
         if (this.query.status !== "") params.status = this.query.status;
 
+        if (this.userInfo && this.userInfo.role === 'MERCHANT') {
+          params.ownerId = this.userInfo.id;
+        }
+
         const res = await searchShops(params);
         if (res.data && res.data.records) {
           this.shops = res.data.records;
@@ -239,6 +275,21 @@ export default {
         console.warn("获取商店列表失败", e);
         alert(e.message || "获取商店列表失败");
       }
+    },
+    onFileSelected(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      // TODO: 实际应调用后端文件上传接口
+      // 这里模拟一个线上URL
+      this.formData.logo = "https://img.zcool.cn/community/016e785c3454bba801213f26cf9cba.jpg@1280w_1l_2o_100sh.jpg";
+    },
+    onMapSelect(loc) {
+      this.formData.latitude = loc.lat;
+      this.formData.longitude = loc.lng;
+      if (loc.address && !this.formData.address) {
+        this.formData.address = loc.address;
+      }
+      this.mapPickerVisible = false;
     },
     doSearch() {
       this.query.page = 1;
@@ -268,10 +319,14 @@ export default {
         alert(e.message || "状态切换失败");
       }
     },
-    async handleDelete(id) {
-      if (!confirm("确定要删除这个门店吗？")) return;
+    handleDelete(id) {
+      this.deleteTargetId = id;
+      this.deleteModalVisible = true;
+    },
+    async confirmDelete() {
       try {
-        await deleteShop(id);
+        await deleteShop(this.deleteTargetId);
+        this.deleteModalVisible = false;
         this.fetchData();
       } catch (e) {
         alert(e.message || "删除失败");
@@ -279,6 +334,7 @@ export default {
     },
     openAddModal() {
       this.isEdit = false;
+      this.formErrors = {};
       this.formData = {
         id: null, name: "", phone: "", province: "", city: "", district: "",
         address: "", longitude: "", latitude: "", status: 1, logo: "", description: ""
@@ -287,6 +343,7 @@ export default {
     },
     openEditModal(shop) {
       this.isEdit = true;
+      this.formErrors = {};
       this.formData = {
         id: shop.id,
         name: shop.name || "",
@@ -304,8 +361,9 @@ export default {
       this.modalVisible = true;
     },
     async saveShop() {
-      if (!this.formData.name) {
-        alert("请输入门店名称");
+      this.formErrors = {};
+      if (!this.formData.name || !this.formData.name.trim()) {
+        this.formErrors = { name: "请输入门店名称" };
         return;
       }
       
@@ -394,7 +452,7 @@ export default {
 
 /* 弹窗 */
 .modal-mask { position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; }
-.modal-wrapper { width: 640px; max-width: 90%; }
+.modal-wrapper { width: 720px; max-width: 90%; }
 .modal-container { background: #fff; border-radius: 8px; box-shadow: 0 4px 24px rgba(0,0,0,0.15); display: flex; flex-direction: column; max-height: 90vh; }
 .modal-header { padding: 16px 24px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
 .modal-header h3 { margin: 0; font-size: 16px; }

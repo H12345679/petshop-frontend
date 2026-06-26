@@ -1,29 +1,6 @@
 <template>
   <div class="shop-list-page">
-    <header class="topbar">
-      <div class="logo"><span class="paw">🐾</span>宠物商城</div>
-      <nav class="nav">
-        <router-link to="/">首页</router-link>
-        <router-link to="/products">全部商品</router-link>
-        <span class="active">找门店</span>
-        <span class="muted">萌宠视频</span>
-      </nav>
-      <div class="search">
-        <input v-model="query.name" placeholder="搜索门店名称..." @keyup.enter="doSearch" />
-        <button class="go" @click="doSearch">搜索</button>
-      </div>
-      <div class="right">
-        <span @click="$router.push('/map')" style="cursor:pointer">🗺 地图找附近</span>
-        <span>🛒 购物车</span>
-        <span>🔔 消息</span>
-        <template v-if="userInfo">
-          <span>👤 {{ userInfo.nickname || userInfo.username }}</span>
-          <router-link v-if="userInfo.role === 'ADMIN' || userInfo.role === 'MERCHANT'" to="/admin/shops" class="link" style="color: #ff5000; font-weight: 600;">管理后台</router-link>
-          <span class="link" @click="logout">退出</span>
-        </template>
-        <router-link v-else to="/login" class="link">登录 / 注册</router-link>
-      </div>
-    </header>
+    <AppHeader />
 
     <div class="container pad">
       <div class="card" style="padding: 12px 16px; margin-bottom: 20px;">
@@ -33,6 +10,10 @@
           <span class="tag" :class="{ accent: query.status === 1 }" @click="selectStatus(1)">营业中</span>
           <span class="tag" :class="{ accent: query.status === 0 }" @click="selectStatus(0)">已停业</span>
           <span class="spacer" style="flex: 1;"></span>
+          <div style="display: flex; gap: 8px;">
+            <input v-model="query.name" placeholder="搜索门店名称..." @keyup.enter="doSearch" style="padding: 4px 10px; border: 1px solid #d6dbe3; border-radius: 4px; outline: none; font-size: 13px;" />
+            <button class="btn sm outline primary" style="background:#5b8def; color:#fff;" @click="doSearch">搜索</button>
+          </div>
           <span class="btn sm outline" style="width: auto; padding: 0 12px;" @click="$router.push('/map')">🗺 切换地图模式</span>
         </div>
       </div>
@@ -85,13 +66,11 @@
 
 <script>
 import { searchShops } from "@/api/modules/shop.js";
-import { getStore, removestore } from "@/libs/storage.js";
 
 export default {
   name: "ShopsView",
   data() {
     return {
-      userInfo: null,
       loading: false,
       shops: [],
       total: 0,
@@ -108,10 +87,7 @@ export default {
       return Math.ceil(this.total / this.query.size) || 1;
     }
   },
-  created() {
-    const u = getStore("userInfo");
-    try { this.userInfo = u ? JSON.parse(u) : null; } catch (e) { this.userInfo = null; }
-    
+  created() {    
     this.doSearch();
   },
   methods: {
@@ -149,11 +125,6 @@ export default {
     goToShop(shop) {
       if (shop.status === 0) return;
       this.$router.push('/shop/' + shop.id);
-    },
-    logout() {
-      removestore("token");
-      removestore("userInfo");
-      this.userInfo = null;
     }
   }
 };
@@ -161,18 +132,6 @@ export default {
 
 <style scoped>
 .shop-list-page { background: #f4f5f7; min-height: 100vh; display: flex; flex-direction: column; }
-
-/* 顶栏 */
-.topbar { display: flex; align-items: center; gap: 18px; padding: 12px 24px; background: #fff; border-bottom: 1px solid #e6e8eb; position: sticky; top: 0; z-index: 10; }
-.logo { font-weight: 700; font-size: 18px; color: #5b8def; white-space: nowrap; }
-.logo .paw { margin-right: 4px; }
-.nav { display: flex; gap: 18px; font-size: 14px; }
-.nav a, .nav span { color: #555; text-decoration: none; cursor: pointer; }
-.nav .active { color: #5b8def; font-weight: 600; }
-.search { flex: 1; max-width: 420px; display: flex; border: 1px solid #d6dbe3; border-radius: 20px; overflow: hidden; }
-.search input { flex: 1; border: 0; padding: 8px 14px; outline: none; font-size: 13px; background: #fafbfc; }
-.search .go { border: 0; background: #5b8def; color: #fff; padding: 0 18px; cursor: pointer; }
-.right { display: flex; align-items: center; gap: 14px; font-size: 13px; color: #555; white-space: nowrap; margin-left: auto; }
 
 /* 布局 */
 .container { width: 1600px; max-width: 100%; margin: 0 auto; flex: 1; }
