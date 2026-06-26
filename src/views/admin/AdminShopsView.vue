@@ -1,33 +1,7 @@
 <template>
-  <div class="admin-layout">
-    <div class="aside">
-      <div class="brand">🐾 宠物商城后台</div>
-      <div class="menu-group">数据</div>
-      <a>📊 数据看板</a>
-      <div class="menu-group">商品</div>
-      <router-link to="/admin/shops" class="active">🏬 商店管理</router-link>
-      <router-link to="/admin/products">📦 商品管理</router-link>
-      <a>⭐ 评价管理</a>
-      <div class="menu-group">交易</div>
-      <a>🧾 订单管理</a>
-      <a>↩ 退单审核</a>
-      <div class="menu-group">运营</div>
-      <a>🎬 视频管理</a>
-      <a>🔔 消息推送</a>
-      <div style="flex: 1;"></div>
-      <router-link to="/" class="menu-group" style="margin-bottom: 20px; color: #888;">← 返回前台</router-link>
-    </div>
-
-    <div class="amain">
-      <div class="atop">
-        <span>商品 / 商店管理</span>
-        <div class="spacer"></div>
-        <span>👤 {{ userInfo ? (userInfo.nickname || userInfo.username) : '未登录' }}</span>
-      </div>
-
-      <div class="acontent">
-        <!-- 检索条 -->
-        <div class="card row center wrap gap8" style="padding:12px 16px; margin-bottom: 20px;">
+  <div class="acontent">
+    <!-- 检索条 -->
+    <div class="card row center wrap gap8" style="padding:12px 16px; margin-bottom: 20px;">
           <span class="small muted">门店名称</span>
           <div class="input-wrap" style="width:180px">
             <input v-model="query.name" placeholder="模糊搜索" @keyup.enter="doSearch"/>
@@ -96,8 +70,6 @@
           <span @click="changePage(query.page + 1)" :class="{ disabled: query.page >= totalPages }">›</span>
           <span class="total-text">共 {{ total }} 家</span>
         </div>
-      </div>
-    </div>
 
     <!-- 弹窗 -->
     <div class="modal-mask" v-if="modalVisible">
@@ -368,7 +340,6 @@ export default {
 .atop { height: 60px; background: #fff; border-bottom: 1px solid #e6e8eb; display: flex; align-items: center; padding: 0 24px; font-weight: 500; }
 .acontent { padding: 24px; overflow-y: auto; flex: 1; }
 
-/* 实用类 */
 .row { display: flex; }
 .col { display: flex; flex-direction: column; }
 .center { align-items: center; }
