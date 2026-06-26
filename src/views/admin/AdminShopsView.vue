@@ -230,6 +230,10 @@ export default {
         if (this.query.name) params.name = this.query.name;
         if (this.query.status !== "") params.status = this.query.status;
 
+        if (this.userInfo && this.userInfo.role === 'MERCHANT') {
+          params.ownerId = this.userInfo.id;
+        }
+
         const res = await searchShops(params);
         if (res.data && res.data.records) {
           this.shops = res.data.records;

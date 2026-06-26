@@ -73,4 +73,9 @@ export function del(url, data) {
   return instance.delete(url, { data });
 }
 
+/** POST 文件上传 */
+export function upload(url, formData) {
+  return instance.post(url, formData);
+}
+
 export default instance;

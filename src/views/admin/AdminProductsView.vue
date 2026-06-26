@@ -19,9 +19,12 @@
           <div class="input-wrap select-wrap" style="width:120px">
             <select v-model="query.categoryId" @change="doSearch">
               <option value="">全部</option>
-              <optgroup v-for="g in categoryTreeData" :key="g.id" :label="g.name">
-                <option v-for="c in g.children" :key="c.id" :value="c.id">{{ c.name }}</option>
-              </optgroup>
+              <template v-for="g in categoryTreeData">
+                <optgroup v-if="g.children && g.children.length > 0" :key="'qg-'+g.id" :label="g.name">
+                  <option v-for="c in g.children" :key="c.id" :value="c.id">{{ c.name }}</option>
+                </optgroup>
+                <option v-else :key="g.id" :value="g.id">{{ g.name }}</option>
+              </template>
             </select>
           </div>
           
@@ -119,9 +122,12 @@
                 <label><span class="req">*</span> 商品分类</label>
                 <div class="input-wrap select-wrap">
                   <select v-model="formData.categoryId">
-                    <optgroup v-for="g in categoryTreeData" :key="g.id" :label="g.name">
-                      <option v-for="c in g.children" :key="c.id" :value="c.id">{{ c.name }}</option>
-                    </optgroup>
+                    <template v-for="g in categoryTreeData">
+                      <optgroup v-if="g.children && g.children.length > 0" :key="'g-'+g.id" :label="g.name">
+                        <option v-for="c in g.children" :key="c.id" :value="c.id">{{ c.name }}</option>
+                      </optgroup>
+                      <option v-else :key="g.id" :value="g.id">{{ g.name }}</option>
+                    </template>
                   </select>
                 </div>
               </div>
@@ -307,18 +313,22 @@ export default {
       return Math.ceil(this.total / this.query.size) || 1;
     }
   },
-  created() {
+  async created() {
     const u = getStore("userInfo");
     try { this.userInfo = u ? JSON.parse(u) : null; } catch (e) { this.userInfo = null; }
     
-    this.loadDependencies();
+    await this.loadDependencies();
     this.fetchData();
   },
   methods: {
     async loadDependencies() {
       try {
-        // 加载全部商店 (如果是 MERCHANT，后端自带 owner_id 过滤)
-        const shopRes = await searchShops({ current: 1, size: 999 });
+        // 加载商店下拉选项：MERCHANT 只看自己的店，ADMIN 看全部
+        const shopParams = { current: 1, size: 999 };
+        if (this.userInfo && this.userInfo.role === 'MERCHANT') {
+          shopParams.ownerId = this.userInfo.id;
+        }
+        const shopRes = await searchShops(shopParams);
         if (shopRes.data && shopRes.data.records) {
           this.shopOptions = shopRes.data.records;
         }
@@ -340,7 +350,12 @@ export default {
           status: "" // 不传状态或者后端支持按状态过滤，默认传空查全部
         };
         if (this.query.name) params.name = this.query.name;
-        if (this.query.shopId) params.shopId = this.query.shopId;
+        if (this.query.shopId) {
+          params.shopId = this.query.shopId;
+        } else if (this.userInfo && this.userInfo.role === 'MERCHANT' && this.shopOptions.length > 0) {
+          // 商家未选择具体门店时，用 shopIds 传所有自己的门店ID
+          params.shopIds = this.shopOptions.map(s => s.id).join(',');
+        }
         if (this.query.categoryId) params.categoryId = this.query.categoryId;
         if (this.query.type) params.type = this.query.type;
 
