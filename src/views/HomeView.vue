@@ -7,7 +7,7 @@
         <router-link to="/" class="active">首页</router-link>
         <router-link to="/products">全部商品</router-link>
         <router-link to="/shops">找门店</router-link>
-        <span class="muted">萌宠视频</span>
+        <router-link to="/videos" class="muted" style="text-decoration:none">萌宠视频</router-link>
       </nav>
       <div class="search">
         <input v-model.trim="keyword" placeholder="搜索宠物 / 用品..." @keyup.enter="onSearch" />

@@ -12,6 +12,11 @@ const routes = [
     component: HomeView
   },
   {
+    path: '/videos',
+    name: 'videos',
+    component: () => import(/* webpackChunkName: "video" */ '../views/VideoListView.vue')
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import(/* webpackChunkName: "auth" */ '../views/auth/LoginView.vue')
