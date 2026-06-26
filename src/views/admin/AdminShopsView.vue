@@ -205,6 +205,7 @@
 
 <script>
 import { searchShops, createShop, updateShop, deleteShop } from "@/api/modules/shop.js";
+import { uploadImage } from "@/api/modules/product.js";
 import { getStore } from "@/libs/storage.js";
 import MapPicker from "@/components/MapPicker.vue";
 
@@ -282,12 +283,19 @@ export default {
     triggerUpload() {
       this.$refs.fileInput.click();
     },
-    onFileSelected(e) {
+    async onFileSelected(e) {
       const file = e.target.files[0];
       if (!file) return;
-      // TODO: 实际应调用后端文件上传接口
-      // 这里模拟一个线上URL
-      this.formData.logo = "https://img.zcool.cn/community/016e785c3454bba801213f26cf9cba.jpg@1280w_1l_2o_100sh.jpg";
+      try {
+        const res = await uploadImage(file);
+        if (res.data && res.data.url) {
+          this.formData.logo = res.data.url;
+        }
+      } catch (err) {
+        alert("上传失败：" + (err.message || err));
+      } finally {
+        e.target.value = ""; // 清空 input 以便下次能触发 change
+      }
     },
     onMapSelect(loc) {
       this.formData.latitude = loc.lat;
