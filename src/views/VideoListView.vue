@@ -53,14 +53,14 @@
       <!-- 真实数据 -->
       <div class="grid c4" v-else-if="videoList.length > 0">
         <div class="pcard" v-for="v in videoList" :key="v.id" @click="goToDetail(v.id)">
-          <div class="img pimg" :style="{ backgroundImage: v.coverUrl ? 'url(' + v.coverUrl + ')' : null }">
-            <span v-if="!v.coverUrl">▶ 视频封面</span>
+          <div class="img pimg" :style="{ backgroundImage: v.cover ? 'url(' + v.cover + ')' : null }">
+            <span v-if="!v.cover">▶ 视频封面</span>
             <span class="duration-tag" v-if="v.duration">{{ v.duration }}</span>
           </div>
           <div class="pbody">
             <div class="pname">{{ v.title }}</div>
             <div class="row between small muted mt8">
-              <span>▶ {{ v.viewCount || 0 }} 播放</span>
+              <span>▶ {{ v.views || 0 }} 播放</span>
               <span class="tag accent" v-if="v.productId">关联商品</span>
             </div>
           </div>
@@ -91,6 +91,7 @@
 
 <script>
 import { getVideoList } from "@/api/modules/video.js";
+import { getCategories } from "@/api/modules/product.js";
 import { getStore, removestore } from "@/libs/storage.js";
 
 export default {
@@ -101,11 +102,7 @@ export default {
       userInfo: null,
       activeTab: "", // 空代表推荐或全部
       tabs: [
-        { label: "推荐", value: "" },
-        { label: "猫咪", value: "cat" },
-        { label: "狗狗", value: "dog" },
-        { label: "萌宠日常", value: "daily" },
-        { label: "养护知识", value: "knowledge" },
+        { label: "推荐 / 全部", value: "" }
       ],
       videoList: [],
       pageNum: 1,
@@ -122,19 +119,32 @@ export default {
     if (this.$route.query.title) {
       this.keyword = this.$route.query.title;
     }
+    this.loadCategories();
     this.fetchVideos();
   },
   methods: {
+    async loadCategories() {
+      try {
+        const res = await getCategories();
+        if (res.data) {
+          const categoryTabs = res.data.map(c => ({ label: c.name, value: c.id }));
+          this.tabs = [{ label: "推荐 / 全部", value: "" }, ...categoryTabs];
+        }
+      } catch (e) {
+        console.error("加载分类失败", e);
+      }
+    },
     async fetchVideos() {
       this.loading = true;
       this.isError = false;
       try {
         const params = {
           page: this.pageNum,
-          size: this.pageSize
+          size: this.pageSize,
+          status: 1 // 只拉取已上架的视频
         };
         if (this.keyword) params.title = this.keyword;
-        if (this.activeTab) params.category = this.activeTab;
+        if (this.activeTab) params.productCategoryId = this.activeTab;
         
         const res = await getVideoList(params);
         if (res.data && res.data.records) {
@@ -168,7 +178,7 @@ export default {
       this.fetchVideos();
     },
     goToDetail(id) {
-      this.$router.push(`/videos/${id}`);
+      this.$router.push(`/video/${id}`);
     },
     logout() {
       removestore("token");

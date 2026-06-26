@@ -10,6 +10,14 @@ export function searchProducts(params) {
 }
 
 /**
+ * 获取商品分类树
+ * GET /api/categories
+ */
+export function getCategories() {
+  return get("/categories");
+}
+
+/**
  * 获取商品详情
  * GET /api/products/{id}
  */

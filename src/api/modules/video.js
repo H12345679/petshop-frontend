@@ -5,6 +5,11 @@ export function getVideoList(params) {
   return get("/videos", params);
 }
 
+/** 获取视频详情：GET /api/videos/{id} */
+export function getVideoDetail(id) {
+  return get(`/videos/${id}`);
+}
+
 /** 创建视频：POST /api/videos */
 export function createVideo(data) {
   const { postJson } = require("../axios.js");
