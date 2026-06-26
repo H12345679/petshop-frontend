@@ -1,28 +1,6 @@
 <template>
   <div class="products-page">
-    <!-- 顶栏 -->
-    <header class="topbar">
-      <div class="logo"><span class="paw">🐾</span>宠物商城</div>
-      <nav class="nav">
-        <router-link to="/">首页</router-link>
-        <span class="active">全部商品</span>
-        <router-link to="/shops">找门店</router-link>
-        <span class="muted">萌宠视频</span>
-      </nav>
-      <div class="search">
-        <input v-model.trim="query.name" placeholder="搜索宠物 / 用品..." @keyup.enter="doSearch" />
-        <button class="go" @click="doSearch">搜索</button>
-      </div>
-      <div class="right">
-        <span>🛒 购物车</span>
-        <span>🔔 消息</span>
-        <template v-if="userInfo">
-          <span>👤 {{ userInfo.nickname || userInfo.username }}</span>
-          <span class="link" @click="logout">退出</span>
-        </template>
-        <router-link v-else to="/login" class="link">登录 / 注册</router-link>
-      </div>
-    </header>
+    <AppHeader />
 
     <div class="container">
       <div class="breadcrumb small muted mb12">首页 / 全部商品{{ currentCategoryName ? ' / ' + currentCategoryName : '' }}</div>
@@ -123,7 +101,6 @@
 <script>
 import { categoryTree } from "@/api/modules/home.js";
 import { searchProducts } from "@/api/modules/product.js";
-import { getStore, removestore } from "@/libs/storage.js";
 
 // Mock Data fallback
 const mockCategories = [
@@ -149,7 +126,6 @@ export default {
   name: "ProductsView",
   data() {
     return {
-      userInfo: null,
       categories: [],
       currentCategoryName: "",
       
@@ -175,8 +151,6 @@ export default {
     }
   },
   created() {
-    const u = getStore("userInfo");
-    try { this.userInfo = u ? JSON.parse(u) : null; } catch (e) { this.userInfo = null; }
     
     // 初始化参数
     if (this.$route.query.categoryId) this.query.categoryId = Number(this.$route.query.categoryId) || this.$route.query.categoryId;
@@ -185,6 +159,13 @@ export default {
     
     this.loadCategories();
     this.doSearch();
+  },
+  watch: {
+    '$route.query.name'(newVal) {
+      this.query.name = newVal || "";
+      this.query.page = 1;
+      this.doSearch();
+    }
   },
   methods: {
     async loadCategories() {
@@ -301,18 +282,6 @@ export default {
 
 <style scoped>
 .products-page { background: #f4f5f7; min-height: 100vh; display: flex; flex-direction: column; }
-
-/* 顶栏 */
-.topbar { display: flex; align-items: center; gap: 18px; padding: 12px 24px; background: #fff; border-bottom: 1px solid #e6e8eb; position: sticky; top: 0; z-index: 10; }
-.logo { font-weight: 700; font-size: 18px; color: #5b8def; white-space: nowrap; }
-.logo .paw { margin-right: 4px; }
-.nav { display: flex; gap: 18px; font-size: 14px; }
-.nav a, .nav span { color: #555; text-decoration: none; cursor: pointer; }
-.nav .active { color: #5b8def; font-weight: 600; }
-.search { flex: 1; max-width: 420px; display: flex; border: 1px solid #d6dbe3; border-radius: 20px; overflow: hidden; }
-.search input { flex: 1; border: 0; padding: 8px 14px; outline: none; font-size: 13px; background: #fafbfc; }
-.search .go { border: 0; background: #5b8def; color: #fff; padding: 0 18px; cursor: pointer; }
-.right { display: flex; align-items: center; gap: 14px; font-size: 13px; color: #555; white-space: nowrap; margin-left: auto; }
 
 /* 布局 */
 .container { width: 1600px; max-width: 100%; margin: 0 auto; padding: 18px 0 40px; flex: 1; }

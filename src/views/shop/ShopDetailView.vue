@@ -1,27 +1,6 @@
 <template>
   <div class="shop-detail-page">
-    <header class="topbar">
-      <div class="logo"><span class="paw">🐾</span>宠物商城</div>
-      <nav class="nav">
-        <router-link to="/">首页</router-link>
-        <router-link to="/products">全部商品</router-link>
-        <router-link to="/shops">找门店</router-link>
-        <span class="muted">萌宠视频</span>
-      </nav>
-      <div class="search">
-        <input v-model.trim="searchKeyword" placeholder="店内搜索..." @keyup.enter="onSearch" />
-        <button class="go" @click="onSearch">搜索</button>
-      </div>
-      <div class="right">
-        <span>🛒 购物车</span>
-        <span>🔔 消息</span>
-        <template v-if="userInfo">
-          <span>👤 {{ userInfo.nickname || userInfo.username }}</span>
-          <span class="link" @click="logout">退出</span>
-        </template>
-        <router-link v-else to="/login" class="link">登录 / 注册</router-link>
-      </div>
-    </header>
+    <AppHeader />
 
     <div class="container" v-if="shop">
       <!-- 店招 -->
@@ -43,12 +22,18 @@
         </div>
       </div>
 
-      <!-- 分类 Tabs -->
-      <div class="tabs">
-        <span class="tab" :class="{ on: activeTab === 'all' }" @click="selectTab('all')">全部商品</span>
-        <span class="tab" :class="{ on: activeTab === 'pets' }" @click="selectTab('pets')">宠物活体</span>
-        <span class="tab" :class="{ on: activeTab === 'items' }" @click="selectTab('items')">周边用品</span>
-        <span class="tab" :class="{ on: activeTab === 'intro' }" @click="selectTab('intro')">店铺简介</span>
+      <!-- 分类 Tabs与搜索 -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; margin-bottom: 20px;">
+        <div class="tabs" style="border-bottom: none; margin-bottom: 0;">
+          <span class="tab" :class="{ on: activeTab === 'all' }" @click="selectTab('all')">全部商品</span>
+          <span class="tab" :class="{ on: activeTab === 'pets' }" @click="selectTab('pets')">宠物活体</span>
+          <span class="tab" :class="{ on: activeTab === 'items' }" @click="selectTab('items')">周边用品</span>
+          <span class="tab" :class="{ on: activeTab === 'intro' }" @click="selectTab('intro')">店铺简介</span>
+        </div>
+        <div v-show="activeTab !== 'intro'" style="display: flex; gap: 8px; margin-bottom: 8px;">
+          <input v-model.trim="searchKeyword" placeholder="店内搜索..." @keyup.enter="onSearch" style="padding: 6px 12px; border: 1px solid #d6dbe3; border-radius: 4px; outline: none; font-size: 13px;" />
+          <button class="btn sm primary" style="background:#5b8def; color:#fff; border: none; padding: 0 16px;" @click="onSearch">搜索</button>
+        </div>
       </div>
 
       <!-- 店内商品列表 -->
@@ -110,13 +95,12 @@
 <script>
 import { getShopDetail } from "@/api/modules/shop.js";
 import { searchProducts } from "@/api/modules/product.js";
-import { getStore, removestore } from "@/libs/storage.js";
 
 export default {
   name: "ShopDetailView",
   data() {
     return {
-      userInfo: null,
+      shopId: null,
       loading: true,
       shop: null,
       searchKeyword: "",
@@ -139,14 +123,12 @@ export default {
     }
   },
   created() {
-    const u = getStore("userInfo");
-    try { this.userInfo = u ? JSON.parse(u) : null; } catch (e) { this.userInfo = null; }
-    
+    this.shopId = this.$route.params.id;
     this.fetchShopData();
   },
   methods: {
     async fetchShopData() {
-      const id = this.$route.params.id;
+      const id = this.shopId;
       if (!id) return;
       
       this.loading = true;
@@ -208,11 +190,6 @@ export default {
       if (p < 1 || p > this.totalPages || p === this.query.page) return;
       this.query.page = p;
       this.fetchProducts();
-    },
-    logout() {
-      removestore("token");
-      removestore("userInfo");
-      this.userInfo = null;
     }
   }
 };
@@ -220,18 +197,6 @@ export default {
 
 <style scoped>
 .shop-detail-page { background: #f4f5f7; min-height: 100vh; display: flex; flex-direction: column; }
-
-/* 顶栏 */
-.topbar { display: flex; align-items: center; gap: 18px; padding: 12px 24px; background: #fff; border-bottom: 1px solid #e6e8eb; position: sticky; top: 0; z-index: 10; }
-.logo { font-weight: 700; font-size: 18px; color: #5b8def; white-space: nowrap; }
-.logo .paw { margin-right: 4px; }
-.nav { display: flex; gap: 18px; font-size: 14px; }
-.nav a, .nav span { color: #555; text-decoration: none; cursor: pointer; }
-.nav .active { color: #5b8def; font-weight: 600; }
-.search { flex: 1; max-width: 420px; display: flex; border: 1px solid #d6dbe3; border-radius: 20px; overflow: hidden; }
-.search input { flex: 1; border: 0; padding: 8px 14px; outline: none; font-size: 13px; background: #fafbfc; }
-.search .go { border: 0; background: #5b8def; color: #fff; padding: 0 18px; cursor: pointer; }
-.right { display: flex; align-items: center; gap: 14px; font-size: 13px; color: #555; white-space: nowrap; margin-left: auto; }
 
 /* 布局 */
 .container { width: 1600px; max-width: 100%; margin: 0 auto; padding: 18px 0 40px; flex: 1; }
