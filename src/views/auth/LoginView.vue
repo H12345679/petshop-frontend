@@ -37,7 +37,8 @@
             <div class="field">
               <label>密码</label>
               <div class="input-wrap">
-                <input v-model="form.password" type="password" placeholder="请输入密码" />
+                <input v-model="form.password" :type="showPassword ? 'text' : 'password'" placeholder="请输入密码" />
+                <span class="muted small" style="cursor:pointer; margin-left: 8px;" @click="showPassword = !showPassword">👁</span>
               </div>
             </div>
             
@@ -83,6 +84,7 @@ export default {
       form: { username: "", password: "" },
       loading: false,
       error: "",
+      showPassword: false
     };
   },
   methods: {
@@ -94,7 +96,6 @@ export default {
       }
       this.loading = true;
       try {
-        // 后端返回 { code, message, data: { token, user } }
         const res = await login(this.form);
         const { token, user } = res.data;
         setStore("token", token);
@@ -103,22 +104,7 @@ export default {
         const redirect = this.$route.query.redirect || "/";
         this.$router.replace(redirect);
       } catch (e) {
-        // 如果后端接口不存在或报错，降级为模拟登录（供参考和前端独立测试使用）
-        console.warn("后端登录请求失败，启用模拟登录供查考测试:", e.message);
-        
-        const mockToken = "mock_token_" + new Date().getTime();
-        const mockUser = { 
-          id: 1, 
-          username: this.form.username, 
-          nickname: this.form.username === 'admin' ? "超级管理员" : "测试体验用户",
-          balance: 999.00
-        };
-        
-        setStore("token", mockToken);
-        setStore("userInfo", mockUser);
-        
-        const redirect = this.$route.query.redirect || "/";
-        this.$router.replace(redirect);
+        this.error = e.message || "登录失败，用户名或密码错误";
       } finally {
         this.loading = false;
       }
