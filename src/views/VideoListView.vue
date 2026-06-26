@@ -32,7 +32,26 @@
         </span>
       </div>
 
-      <div class="grid c4">
+      <!-- 骨架屏 (加载中显示) -->
+      <div class="grid c4" v-if="loading">
+        <div class="pcard" v-for="i in 8" :key="'skel-'+i">
+          <el-skeleton style="width: 100%" animated>
+            <template slot="template">
+              <el-skeleton-item variant="image" style="width: 100%; height: 160px; display: block;" />
+              <div style="padding: 12px;">
+                <el-skeleton-item variant="p" style="width: 90%" />
+                <el-skeleton-item variant="p" style="width: 60%" />
+                <div style="margin-top: 10px;">
+                  <el-skeleton-item variant="text" style="width: 40%" />
+                </div>
+              </div>
+            </template>
+          </el-skeleton>
+        </div>
+      </div>
+
+      <!-- 真实数据 -->
+      <div class="grid c4" v-else-if="videoList.length > 0">
         <div class="pcard" v-for="v in videoList" :key="v.id" @click="goToDetail(v.id)">
           <div class="img pimg" :style="{ backgroundImage: v.coverUrl ? 'url(' + v.coverUrl + ')' : null }">
             <span v-if="!v.coverUrl">▶ 视频封面</span>
@@ -48,7 +67,15 @@
         </div>
       </div>
       
-      <div v-if="!loading && !videoList.length" class="empty">暂无相关视频</div>
+      <!-- 空状态或错误状态 -->
+      <div v-else class="empty">
+        <div v-if="isError">
+          <div style="font-size: 40px; margin-bottom: 15px;">📡</div>
+          <div>网络连接失败，无法获取视频列表</div>
+          <button class="go mt16" style="padding: 8px 24px; border-radius: 20px; margin-top: 20px;" @click="fetchVideos">重新加载</button>
+        </div>
+        <div v-else>暂无相关视频</div>
+      </div>
 
       <!-- 分页 -->
       <div class="pager" v-if="totalPages > 1">
@@ -84,7 +111,8 @@ export default {
       pageNum: 1,
       pageSize: 12,
       totalPages: 0,
-      loading: false
+      loading: false,
+      isError: false
     };
   },
   created() {
@@ -99,6 +127,7 @@ export default {
   methods: {
     async fetchVideos() {
       this.loading = true;
+      this.isError = false;
       try {
         const params = {
           page: this.pageNum,
@@ -119,6 +148,7 @@ export default {
         }
       } catch (e) {
         this.videoList = [];
+        this.isError = true;
       } finally {
         this.loading = false;
       }
