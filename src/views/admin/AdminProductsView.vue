@@ -19,9 +19,12 @@
           <div class="input-wrap select-wrap" style="width:120px">
             <select v-model="query.categoryId" @change="doSearch">
               <option value="">全部</option>
-              <optgroup v-for="g in categoryTreeData" :key="g.id" :label="g.name">
-                <option v-for="c in g.children" :key="c.id" :value="c.id">{{ c.name }}</option>
-              </optgroup>
+              <template v-for="g in categoryTreeData">
+                <optgroup v-if="g.children && g.children.length > 0" :key="'qg-'+g.id" :label="g.name">
+                  <option v-for="c in g.children" :key="c.id" :value="c.id">{{ c.name }}</option>
+                </optgroup>
+                <option v-else :key="g.id" :value="g.id">{{ g.name }}</option>
+              </template>
             </select>
           </div>
           
@@ -114,16 +117,21 @@
                     <option v-for="s in shopOptions" :key="s.id" :value="s.id">{{ s.name }}</option>
                   </select>
                 </div>
+                <div v-if="formErrors.shopId" style="color:#d9534f; font-size:12px; margin-top:4px;">{{formErrors.shopId}}</div>
               </div>
               <div class="field col flex1">
                 <label><span class="req">*</span> 商品分类</label>
                 <div class="input-wrap select-wrap">
                   <select v-model="formData.categoryId">
-                    <optgroup v-for="g in categoryTreeData" :key="g.id" :label="g.name">
-                      <option v-for="c in g.children" :key="c.id" :value="c.id">{{ c.name }}</option>
-                    </optgroup>
+                    <template v-for="g in categoryTreeData">
+                      <optgroup v-if="g.children && g.children.length > 0" :key="'g-'+g.id" :label="g.name">
+                        <option v-for="c in g.children" :key="c.id" :value="c.id">{{ c.name }}</option>
+                      </optgroup>
+                      <option v-else :key="g.id" :value="g.id">{{ g.name }}</option>
+                    </template>
                   </select>
                 </div>
+                <div v-if="formErrors.categoryId" style="color:#d9534f; font-size:12px; margin-top:4px;">{{formErrors.categoryId}}</div>
               </div>
               <div class="field col flex1">
                 <label><span class="req">*</span> 商品类型</label>
@@ -141,6 +149,7 @@
               <div class="input-wrap">
                 <input v-model="formData.name" placeholder="如：英国短毛猫 蓝猫 纯种健康" />
               </div>
+              <div v-if="formErrors.name" style="color:#d9534f; font-size:12px; margin-top:4px;">{{formErrors.name}}</div>
             </div>
 
             <div class="row gap16 mb16">
@@ -149,6 +158,7 @@
                 <div class="input-wrap">
                   <input type="number" v-model.number="formData.price" placeholder="¥2500" />
                 </div>
+                <div v-if="formErrors.price" style="color:#d9534f; font-size:12px; margin-top:4px;">{{formErrors.price}}</div>
               </div>
               <div class="field col flex1">
                 <label>原价</label>
@@ -248,6 +258,26 @@
         </div>
       </div>
     </div>
+    
+    <!-- 删除确认弹窗 -->
+    <div class="modal-mask" v-if="deleteModalVisible">
+      <div class="modal-wrapper" style="width: 400px;">
+        <div class="modal-container">
+          <div class="modal-header">
+            <h3>确认删除</h3>
+            <span class="close-btn" @click="deleteModalVisible = false">×</span>
+          </div>
+          <div class="modal-body" style="padding: 30px 24px; text-align: center; font-size: 16px; color: #555;">
+            确定要删除这个商品吗？此操作不可恢复。
+          </div>
+          <div class="modal-footer row gap8" style="justify-content: flex-end;">
+            <div class="btn" @click="deleteModalVisible = false">取消</div>
+            <div class="btn primary danger" style="background:#d9534f; border-color:#d9534f; color:#fff;" @click="confirmDelete">确定删除</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 隐藏的文件上传控件 -->
     <input type="file" ref="fileInput" style="display: none;" @change="onFileSelected" accept="image/*" />
   </div>
@@ -280,6 +310,9 @@ export default {
       
       modalVisible: false,
       isEdit: false,
+      formErrors: {},
+      deleteModalVisible: false,
+      deleteTargetId: null,
       formData: {
         id: null,
         shopId: "",
@@ -307,18 +340,22 @@ export default {
       return Math.ceil(this.total / this.query.size) || 1;
     }
   },
-  created() {
+  async created() {
     const u = getStore("userInfo");
     try { this.userInfo = u ? JSON.parse(u) : null; } catch (e) { this.userInfo = null; }
     
-    this.loadDependencies();
+    await this.loadDependencies();
     this.fetchData();
   },
   methods: {
     async loadDependencies() {
       try {
-        // 加载全部商店 (如果是 MERCHANT，后端自带 owner_id 过滤)
-        const shopRes = await searchShops({ current: 1, size: 999 });
+        // 加载商店下拉选项：MERCHANT 只看自己的店，ADMIN 看全部
+        const shopParams = { current: 1, size: 999 };
+        if (this.userInfo && this.userInfo.role === 'MERCHANT') {
+          shopParams.ownerId = this.userInfo.id;
+        }
+        const shopRes = await searchShops(shopParams);
         if (shopRes.data && shopRes.data.records) {
           this.shopOptions = shopRes.data.records;
         }
@@ -340,7 +377,12 @@ export default {
           status: "" // 不传状态或者后端支持按状态过滤，默认传空查全部
         };
         if (this.query.name) params.name = this.query.name;
-        if (this.query.shopId) params.shopId = this.query.shopId;
+        if (this.query.shopId) {
+          params.shopId = this.query.shopId;
+        } else if (this.userInfo && this.userInfo.role === 'MERCHANT' && this.shopOptions.length > 0) {
+          // 商家未选择具体门店时，用 shopIds 传所有自己的门店ID
+          params.shopIds = this.shopOptions.map(s => s.id).join(',');
+        }
         if (this.query.categoryId) params.categoryId = this.query.categoryId;
         if (this.query.type) params.type = this.query.type;
 
@@ -386,10 +428,14 @@ export default {
         alert(e.message || "状态切换失败");
       }
     },
-    async handleDelete(id) {
-      if (!confirm("确定要删除这个商品吗？")) return;
+    handleDelete(id) {
+      this.deleteTargetId = id;
+      this.deleteModalVisible = true;
+    },
+    async confirmDelete() {
       try {
-        await deleteProduct(id);
+        await deleteProduct(this.deleteTargetId);
+        this.deleteModalVisible = false;
         this.fetchData();
       } catch (e) {
         alert(e.message || "删除失败");
@@ -397,6 +443,7 @@ export default {
     },
     openAddModal() {
       this.isEdit = false;
+      this.formErrors = {};
       this.formData = {
         id: null,
         shopId: this.shopOptions.length > 0 ? this.shopOptions[0].id : "",
@@ -415,6 +462,7 @@ export default {
     },
     openEditModal(p) {
       this.isEdit = true;
+      this.formErrors = {};
       let imgList = [];
       try {
         if (p.images) imgList = JSON.parse(p.images);
@@ -468,10 +516,25 @@ export default {
       }
     },
     async saveProduct() {
-      if (!this.formData.name || !this.formData.shopId || !this.formData.categoryId || this.formData.price == null) {
-        alert("请填写必填项 (*)");
-        return;
+      this.formErrors = {};
+      let hasError = false;
+      if (!this.formData.shopId) {
+        this.formErrors = { ...this.formErrors, shopId: "请选择所属门店" };
+        hasError = true;
       }
+      if (!this.formData.categoryId) {
+        this.formErrors = { ...this.formErrors, categoryId: "请选择商品分类" };
+        hasError = true;
+      }
+      if (!this.formData.name || !this.formData.name.trim()) {
+        this.formErrors = { ...this.formErrors, name: "请输入商品名称" };
+        hasError = true;
+      }
+      if (this.formData.price == null || this.formData.price === "") {
+        this.formErrors = { ...this.formErrors, price: "请输入商品售价" };
+        hasError = true;
+      }
+      if (hasError) return;
       
       const payload = { ...this.formData };
       payload.images = JSON.stringify(payload.imagesList);

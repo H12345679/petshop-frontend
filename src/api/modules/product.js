@@ -1,4 +1,4 @@
-import { get } from "../axios.js";
+import { get, post, postJson, put, del, upload } from "../axios.js";
 
 /**
  * 分页搜索商品
@@ -22,8 +22,6 @@ export function getProductDetail(id) {
  * POST /api/cart
  */
 export function addToCart(data) {
-  // eslint-disable-next-line
-  const { post } = require("../axios.js");
   return post("/cart", data);
 }
 
@@ -32,8 +30,6 @@ export function addToCart(data) {
  * POST /api/favorites/{productId}
  */
 export function toggleFavorite(productId) {
-  // eslint-disable-next-line
-  const { post } = require("../axios.js");
   return post(`/favorites/${productId}`);
 }
 
@@ -42,9 +38,7 @@ export function toggleFavorite(productId) {
  * POST /api/products
  */
 export function createProduct(data) {
-  // eslint-disable-next-line
-  const { post } = require("../axios.js");
-  return post("/products", data);
+  return postJson("/products", data);
 }
 
 /**
@@ -52,8 +46,6 @@ export function createProduct(data) {
  * PUT /api/products/{id}
  */
 export function updateProduct(id, data) {
-  // eslint-disable-next-line
-  const { put } = require("../axios.js");
   return put(`/products/${id}`, data);
 }
 
@@ -62,8 +54,6 @@ export function updateProduct(id, data) {
  * DELETE /api/products/{id}
  */
 export function deleteProduct(id) {
-  // eslint-disable-next-line
-  const { del } = require("../axios.js");
   return del(`/products/${id}`);
 }
 
@@ -72,13 +62,7 @@ export function deleteProduct(id) {
  * POST /api/files/image
  */
 export function uploadImage(file) {
-  // eslint-disable-next-line
-  const { post } = require("../axios.js");
   const formData = new FormData();
   formData.append("file", file);
-  return post("/files/image", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data"
-    }
-  });
+  return upload("/files/image", formData);
 }
