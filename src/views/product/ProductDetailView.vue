@@ -74,9 +74,7 @@
           <div class="row gap8 mt16">
             <div class="btn lg add-cart-btn" :class="{ disabled: currentStock === 0 }" @click="handleAddToCart">加入购物车</div>
             <div class="btn lg primary-btn" :class="{ disabled: currentStock === 0 }" @click="handleBuyNow">立即购买</div>
-            <div class="btn lg fav-btn" :class="{ active: isFavorite }" @click="handleFavorite">
-              {{ isFavorite ? '♥ 已收藏' : '♡ 收藏' }}
-            </div>
+            <div class="btn lg fav-btn" :class="{ 'fav-active': isFavorited }" @click="handleFavorite">{{ isFavorited ? '♥' : '♡' }} 收藏</div>
           </div>
         </div>
       </div>
@@ -100,7 +98,7 @@
         <div class="col flex1">
           <div class="tabs">
             <span class="tab" :class="{ on: activeTab === 'detail' }" @click="activeTab = 'detail'">商品详情</span>
-            <span class="tab" :class="{ on: activeTab === 'reviews' }" @click="activeTab = 'reviews'">用户评价 (0)</span>
+            <span class="tab" :class="{ on: activeTab === 'reviews' }" @click="switchReviews">用户评价 ({{ totalReviews }})</span>
             <span class="tab" :class="{ on: activeTab === 'service' }" @click="activeTab = 'service'">售后保障</span>
           </div>
           
@@ -110,7 +108,22 @@
           </div>
 
           <div class="card pad20" v-show="activeTab === 'reviews'">
-            <div class="muted text-center" style="padding: 40px;">暂无用户评价</div>
+            <div v-if="reviews.length === 0" class="muted text-center" style="padding: 40px;">暂无用户评价</div>
+            <div v-else class="review-list">
+              <div v-for="rv in reviews" :key="rv.id" class="review-item">
+                <div class="review-top">
+                  <span class="review-user">{{ rv.nickname || rv.username || '匿名用户' }}</span>
+                  <span class="review-rating">
+                    <span v-for="s in 5" :key="s" class="star" :class="{ filled: s <= rv.rating }">★</span>
+                  </span>
+                  <span class="review-time">{{ formatTime(rv.createTime) }}</span>
+                </div>
+                <div class="review-content">{{ rv.content }}</div>
+                <div v-if="rv.reply" class="review-reply">
+                  <span class="reply-label">商家回复：</span>{{ rv.reply }}
+                </div>
+              </div>
+            </div>
           </div>
           
           <div class="card pad20" v-show="activeTab === 'service'">
@@ -140,8 +153,7 @@
 </template>
 
 <script>
-import { getProductDetail, addToCart, searchProducts } from "@/api/modules/product.js";
-import { addFavorite, removeFavorite, checkFavorite } from "@/api/modules/user.js";
+import { getProductDetail, addToCart, addFavorite, removeFavorite, checkFavorite, searchProducts, getProductReviews } from "@/api/modules/product.js";
 import { getStore } from "@/libs/storage.js";
 
 export default {
@@ -160,7 +172,10 @@ export default {
       quantity: 1,
       
       activeTab: "detail",
-      otherProducts: []
+      otherProducts: [],
+      reviews: [],
+      totalReviews: 0,
+      isFavorited: false
     };
   },
   watch: {
@@ -210,6 +225,8 @@ export default {
         if (res.data) {
           this.product = res.data;
           this.initData();
+          this.loadReviews();
+          this.checkFavStatus();
         }
       } catch (e) {
         console.error("获取商品详情失败", e);
@@ -308,17 +325,14 @@ export default {
       if (this.currentStock === 0) return;
       alert("结算页面暂未开放，敬请期待！");
     },
-    async checkFavState() {
+    async checkFavStatus() {
       if (!this.userInfo || !this.product) return;
       try {
         const res = await checkFavorite(this.product.id);
-        if (res.data) {
-          this.isFavorite = res.data.isFavorite || res.data === true; // Handle different backend responses
-        }
-      } catch (e) {
-        console.error("查询收藏状态失败", e);
-      }
+        this.isFavorited = res.data?.isFavorite === 1;
+      } catch (e) { /* ignore */ }
     },
+
     async handleFavorite() {
       if (!this.userInfo) {
         this.$message.warning("请先登录！");
@@ -326,18 +340,38 @@ export default {
         return;
       }
       try {
-        if (this.isFavorite) {
+        if (this.isFavorited) {
           await removeFavorite(this.product.id);
-          this.isFavorite = false;
+          this.isFavorited = false;
           this.$message.success("已取消收藏");
         } else {
           await addFavorite(this.product.id);
-          this.isFavorite = true;
-          this.$message.success("收藏成功！");
+          this.isFavorited = true;
+          this.$message.success("已收藏");
         }
       } catch (e) {
-        this.$message.error("操作失败：" + (e.message || "请求异常"));
+        this.$message.error(e.message || "操作失败");
       }
+    },
+    async loadReviews() {
+      if (!this.product) return;
+      try {
+        const res = await getProductReviews(this.product.id, { current: 1, size: 10 });
+        this.reviews = res.data?.records || [];
+        this.totalReviews = res.data?.total || 0;
+      } catch (e) {
+        console.error("加载评价失败", e);
+      }
+    },
+    switchReviews() {
+      this.activeTab = 'reviews';
+      if (this.reviews.length === 0 && this.product) {
+        this.loadReviews();
+      }
+    },
+    formatTime(t) {
+      if (!t) return '';
+      return t.substring(0, 10);
     }
   }
 };
@@ -402,6 +436,8 @@ export default {
 .primary-btn:hover:not(.disabled) { background: #4a7ce0 !important; }
 .fav-btn { color: #555; }
 .fav-btn:hover { background: #f8f9fb; }
+.fav-btn.fav-active { color: #e74c3c; border-color: #e74c3c; background: #fef2f2; }
+.fav-btn.fav-active:hover { background: #fde8e8; }
 
 /* 底部 Tabs */
 .tabs { display: flex; border-bottom: 2px solid #e6e8eb; margin-bottom: 20px; }
@@ -411,4 +447,17 @@ export default {
 
 .pcard { display: flex; gap: 12px; }
 .pimg { width: 80px; height: 80px; background: #f0f0f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #aaa; flex-shrink: 0; }
+/* 评价 */
+.review-list { display: flex; flex-direction: column; gap: 16px; }
+.review-item { padding-bottom: 16px; border-bottom: 1px solid #f0f0f0; }
+.review-item:last-child { border-bottom: none; }
+.review-top { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.review-user { font-weight: 600; font-size: 14px; color: #2c3e50; }
+.review-rating { display: flex; gap: 2px; }
+.star { color: #ddd; font-size: 16px; }
+.star.filled { color: #f5a623; }
+.review-time { font-size: 12px; color: #bbb; margin-left: auto; }
+.review-content { font-size: 14px; color: #555; line-height: 1.6; }
+.review-reply { margin-top: 8px; padding: 8px 12px; background: #f9fafb; border-radius: 6px; font-size: 13px; color: #666; }
+.reply-label { color: #6b8dd6; font-weight: 500; }
 </style>

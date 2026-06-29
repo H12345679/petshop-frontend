@@ -30,15 +30,31 @@ export function getProductDetail(id) {
  * POST /api/cart
  */
 export function addToCart(data) {
-  return post("/cart", data);
+  return postJson("/cart", data);
 }
 
 /**
- * 收藏商品 (占位/实际)
+ * 添加收藏
  * POST /api/favorites/{productId}
  */
-export function toggleFavorite(productId) {
+export function addFavorite(productId) {
   return post(`/favorites/${productId}`);
+}
+
+/**
+ * 取消收藏
+ * DELETE /api/favorites/{productId}
+ */
+export function removeFavorite(productId) {
+  return del(`/favorites/${productId}`);
+}
+
+/**
+ * 检查是否已收藏
+ * GET /api/favorites/{productId}/check
+ */
+export function checkFavorite(productId) {
+  return get(`/favorites/${productId}/check`);
 }
 
 /**
@@ -74,4 +90,12 @@ export function uploadImage(file) {
   const formData = new FormData();
   formData.append("file", file);
   return upload("/files/image", formData);
+}
+
+/**
+ * 获取商品评价
+ * GET /api/products/{productId}/reviews
+ */
+export function getProductReviews(productId, params) {
+  return get(`/products/${productId}/reviews`, params);
 }

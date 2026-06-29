@@ -3,16 +3,17 @@
     <div class="aside">
       <div class="brand">🐾 宠物商城后台</div>
       <div class="menu-group">数据</div>
-      <a>📊 数据看板</a>
+      <router-link to="/admin/dashboard">📊 数据看板</router-link>
       <div class="menu-group">商品</div>
       <router-link to="/admin/shops">🏬 商店管理</router-link>
       <router-link to="/admin/products">📦 商品管理</router-link>
-      <a>⭐ 评价管理</a>
+      <router-link to="/admin/reviews">⭐ 评价管理</router-link>
       <div class="menu-group">交易</div>
-      <a>🧾 订单管理</a>
-      <a>↩ 退单审核</a>
+      <router-link to="/admin/orders">🧾 订单管理</router-link>
+      
       <div class="menu-group">运营</div>
       <router-link to="/admin/videos">🎬 视频管理</router-link>
+      <router-link to="/admin/coupons">🎫 优惠券管理</router-link>
       <router-link to="/admin/messages">🔔 消息推送</router-link>
       <div style="flex: 1;"></div>
       <router-link to="/" class="menu-group" style="margin-bottom: 20px; color: #888;">← 返回前台</router-link>
