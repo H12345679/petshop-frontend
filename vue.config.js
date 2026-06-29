@@ -8,6 +8,7 @@ module.exports = {
         host: 'localhost',
         port: 8099, // 服务端口
         https: false,
+        historyApiFallback: true, // 支持 History 模式路由（/map 等路径需要）
         //hotOnly: false,
         // http:localhost:8099/
         //vue:  api/book/save

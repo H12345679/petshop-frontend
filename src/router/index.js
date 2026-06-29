@@ -52,6 +52,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "shop" */ '../views/shop/ShopDetailView.vue')
   },
   {
+    path: '/map',
+    name: 'map',
+    component: () => import(/* webpackChunkName: "map" */ '../views/map/MapView.vue')
+  },
+  {
     path: '/admin',
     component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminLayout.vue'),
     meta: { requiresAdmin: true },
