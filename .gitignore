@@ -22,3 +22,5 @@ pnpm-debug.log*
 *.sln
 *.sw?
 node_modules
+项目接口设计文档.md
+肖志超的接口文档.md

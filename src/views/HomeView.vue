@@ -16,7 +16,7 @@
       <div class="right">
         <span>🛒 购物车</span>
         <template v-if="userInfo">
-          <span>👤 {{ userInfo.nickname || userInfo.username }}</span>
+          <router-link to="/user/center" class="link">👤 {{ userInfo.nickname || userInfo.username }}</router-link>
           <span class="link" @click="logout">退出</span>
         </template>
         <router-link v-else to="/login" class="link">登录 / 注册</router-link>
