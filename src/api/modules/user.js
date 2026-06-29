@@ -12,6 +12,9 @@ export function getUserInfo() {
   return get("/users/me");
 }
 
+/** 别名：getMe 等价于 getUserInfo */
+export const getMe = getUserInfo;
+
 /** 修改当前用户信息：PUT /api/users/me */
 export function updateUserInfo(data) {
   return put("/users/me", data);
@@ -122,4 +125,17 @@ export function readMessage(id) {
 /** 一键全部已读：PUT /api/messages/my/read-all */
 export function readAllMessages() {
   return put("/messages/my/read-all");
+}
+
+/** 发送/推送系统消息：POST /api/messages */
+export function pushMessage(data) {
+  return postJson("/messages", data);
+}
+
+/** 后台消息历史列表：GET /api/messages/manage */
+export function getManageMessages(params) {
+  return get("/messages/manage", params);
+/** 充值：POST /api/users/recharge */
+export function recharge(amount) {
+  return postJson("/users/recharge", { amount });
 }
