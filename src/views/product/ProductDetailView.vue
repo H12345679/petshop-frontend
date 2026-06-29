@@ -74,7 +74,9 @@
           <div class="row gap8 mt16">
             <div class="btn lg add-cart-btn" :class="{ disabled: currentStock === 0 }" @click="handleAddToCart">加入购物车</div>
             <div class="btn lg primary-btn" :class="{ disabled: currentStock === 0 }" @click="handleBuyNow">立即购买</div>
-            <div class="btn lg fav-btn" @click="handleFavorite">♡ 收藏</div>
+            <div class="btn lg fav-btn" :class="{ active: isFavorite }" @click="handleFavorite">
+              {{ isFavorite ? '♥ 已收藏' : '♡ 收藏' }}
+            </div>
           </div>
         </div>
       </div>
@@ -138,7 +140,8 @@
 </template>
 
 <script>
-import { getProductDetail, addToCart, toggleFavorite, searchProducts } from "@/api/modules/product.js";
+import { getProductDetail, addToCart, searchProducts } from "@/api/modules/product.js";
+import { addFavorite, removeFavorite, checkFavorite } from "@/api/modules/user.js";
 import { getStore } from "@/libs/storage.js";
 
 export default {
@@ -148,6 +151,7 @@ export default {
       loading: true,
       product: null,
       userInfo: null,
+      isFavorite: false,
       
       imageList: [],
       activeImage: "",
@@ -242,6 +246,9 @@ export default {
       this.quantity = 1;
       if (this.currentStock === 0) this.quantity = 0;
       
+      // 加载收藏状态
+      this.checkFavState();
+      
       // 加载本店其他商品
       this.fetchOtherProducts();
     },
@@ -301,16 +308,35 @@ export default {
       if (this.currentStock === 0) return;
       alert("结算页面暂未开放，敬请期待！");
     },
+    async checkFavState() {
+      if (!this.userInfo || !this.product) return;
+      try {
+        const res = await checkFavorite(this.product.id);
+        if (res.data) {
+          this.isFavorite = res.data.isFavorite || res.data === true; // Handle different backend responses
+        }
+      } catch (e) {
+        console.error("查询收藏状态失败", e);
+      }
+    },
     async handleFavorite() {
       if (!this.userInfo) {
+        this.$message.warning("请先登录！");
         this.$router.push('/login');
         return;
       }
       try {
-        await toggleFavorite(this.product.id);
-        alert("收藏操作成功！");
+        if (this.isFavorite) {
+          await removeFavorite(this.product.id);
+          this.isFavorite = false;
+          this.$message.success("已取消收藏");
+        } else {
+          await addFavorite(this.product.id);
+          this.isFavorite = true;
+          this.$message.success("收藏成功！");
+        }
       } catch (e) {
-        alert("收藏失败：" + (e.message || "请求异常"));
+        this.$message.error("操作失败：" + (e.message || "请求异常"));
       }
     }
   }
