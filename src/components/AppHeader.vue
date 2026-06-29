@@ -12,10 +12,13 @@
       <button class="go" @click="onSearch">搜索</button>
     </div>
     <div class="right">
-      <span>🛒 购物车</span>
-      <span>🔔 消息</span>
+      <router-link to="/cart" class="cart-link">🛒 购物车</router-link>
+      <router-link to="/messages" class="link">🔔 消息</router-link>
       <template v-if="userInfo">
+        <router-link to="/orders" class="link" style="font-weight: 500;">📄 我的订单</router-link>
+        <router-link to="/coupons?tab=mine" class="link" style="font-weight: 500;">🎫 优惠券</router-link>
         <span>👤 {{ userInfo.nickname || userInfo.username }}</span>
+        <router-link to="/addresses" class="link" style="font-weight: 500;">📍 地址管理</router-link>
         <router-link v-if="userInfo.role === 'ADMIN' || userInfo.role === 'MERCHANT'" to="/admin/shops" class="link" style="color: #ff5000; font-weight: 600;">管理后台</router-link>
         <span class="link" @click="logout">退出</span>
       </template>
@@ -126,5 +129,7 @@ export default {
 .right span:hover { color: #6B8DD6; }
 .link { color: #6B8DD6; cursor: pointer; text-decoration: none; font-weight: 600; transition: opacity 0.2s; }
 .link:hover { opacity: 0.8; }
+.cart-link { color: #555; cursor: pointer; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+.cart-link:hover { color: #6B8DD6; }
 .muted { color: #999; }
 </style>

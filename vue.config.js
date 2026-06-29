@@ -8,6 +8,7 @@ module.exports = {
         host: 'localhost',
         port: 8099, // 服务端口
         https: false,
+        historyApiFallback: true,
         //hotOnly: false,
         // http:localhost:8099/
         //vue:  api/book/save

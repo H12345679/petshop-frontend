@@ -22,14 +22,14 @@
               <div class="avatar">{{ userInfo ? (userInfo.nickname || userInfo.username || '我')[0] : '🐾' }}</div>
               <div v-if="userInfo" class="u-info">
                 <div class="u-name">{{ userInfo.nickname || userInfo.username }}</div>
-                <div class="u-bal">余额 <span>¥{{ userInfo.balance != null ? userInfo.balance : 0 }}</span></div>
+                <div class="u-bal">余额 <span>¥{{ userInfo.balance != null ? userInfo.balance : 0 }}</span> <router-link to="/recharge" class="recharge-link">充值</router-link></div>
               </div>
               <div v-else class="u-info">
                 <div class="u-name">欢迎来到宠物商城</div>
                 <router-link to="/login" class="u-login-btn">登录 / 注册</router-link>
               </div>
             </div>
-          <div class="entry">🎫 领券中心</div>
+          <div class="entry" @click="$router.push('/coupons')">🎫 领券中心</div>
           <div class="entry" @click="$router.push('/user/center')">⚙️ 设置</div>
         </aside>
       </div>
@@ -184,6 +184,8 @@ export default {
 .u-name { font-weight: 700; font-size: 16px; color: #222; margin-bottom: 4px; }
 .u-bal { font-size: 12px; color: #888; }
 .u-bal span { color: #FF4757; font-weight: 600; font-size: 14px; }
+.recharge-link { margin-left: 8px; font-size: 12px; color: #5b8def; font-weight: 600; text-decoration: none; }
+.recharge-link:hover { opacity: 0.8; }
 .u-login-btn {
   display: inline-block; background: #ffece8; color: #FF4757;
   padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; text-decoration: none; transition: background 0.2s;

@@ -12,6 +12,9 @@ export function getUserInfo() {
   return get("/users/me");
 }
 
+/** 别名：getMe 等价于 getUserInfo */
+export const getMe = getUserInfo;
+
 /** 修改当前用户信息：PUT /api/users/me */
 export function updateUserInfo(data) {
   return put("/users/me", data);
@@ -122,4 +125,9 @@ export function readMessage(id) {
 /** 一键全部已读：PUT /api/messages/my/read-all */
 export function readAllMessages() {
   return put("/messages/my/read-all");
+}
+
+/** 充值：POST /api/users/recharge */
+export function recharge(amount) {
+  return postJson("/users/recharge", { amount });
 }
