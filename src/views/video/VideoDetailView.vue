@@ -1,28 +1,7 @@
 <template>
   <div class="video-detail-page">
     <!-- 顶栏 -->
-    <header class="topbar">
-      <div class="logo"><span class="paw">🐾</span>宠物商城</div>
-      <nav class="nav">
-        <router-link to="/">首页</router-link>
-        <router-link to="/products">全部商品</router-link>
-        <router-link to="/shops">找门店</router-link>
-        <router-link to="/videos" class="active">萌宠视频</router-link>
-      </nav>
-      <div class="search">
-        <input placeholder="搜索视频..." @keyup.enter="handleSearch" v-model="searchKeyword" />
-        <button class="go" @click="handleSearch">搜索</button>
-      </div>
-      <div class="right">
-        <span>🛒 购物车</span>
-        <span>🔔 消息</span>
-        <template v-if="userInfo">
-          <span>👤 {{ userInfo.nickname || userInfo.username }}</span>
-          <span class="link" @click="logout">退出</span>
-        </template>
-        <router-link v-else to="/login" class="link">登录 / 注册</router-link>
-      </div>
-    </header>
+    <AppHeader />
 
     <div class="container" v-if="video">
       <el-row :gutter="24">
