@@ -58,10 +58,66 @@ const routes = [
     component: () => import(/* webpackChunkName: "shop" */ '../views/shop/ShopDetailView.vue')
   },
   {
+    path: '/coupons',
+    name: 'coupons',
+    component: () => import(/* webpackChunkName: "order" */ '../views/CouponCenterView.vue')
+  },
+  {
+    path: '/messages',
+    name: 'messages',
+    component: () => import(/* webpackChunkName: "order" */ '../views/MessageCenterView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/recharge',
+    name: 'recharge',
+    component: () => import(/* webpackChunkName: "order" */ '../views/RechargeView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/addresses',
+    name: 'addresses',
+    component: () => import(/* webpackChunkName: "order" */ '../views/AddressManageView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/cart',
+    name: 'cart',
+    component: () => import(/* webpackChunkName: "order" */ '../views/CartView.vue')
+  },
+  {
+    path: '/checkout',
+    name: 'checkout',
+    component: () => import(/* webpackChunkName: "order" */ '../views/CheckoutView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/orders',
+    name: 'orders',
+    component: () => import(/* webpackChunkName: "order" */ '../views/OrderListView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/order/:id',
+    name: 'order-detail',
+    component: () => import(/* webpackChunkName: "order" */ '../views/OrderDetailView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/admin',
     component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminLayout.vue'),
     meta: { requiresAdmin: true },
     children: [
+      {
+        path: '',
+        redirect: '/admin/dashboard'
+      },
+      {
+        path: 'dashboard',
+        name: 'admin-dashboard',
+        component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminDashboardView.vue'),
+        meta: { title: '数据 / 数据看板' }
+      },
       {
         path: "shops",
         name: "AdminShops",
@@ -75,10 +131,34 @@ const routes = [
         meta: { title: "后台管理 - 视频管理" },
       },
       {
+        path: 'orders',
+        name: 'admin-orders',
+        component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminOrdersView.vue'),
+        meta: { title: '订单 / 订单管理' }
+      },
+      {
         path: 'products',
         name: 'admin-products',
         component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminProductsView.vue'),
         meta: { title: '商品 / 商品管理' }
+      },
+      {
+        path: 'reviews',
+        name: 'admin-reviews',
+        component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminReviewsView.vue'),
+        meta: { title: '评价 / 评价管理' }
+      },
+      {
+        path: 'coupons',
+        name: 'admin-coupons',
+        component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminCouponsView.vue'),
+        meta: { title: '优惠券 / 优惠券管理' }
+      },
+      {
+        path: 'messages',
+        name: 'admin-messages',
+        component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminMessagesView.vue'),
+        meta: { title: '消息 / 消息推送' }
       }
     ]
   }
