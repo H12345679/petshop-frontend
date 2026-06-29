@@ -79,6 +79,12 @@ const routes = [
         name: 'admin-products',
         component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminProductsView.vue'),
         meta: { title: '商品 / 商品管理' }
+      },
+      {
+        path: 'logs',
+        name: 'AdminLogs',
+        component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminLogsView.vue'),
+        meta: { title: '后台管理 - 日志审核' }
       }
     ]
   }

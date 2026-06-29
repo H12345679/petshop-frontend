@@ -297,7 +297,7 @@ export default {
 .notify-close { cursor: pointer; font-weight: 700; }
 
 .uc-body {
-  flex: 1; display: flex; width: 1200px; max-width: 100%; margin: 20px auto; gap: 20px; padding: 0 24px;
+  flex: 1; display: flex; width: 1600px; max-width: 100%; margin: 20px auto; gap: 20px; padding: 0 24px;
 }
 
 /* ========== 左侧菜单 ========== */

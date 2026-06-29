@@ -14,6 +14,8 @@
       <div class="menu-group">运营</div>
       <router-link to="/admin/videos">🎬 视频管理</router-link>
       <a>🔔 消息推送</a>
+      <div class="menu-group">系统</div>
+      <router-link to="/admin/logs">📝 日志审核</router-link>
       <div style="flex: 1;"></div>
       <router-link to="/" class="menu-group" style="margin-bottom: 20px; color: #888;">← 返回前台</router-link>
     </div>
