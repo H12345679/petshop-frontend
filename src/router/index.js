@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import HomeView from '../views/user/HomeView.vue/index.js'
+import HomeView from '../views/user/HomeView.vue'
 import { getStore } from '../libs/storage.js'
 
 Vue.use(VueRouter)
@@ -29,14 +29,13 @@ const routes = [
   {
     path: '/register',
     name: 'register',
-    component: () => import(/* webpackChunkName: "auth" */ '../views/RegisterView.vue')
+    component: () => import(/* webpackChunkName: "auth" */ '../views/auth/RegisterView.vue')
   },
   {
     path: '/user/center',
     name: 'userCenter',
     component: () => import(/* webpackChunkName: "user" */ '../views/UserCenter.vue'),
     meta: { requiresAuth: true }
-    component: () => import(/* webpackChunkName: "auth" */ '../views/auth/RegisterView.vue')
   },
   {
     path: '/products',
