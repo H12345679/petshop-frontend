@@ -29,6 +29,13 @@ const routes = [
   {
     path: '/register',
     name: 'register',
+    component: () => import(/* webpackChunkName: "auth" */ '../views/RegisterView.vue')
+  },
+  {
+    path: '/user/center',
+    name: 'userCenter',
+    component: () => import(/* webpackChunkName: "user" */ '../views/UserCenter.vue'),
+    meta: { requiresAuth: true }
     component: () => import(/* webpackChunkName: "auth" */ '../views/auth/RegisterView.vue')
   },
   {
