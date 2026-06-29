@@ -133,6 +133,12 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: "/ai-chat",
+    name: "ai-chat",
+    component: () =>
+      import(/* webpackChunkName: "ai" */ "../views/ai/AiChatView.vue"),
+  },
+  {
     path: "/admin",
     component: () =>
       import(/* webpackChunkName: "admin" */ "../views/admin/AdminLayout.vue"),
