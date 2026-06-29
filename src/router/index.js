@@ -75,6 +75,12 @@ const routes = [
         meta: { title: "后台管理 - 视频管理" },
       },
       {
+        path: "messages",
+        name: "AdminMessages",
+        component: () => import("../views/admin/AdminMessagesView.vue"),
+        meta: { title: "运营 / 消息推送" },
+      },
+      {
         path: 'products',
         name: 'admin-products',
         component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminProductsView.vue'),
