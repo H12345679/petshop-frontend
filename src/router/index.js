@@ -15,7 +15,7 @@ const routes = [
     path: "/videos",
     name: "videos",
     component: () =>
-      import(/* webpackChunkName: "video" */ "../views/VideoListView.vue/index.js"),
+      import(/* webpackChunkName: "video" */ "../views/VideoListView.vue"),
   },
   {
     path: "/video/:id",
@@ -242,7 +242,7 @@ router.beforeEach((to, from, next) => {
   let userInfo = null;
   try {
     userInfo = JSON.parse(getStore("userInfo") || "null");
-  } catch (e) {}
+  } catch (e) { }
 
   // 已登录还去登录/注册页 → 直接回首页
   if (token && (to.path === "/login" || to.path === "/register")) {
