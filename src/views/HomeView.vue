@@ -13,7 +13,9 @@
           </ul>
         </aside>
 
-        <div class="banner">首页轮播 Banner（自动播放）</div>
+        <div class="banner">
+          <img src="@/assets/home_bg.png" alt="首页Banner" />
+        </div>
 
           <aside class="user-card" :class="{ logged: userInfo }">
             <div class="u-top">
@@ -27,8 +29,8 @@
                 <router-link to="/login" class="u-login-btn">登录 / 注册</router-link>
               </div>
             </div>
-          <div class="entry">🎁 活动入口</div>
           <div class="entry">🎫 领券中心</div>
+          <div class="entry" @click="$router.push('/user/center')">⚙️ 设置</div>
         </aside>
       </div>
 
@@ -156,15 +158,14 @@ export default {
 
 /* 中央大屏 Banner */
 .banner {
-  flex: 1; border-radius: 16px; color: #fff; font-size: 20px; font-weight: 700; letter-spacing: 2px;
+  flex: 1; border-radius: 16px;
   display: flex; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, #8E37D7, #6B8DD6, #3b5998);
-  background-size: 200% 200%;
-  animation: gradientShift 8s ease infinite;
   box-shadow: 0 12px 32px rgba(107, 141, 214, 0.25);
   position: relative; overflow: hidden;
 }
-@keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.banner img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
 
 /* 右侧用户卡片 */
 .user-card { width: 260px; flex-shrink: 0; display: flex; flex-direction: column; }
