@@ -135,6 +135,7 @@ export function pushMessage(data) {
 /** 后台消息历史列表：GET /api/messages/manage */
 export function getManageMessages(params) {
   return get("/messages/manage", params);
+}
 /** 充值：POST /api/users/recharge */
 export function recharge(amount) {
   return postJson("/users/recharge", { amount });

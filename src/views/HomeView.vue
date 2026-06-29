@@ -63,8 +63,7 @@
 
     <AppFooter />
 
-    <!-- AI 客服悬浮按钮（P23，后续接 /api/ai/chat） -->
-    <div class="ai-fab" title="AI 客服">🤖</div>
+
   </div>
 </template>
 
@@ -234,18 +233,5 @@ export default {
 .link { color: #6B8DD6; cursor: pointer; text-decoration: none; font-weight: 600; transition: opacity 0.2s; }
 .link:hover { opacity: 0.8; }
 
-/* AI 客服呼吸光环动效 */
-.ai-fab {
-  position: fixed; right: 40px; bottom: 40px; width: 60px; height: 60px; border-radius: 50%;
-  background: linear-gradient(135deg, #6B8DD6, #8E37D7); color: #fff; font-size: 28px;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 8px 24px rgba(107, 141, 214, 0.4); cursor: pointer; z-index: 100;
-  animation: pulse 2s infinite; transition: transform 0.2s;
-}
-.ai-fab:hover { transform: scale(1.1); animation: none; }
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(107, 141, 214, 0.6); }
-  70% { box-shadow: 0 0 0 20px rgba(107, 141, 214, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(107, 141, 214, 0); }
-}
+
 </style>
