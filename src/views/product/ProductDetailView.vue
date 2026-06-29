@@ -163,6 +163,7 @@ export default {
       loading: true,
       product: null,
       userInfo: null,
+      isFavorite: false,
       
       imageList: [],
       activeImage: "",
@@ -262,6 +263,9 @@ export default {
       this.quantity = 1;
       if (this.currentStock === 0) this.quantity = 0;
       
+      // 加载收藏状态
+      this.checkFavState();
+      
       // 加载本店其他商品
       this.fetchOtherProducts();
     },
@@ -331,6 +335,7 @@ export default {
 
     async handleFavorite() {
       if (!this.userInfo) {
+        this.$message.warning("请先登录！");
         this.$router.push('/login');
         return;
       }
