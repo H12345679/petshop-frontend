@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import HomeView from '../views/user/HomeView.vue'
+import HomeView from '../views/HomeView.vue'
 import { getStore } from '../libs/storage.js'
 
 Vue.use(VueRouter)
@@ -34,7 +34,7 @@ const routes = [
   {
     path: '/user/center',
     name: 'userCenter',
-    component: () => import(/* webpackChunkName: "user" */ '../views/UserCenter.vue'),
+    component: () => import(/* webpackChunkName: "user" */ '../views/user/UserCenter.vue'),
     meta: { requiresAuth: true }
   },
   {
