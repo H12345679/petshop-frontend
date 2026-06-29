@@ -15,7 +15,7 @@ const routes = [
     path: "/videos",
     name: "videos",
     component: () =>
-      import(/* webpackChunkName: "video" */ "../views/VideoListView.vue"),
+      import(/* webpackChunkName: "video" */ "../views/VideoListView.vue/index.js"),
   },
   {
     path: "/video/:id",
@@ -82,54 +82,54 @@ const routes = [
     path: "/coupons",
     name: "coupons",
     component: () =>
-      import(/* webpackChunkName: "order" */ "../views/CouponCenterView.vue"),
+      import(/* webpackChunkName: "order" */ "../views/market/CouponCenterView.vue"),
   },
   {
     path: "/messages",
     name: "messages",
     component: () =>
-      import(/* webpackChunkName: "order" */ "../views/MessageCenterView.vue"),
+      import(/* webpackChunkName: "order" */ "../views/user/MessageCenterView.vue"),
     meta: { requiresAuth: true },
   },
   {
     path: "/recharge",
     name: "recharge",
     component: () =>
-      import(/* webpackChunkName: "order" */ "../views/RechargeView.vue"),
+      import(/* webpackChunkName: "order" */ "../views/user/RechargeView.vue"),
     meta: { requiresAuth: true },
   },
   {
     path: "/addresses",
     name: "addresses",
     component: () =>
-      import(/* webpackChunkName: "order" */ "../views/AddressManageView.vue"),
+      import(/* webpackChunkName: "order" */ "../views/user/AddressManageView.vue"),
     meta: { requiresAuth: true },
   },
   {
     path: "/cart",
     name: "cart",
     component: () =>
-      import(/* webpackChunkName: "order" */ "../views/CartView.vue"),
+      import(/* webpackChunkName: "order" */ "../views/order/CartView.vue"),
   },
   {
     path: "/checkout",
     name: "checkout",
     component: () =>
-      import(/* webpackChunkName: "order" */ "../views/CheckoutView.vue"),
+      import(/* webpackChunkName: "order" */ "../views/order/CheckoutView.vue"),
     meta: { requiresAuth: true },
   },
   {
     path: "/orders",
     name: "orders",
     component: () =>
-      import(/* webpackChunkName: "order" */ "../views/OrderListView.vue"),
+      import(/* webpackChunkName: "order" */ "../views/order/OrderListView.vue"),
     meta: { requiresAuth: true },
   },
   {
     path: "/order/:id",
     name: "order-detail",
     component: () =>
-      import(/* webpackChunkName: "order" */ "../views/OrderDetailView.vue"),
+      import(/* webpackChunkName: "order" */ "../views/order/OrderDetailView.vue"),
     meta: { requiresAuth: true },
   },
   {
