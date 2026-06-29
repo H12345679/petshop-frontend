@@ -14,7 +14,11 @@
         </aside>
 
         <div class="banner">
-          <img src="@/assets/home_bg.png" alt="首页Banner" />
+          <el-carousel height="320px" style="width: 100%;">
+            <el-carousel-item v-for="(img, index) in banners" :key="index">
+              <img :src="img" alt="首页Banner" class="carousel-img" />
+            </el-carousel-item>
+          </el-carousel>
         </div>
 
           <aside class="user-card" :class="{ logged: userInfo }">
@@ -79,9 +83,16 @@ export default {
       categories: [],
       userInfo: null,
       sections: [
-        { key: "hot", title: "🔥 热销榜单", tag: "HOT", list: [], loading: true },
-        { key: "new", title: "✨ 新鲜上架", tag: "NEW", list: [], loading: true },
-        { key: "rec", title: "💡 为你推荐", tag: "RECOMMEND", list: [], loading: true },
+        { key: "hot", title: "🔥 热卖", tag: "HOT", list: [], loading: true },
+        { key: "new", title: "🆕 新品上市", tag: "NEW", list: [], loading: true },
+        { key: "rec", title: "🌟 为你推荐", tag: "RECOMMEND", list: [], loading: true },
+      ],
+      banners: [
+        'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1525253086316-d0c936c814f8?auto=format&fit=crop&w=800&q=80'
       ],
     };
   },
@@ -159,11 +170,10 @@ export default {
 /* 中央大屏 Banner */
 .banner {
   flex: 1; border-radius: 16px;
-  display: flex; align-items: center; justify-content: center;
   box-shadow: 0 12px 32px rgba(107, 141, 214, 0.25);
   position: relative; overflow: hidden;
 }
-.banner img {
+.carousel-img {
   width: 100%; height: 100%; object-fit: cover; display: block;
 }
 
