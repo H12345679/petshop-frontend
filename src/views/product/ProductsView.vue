@@ -1,0 +1,353 @@
+<template>
+  <div class="products-page">
+    <AppHeader />
+
+    <div class="container">
+      <div class="breadcrumb small muted mb12">首页 / 全部商品{{ currentCategoryName ? ' / ' + currentCategoryName : '' }}</div>
+      
+      <div class="row layout-body">
+        <!-- 左侧分类树 -->
+        <aside class="sidebar card">
+          <h3 class="cat-title">商品分类</h3>
+          <ul class="tree-list">
+            <li class="tree-item" :class="{ active: query.categoryId === '' }" @click="selectCategory('', '全部')">
+              <span class="tree-label">全部商品</span>
+            </li>
+            <template v-for="c in categories">
+              <li class="tree-item parent" :key="c.id" :class="{ active: query.categoryId === c.id }" @click="selectCategory(c.id, c.name)">
+                <span class="tree-label">▾ {{ c.name }}</span>
+              </li>
+              <li class="tree-item child" v-for="sub in c.children" :key="sub.id" :class="{ active: query.categoryId === sub.id }" @click="selectCategory(sub.id, sub.name)">
+                <span class="tree-label">· {{ sub.name }} <span v-if="query.categoryId === sub.id">✓</span></span>
+              </li>
+            </template>
+            <li v-if="!categories.length" class="muted small" style="padding: 10px 16px;">加载中...</li>
+          </ul>
+        </aside>
+
+        <!-- 右侧主体 -->
+        <main class="main-content">
+          <!-- 筛选条 -->
+          <div class="filter-card card">
+            <div class="filter-row wrap gap8">
+              <span class="small muted label">类型：</span>
+              <span class="tag" :class="{ accent: query.type === '' }" @click="selectType('')">全部</span>
+              <span class="tag" :class="{ accent: query.type === 1 }" @click="selectType(1)">宠物</span>
+              <span class="tag" :class="{ accent: query.type === 2 }" @click="selectType(2)">周边商品</span>
+              
+              <span class="small muted label" style="margin-left:20px">排序：</span>
+              <span class="tag" :class="{ accent: query.sort === '' }" @click="selectSort('')">综合</span>
+              <span class="tag" :class="{ accent: query.sort === 'sales_desc' }" @click="selectSort('sales_desc')">销量</span>
+              <span class="tag" :class="{ accent: query.sort === 'price_asc' || query.sort === 'price_desc' }" @click="togglePriceSort">
+                价格 {{ query.sort === 'price_asc' ? '↑' : (query.sort === 'price_desc' ? '↓' : '↑↓') }}
+              </span>
+              <span class="tag" :class="{ accent: query.sort === 'new' }" @click="selectSort('new')">最新</span>
+              
+              <span class="spacer"></span>
+              
+              <span class="small muted label">价格区间：</span>
+              <div class="price-input">
+                <input v-model.number="query.minPrice" type="number" placeholder="¥最低" @keyup.enter="doSearch" />
+              </div>
+              <span class="dash">-</span>
+              <div class="price-input">
+                <input v-model.number="query.maxPrice" type="number" placeholder="¥最高" @keyup.enter="doSearch" />
+              </div>
+              <button class="btn-small" @click="doSearch">确定</button>
+            </div>
+          </div>
+
+          <!-- 商品网格 -->
+          <div class="product-grid" v-if="!loading && products.length">
+            <div class="pcard" v-for="p in products" :key="p.id" @click="goToDetail(p.id)">
+              <div class="pimg" :class="{ ph: !p.mainImage }" :style="p.mainImage ? { backgroundImage: 'url(' + p.mainImage + ')' } : null">
+                <span v-if="!p.mainImage">商品主图</span>
+              </div>
+              <div class="pbody">
+                <div class="pname">{{ p.name }}</div>
+                <div class="price-row">
+                  <span class="price"><span class="cur">¥</span>{{ p.price }}</span>
+                  <span v-if="p.originalPrice && p.originalPrice > p.price" class="del">¥{{ p.originalPrice }}</span>
+                </div>
+                <div class="row between center small muted mt8">
+                  <span>已售 {{ p.sales || 0 }}</span>
+                  <span>{{ p.shopName || '宠物商城直营' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="empty-state" v-if="!loading && !products.length">
+            没有找到符合条件的商品，换个关键词或分类试试吧。
+          </div>
+          <div class="loading-state" v-if="loading">
+            加载中...
+          </div>
+
+          <!-- 分页 -->
+          <div class="pager" v-if="total > 0 && !loading">
+            <span class="arrow" @click="changePage(query.page - 1)" :class="{ disabled: query.page <= 1 }">‹</span>
+            <span class="num" v-for="p in totalPages" :key="p" :class="{ on: query.page === p }" @click="changePage(p)">{{ p }}</span>
+            <span class="arrow" @click="changePage(query.page + 1)" :class="{ disabled: query.page >= totalPages }">›</span>
+            <span class="total-text">共 {{ total }} 条</span>
+          </div>
+        </main>
+      </div>
+    </div>
+    <AppFooter />
+  </div>
+</template>
+
+<script>
+import { categoryTree } from "@/api/modules/home.js";
+import { searchProducts } from "@/api/modules/product.js";
+
+// Mock Data fallback
+const mockCategories = [
+  { id: 1, name: '宠物', children: [{ id: 11, name: '猫咪' }, { id: 12, name: '狗狗' }, { id: 13, name: '水族小宠' }] },
+  { id: 2, name: '主粮', children: [{ id: 21, name: '猫粮' }, { id: 22, name: '狗粮' }] },
+  { id: 3, name: '玩具用品', children: [] },
+  { id: 4, name: '清洁洗护', children: [] }
+];
+const mockProducts = [
+  { id: 101, name: "英国短毛猫 蓝猫 纯种健康", price: 2500, originalPrice: 3000, sales: 88, shopName: "极客宠物南山店", mainImage: "", type: 1 },
+  { id: 102, name: "布偶猫 海双 蓝眼 公", price: 6800, sales: 12, shopName: "萌宠之家", mainImage: "", type: 1 },
+  { id: 103, name: "银渐层 美短 折耳可选", price: 3200, sales: 30, shopName: "猫舍直营", mainImage: "", type: 1 },
+  { id: 104, name: "橘猫 田园猫 活泼黏人", price: 399, sales: 56, shopName: "领养代售", mainImage: "", type: 1 },
+  { id: 105, name: "暹罗猫 重点色 蓝眼", price: 1500, sales: 8, shopName: "萌宠之家", mainImage: "", type: 1 },
+  { id: 106, name: "无毛猫 斯芬克斯", price: 8800, sales: 3, shopName: "高端猫舍", mainImage: "", type: 1 },
+  { id: 107, name: "缅因猫 巨型 大体", price: 9900, sales: 5, shopName: "高端猫舍", mainImage: "", type: 1 },
+  { id: 108, name: "奶牛猫 活体 已驱虫", price: 299, sales: 22, shopName: "领养代售", mainImage: "", type: 1 },
+  { id: 109, name: "全价猫粮 1.5kg", price: 89, sales: 1200, shopName: "宠物商城自营", mainImage: "", type: 2 },
+  { id: 110, name: "逗猫棒 羽毛材质", price: 9.9, sales: 500, shopName: "宠物商城自营", mainImage: "", type: 2 }
+];
+
+export default {
+  name: "ProductsView",
+  data() {
+    return {
+      categories: [],
+      currentCategoryName: "",
+      
+      products: [],
+      total: 0,
+      loading: false,
+      
+      query: {
+        categoryId: "",
+        name: "",
+        type: "",
+        sort: "",
+        minPrice: null,
+        maxPrice: null,
+        page: 1,
+        size: 8
+      }
+    };
+  },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.total / this.query.size) || 1;
+    }
+  },
+  created() {
+    
+    // 初始化参数
+    if (this.$route.query.categoryId) this.query.categoryId = Number(this.$route.query.categoryId) || this.$route.query.categoryId;
+    if (this.$route.query.name) this.query.name = this.$route.query.name;
+    if (this.$route.query.type) this.query.type = Number(this.$route.query.type);
+    
+    this.loadCategories();
+    this.doSearch();
+  },
+  watch: {
+    '$route.query.name'(newVal) {
+      this.query.name = newVal || "";
+      this.query.page = 1;
+      this.doSearch();
+    }
+  },
+  methods: {
+    async loadCategories() {
+      try {
+        const res = await categoryTree();
+        this.categories = res.data || [];
+      } catch (e) {
+        console.warn("加载分类失败，使用模拟数据");
+        this.categories = mockCategories;
+      }
+    },
+    async doSearch() {
+      this.loading = true;
+      try {
+        const params = {
+          current: this.query.page,
+          size: this.query.size,
+          status: 1 // 只查上架
+        };
+        if (this.query.categoryId) params.categoryId = this.query.categoryId;
+        if (this.query.name) params.name = this.query.name;
+        if (this.query.type) params.type = this.query.type;
+        if (this.query.minPrice != null) params.minPrice = this.query.minPrice;
+        if (this.query.maxPrice != null) params.maxPrice = this.query.maxPrice;
+        if (this.query.sort) params.sort = this.query.sort;
+
+        const res = await searchProducts(params);
+        // 如果后端有数据返回 (PageResult 的结构中有 records 和 total)
+        if (res.data && res.data.records) {
+          this.products = res.data.records;
+          this.total = res.data.total;
+        } else {
+          throw new Error("无数据或格式不匹配");
+        }
+      } catch (e) {
+        console.warn("商品搜索请求失败或未对接后端，启用模拟数据:", e.message);
+        // Mock filtering logic
+        let filtered = mockProducts.filter(p => {
+          if (this.query.name && !p.name.includes(this.query.name)) return false;
+          if (this.query.type !== "" && p.type && p.type !== this.query.type) return false;
+          if (this.query.minPrice != null && p.price < this.query.minPrice) return false;
+          if (this.query.maxPrice != null && p.price > this.query.maxPrice) return false;
+          // Note: mock data category filtering is simplified here
+          return true;
+        });
+        
+        // Mock sorting
+        if (this.query.sort === 'price_asc') filtered.sort((a,b) => a.price - b.price);
+        if (this.query.sort === 'price_desc') filtered.sort((a,b) => b.price - a.price);
+        if (this.query.sort === 'sales_desc') filtered.sort((a,b) => b.sales - a.sales);
+        
+        this.total = filtered.length;
+        // Paginate mock
+        const start = (this.query.page - 1) * this.query.size;
+        this.products = filtered.slice(start, start + this.query.size);
+      } finally {
+        this.loading = false;
+        this.updateUrl();
+      }
+    },
+    selectCategory(id, name) {
+      this.query.categoryId = id;
+      this.currentCategoryName = id === '' ? '' : name;
+      this.query.page = 1;
+      this.doSearch();
+    },
+    selectType(type) {
+      this.query.type = type;
+      this.query.page = 1;
+      this.doSearch();
+    },
+    selectSort(sort) {
+      this.query.sort = sort;
+      this.query.page = 1;
+      this.doSearch();
+    },
+    togglePriceSort() {
+      if (this.query.sort === 'price_asc') {
+        this.selectSort('price_desc');
+      } else {
+        this.selectSort('price_asc');
+      }
+    },
+    changePage(p) {
+      if (p < 1 || p > this.totalPages) return;
+      this.query.page = p;
+      this.doSearch();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    updateUrl() {
+      const q = {};
+      if (this.query.categoryId !== "") q.categoryId = this.query.categoryId;
+      if (this.query.name) q.name = this.query.name;
+      if (this.query.type !== "") q.type = this.query.type;
+      
+      const currentQuery = this.$route.query;
+      const isSame = Object.keys(q).length === Object.keys(currentQuery).length && 
+                     Object.keys(q).every(key => String(q[key]) === String(currentQuery[key]));
+      if (!isSame) {
+        this.$router.replace({ path: '/products', query: q }).catch(() => {});
+      }
+    },
+    goToDetail(id) {
+      this.$router.push('/product/' + id);
+    },
+    logout() {
+      removestore("token");
+      removestore("userInfo");
+      this.userInfo = null;
+    }
+  }
+};
+</script>
+
+<style scoped>
+.products-page { background: #f4f5f7; min-height: 100vh; display: flex; flex-direction: column; }
+
+/* 布局 */
+.container { width: 1600px; max-width: 100%; margin: 0 auto; padding: 18px 0 40px; flex: 1; }
+.layout-body { display: flex; align-items: stretch; gap: 20px; }
+.row { display: flex; }
+.col { display: flex; flex-direction: column; }
+.between { justify-content: space-between; }
+.center { align-items: center; }
+.wrap { flex-wrap: wrap; }
+.gap8 { gap: 8px; }
+.mb12 { margin-bottom: 12px; }
+.mt8 { margin-top: 8px; }
+.small { font-size: 13px; }
+.muted { color: #888; }
+.accent { color: #5b8def !important; font-weight: 600; }
+.spacer { flex: 1; }
+.card { background: #fff; border: 1px solid #e6e8eb; border-radius: 10px; }
+
+/* 侧边分类树 */
+.sidebar { width: 220px; flex-shrink: 0; padding: 20px 0; }
+.cat-title { font-size: 15px; margin: 0 20px 16px; font-weight: 700; color: #888; }
+.tree-list { list-style: none; margin: 0; padding: 0; }
+.tree-item { padding: 10px 20px; cursor: pointer; color: #444; font-size: 14px; transition: 0.2s; }
+.tree-item:hover { background: #f8f9fb; color: #5b8def; }
+.tree-item.active { color: #5b8def; font-weight: 600; background: #eef4fe; }
+.tree-item.parent { font-weight: 600; color: #333; }
+.tree-item.child { padding-left: 36px; font-size: 13px; }
+
+/* 右侧主体区 */
+.main-content { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+
+/* 筛选卡片 */
+.filter-card { padding: 16px 24px; }
+.filter-row { display: flex; align-items: center; font-size: 13px; }
+.filter-row .label { margin-right: 4px; }
+.tag { margin: 0 4px; padding: 4px 10px; cursor: pointer; border-radius: 4px; transition: 0.2s; color: #555; }
+.tag:hover { background: #f4f5f7; color: #5b8def; }
+.tag.accent { background: #eef4fe; color: #5b8def; }
+
+.price-input { width: 70px; border: 1px solid #d6dbe3; border-radius: 4px; overflow: hidden; }
+.price-input input { width: 100%; border: 0; padding: 6px 8px; font-size: 12px; outline: none; }
+.dash { margin: 0 6px; color: #aaa; }
+.btn-small { margin-left: 10px; padding: 5px 12px; border: 1px solid #d6dbe3; background: #fff; border-radius: 4px; cursor: pointer; font-size: 12px; }
+.btn-small:hover { background: #f8f9fb; border-color: #cdd3db; }
+
+/* 商品网格 */
+.product-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; }
+.pcard { background: #fff; border: 1px solid #e6e8eb; border-radius: 10px; overflow: hidden; cursor: pointer; transition: box-shadow 0.2s, transform 0.2s; }
+.pcard:hover { box-shadow: 0 8px 24px rgba(60, 90, 160, 0.1); transform: translateY(-3px); }
+.pimg { width: 100%; aspect-ratio: 1 / 1; background-size: cover; background-position: center; }
+.pimg.ph { display: flex; align-items: center; justify-content: center; color: #aab0b8; font-size: 12px; background: repeating-linear-gradient(45deg, #eef0f3, #eef0f3 10px, #e6e9ee 10px, #e6e9ee 20px); }
+.pbody { padding: 12px; }
+.pname { font-size: 14px; color: #333; height: 40px; line-height: 20px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 8px; }
+.price-row { display: flex; align-items: baseline; }
+.price { color: #d9534f; font-weight: 700; font-size: 18px; }
+.price .cur { font-size: 13px; }
+.del { color: #aaa; text-decoration: line-through; font-size: 12px; margin-left: 6px; }
+
+/* 分页 */
+.pager { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 24px; font-size: 14px; padding-bottom: 20px;}
+.pager span { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; border-radius: 4px; cursor: pointer; color: #555; }
+.pager .num:hover, .pager .arrow:hover { background: #eef4fe; color: #5b8def; }
+.pager .on { background: #5b8def !important; color: #fff !important; font-weight: 600; }
+.pager .disabled { color: #ccc; cursor: not-allowed; background: transparent !important; }
+.pager .total-text { margin-left: 10px; color: #888; font-size: 13px; cursor: default; }
+
+.empty-state { padding: 60px 0; text-align: center; color: #888; background: #fff; border-radius: 10px; border: 1px solid #e6e8eb; }
+.loading-state { padding: 60px 0; text-align: center; color: #5b8def; font-weight: 500; }
+</style>
