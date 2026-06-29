@@ -13,22 +13,24 @@
           </ul>
         </aside>
 
-        <div class="banner">首页轮播 Banner（自动播放）</div>
+        <div class="banner">
+          <img src="@/assets/home_bg.png" alt="首页Banner" />
+        </div>
 
           <aside class="user-card" :class="{ logged: userInfo }">
             <div class="u-top">
               <div class="avatar">{{ userInfo ? (userInfo.nickname || userInfo.username || '我')[0] : '🐾' }}</div>
               <div v-if="userInfo" class="u-info">
                 <div class="u-name">{{ userInfo.nickname || userInfo.username }}</div>
-                <div class="u-bal">余额 <span>¥{{ userInfo.balance != null ? userInfo.balance : 0 }}</span></div>
+                <div class="u-bal">余额 <span>¥{{ userInfo.balance != null ? userInfo.balance : 0 }}</span> <router-link to="/recharge" class="recharge-link">充值</router-link></div>
               </div>
               <div v-else class="u-info">
                 <div class="u-name">欢迎来到宠物商城</div>
                 <router-link to="/login" class="u-login-btn">登录 / 注册</router-link>
               </div>
             </div>
-          <div class="entry">🎁 活动入口</div>
-          <div class="entry">🎫 领券中心</div>
+          <div class="entry" @click="$router.push('/coupons')">🎫 领券中心</div>
+          <div class="entry" @click="$router.push('/user/center')">⚙️ 设置</div>
         </aside>
       </div>
 
@@ -156,15 +158,14 @@ export default {
 
 /* 中央大屏 Banner */
 .banner {
-  flex: 1; border-radius: 16px; color: #fff; font-size: 20px; font-weight: 700; letter-spacing: 2px;
+  flex: 1; border-radius: 16px;
   display: flex; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, #8E37D7, #6B8DD6, #3b5998);
-  background-size: 200% 200%;
-  animation: gradientShift 8s ease infinite;
   box-shadow: 0 12px 32px rgba(107, 141, 214, 0.25);
   position: relative; overflow: hidden;
 }
-@keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.banner img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
 
 /* 右侧用户卡片 */
 .user-card { width: 260px; flex-shrink: 0; display: flex; flex-direction: column; }
@@ -183,6 +184,8 @@ export default {
 .u-name { font-weight: 700; font-size: 16px; color: #222; margin-bottom: 4px; }
 .u-bal { font-size: 12px; color: #888; }
 .u-bal span { color: #FF4757; font-weight: 600; font-size: 14px; }
+.recharge-link { margin-left: 8px; font-size: 12px; color: #5b8def; font-weight: 600; text-decoration: none; }
+.recharge-link:hover { opacity: 0.8; }
 .u-login-btn {
   display: inline-block; background: #ffece8; color: #FF4757;
   padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; text-decoration: none; transition: background 0.2s;
