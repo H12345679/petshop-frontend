@@ -13,3 +13,13 @@ export function login(data) {
 export function register(data) {
   return postJson("/auth/register", data);
 }
+
+/** 发送邮箱验证码：POST /api/auth/email/send-code  body { email } */
+export function sendEmailCode(email) {
+  return postJson("/auth/email/send-code", { email });
+}
+
+/** 邮箱验证码登录：POST /api/auth/email/login  body { email, code } */
+export function emailLogin(email, code) {
+  return postJson("/auth/email/login", { email, code });
+}

@@ -21,27 +21,28 @@
             <div class="poster-illustration">🐶🐱🐰</div>
           </div>
         </div>
-        
+
         <div class="right-card">
           <div class="section-title">欢迎登录</div>
           <div class="muted small mb12">还没有账号？<router-link to="/register" class="link">立即注册 →</router-link></div>
 
-          <form @submit.prevent="onSubmit">
+          <!-- 账号密码登录 -->
+          <form v-if="loginMode === 'password'" @submit.prevent="onPasswordLogin">
             <div class="field">
               <label>用户名 / 手机号</label>
               <div class="input-wrap">
-                <input v-model.trim="form.username" type="text" placeholder="请输入用户名" />
+                <input v-model.trim="passwordForm.username" type="text" placeholder="请输入用户名" />
               </div>
             </div>
-            
+
             <div class="field">
               <label>密码</label>
               <div class="input-wrap">
-                <input v-model="form.password" :type="showPassword ? 'text' : 'password'" placeholder="请输入密码" />
-                <span class="muted small" style="cursor:pointer; margin-left: 8px;" @click="showPassword = !showPassword">👁</span>
+                <input v-model="passwordForm.password" :type="showPassword ? 'text' : 'password'" placeholder="请输入密码" />
+                <span class="muted small toggle-pwd" @click="showPassword = !showPassword">👁</span>
               </div>
             </div>
-            
+
             <div class="row between center small mb12 mt-10">
               <label class="muted checkbox-label"><input type="checkbox" /> 记住我</label>
               <span class="link">忘记密码？</span>
@@ -54,53 +55,108 @@
             </button>
           </form>
 
-          <div class="row center mt16 third-party-divider">
+          <!-- 邮箱验证码登录 -->
+          <form v-else @submit.prevent="onEmailLogin">
+            <div class="field">
+              <label>邮箱</label>
+              <div class="input-wrap">
+                <input v-model.trim="emailForm.email" type="email" placeholder="请输入邮箱地址" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label>验证码</label>
+              <div class="input-wrap code-row">
+                <input v-model.trim="emailForm.code" type="text" maxlength="6" placeholder="请输入6位验证码" />
+                <button type="button" class="send-code-btn" :disabled="countdown > 0" @click="sendCode">
+                  {{ countdown > 0 ? countdown + 's 后重发' : '获取验证码' }}
+                </button>
+              </div>
+            </div>
+
+            <p v-if="error" class="error-text">{{ error }}</p>
+
+            <button type="submit" class="btn primary block lg" :disabled="loading">
+              {{ loading ? "登录中..." : "登 录" }}
+            </button>
+          </form>
+
+          <!-- 切换登录方式 -->
+          <div class="row center mt16 switch-divider">
             <div class="line f"></div>
-            <span class="muted small text-ph">第三方登录</span>
+            <span class="muted small switch-text" @click="toggleLoginMode">
+              {{ loginMode === 'password' ? '邮箱验证码登录' : '账号密码登录' }}
+            </span>
             <div class="line f"></div>
-          </div>
-          
-          <div class="row center mt12 third-party-icons">
-            <div class="avatar">微信</div>
-            <div class="avatar">QQ</div>
-            <span class="anno small muted">选做 OAuth</span>
           </div>
         </div>
       </div>
     </div>
-    
+
     <AppFooter />
   </div>
 </template>
 
 <script>
-import { login } from "@/api/modules/auth.js";
+import { login, sendEmailCode, emailLogin } from "@/api/modules/auth.js";
 import { setStore } from "@/libs/storage.js";
 
 export default {
   name: "LoginView",
   data() {
     return {
-      form: { username: "", password: "" },
+      loginMode: "password", // 'password' | 'email'
+      passwordForm: { username: "", password: "" },
+      emailForm: { email: "", code: "" },
       loading: false,
       error: "",
-      showPassword: false
+      showPassword: false,
+      countdown: 0,
+      countdownTimer: null,
     };
   },
   methods: {
-    async onSubmit() {
+    toggleLoginMode() {
       this.error = "";
-      if (!this.form.username || !this.form.password) {
+      this.loginMode = this.loginMode === "password" ? "email" : "password";
+    },
+    async sendCode() {
+      this.error = "";
+      const email = this.emailForm.email;
+      if (!email) {
+        this.error = "请输入邮箱地址";
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        this.error = "邮箱格式不正确";
+        return;
+      }
+      try {
+        await sendEmailCode(email);
+        this.countdown = 60;
+        this.countdownTimer = setInterval(() => {
+          this.countdown--;
+          if (this.countdown <= 0) {
+            clearInterval(this.countdownTimer);
+            this.countdownTimer = null;
+          }
+        }, 1000);
+      } catch (e) {
+        this.error = e.message || "发送验证码失败";
+      }
+    },
+    async onPasswordLogin() {
+      this.error = "";
+      if (!this.passwordForm.username || !this.passwordForm.password) {
         this.error = "请输入用户名和密码";
         return;
       }
       this.loading = true;
       try {
-        const res = await login(this.form);
+        const res = await login(this.passwordForm);
         const { token, user } = res.data;
         setStore("token", token);
         setStore("userInfo", user);
-        
         const redirect = this.$route.query.redirect || "/";
         this.$router.replace(redirect);
       } catch (e) {
@@ -109,6 +165,39 @@ export default {
         this.loading = false;
       }
     },
+    async onEmailLogin() {
+      this.error = "";
+      if (!this.emailForm.email) {
+        this.error = "请输入邮箱地址";
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.emailForm.email)) {
+        this.error = "邮箱格式不正确";
+        return;
+      }
+      if (!this.emailForm.code) {
+        this.error = "请输入验证码";
+        return;
+      }
+      this.loading = true;
+      try {
+        const res = await emailLogin(this.emailForm.email, this.emailForm.code);
+        const { token, user } = res.data;
+        setStore("token", token);
+        setStore("userInfo", user);
+        const redirect = this.$route.query.redirect || "/";
+        this.$router.replace(redirect);
+      } catch (e) {
+        this.error = e.message || "登录失败";
+      } finally {
+        this.loading = false;
+      }
+    },
+  },
+  beforeDestroy() {
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+    }
   },
 };
 </script>
@@ -318,45 +407,56 @@ export default {
   margin: 12px 0 0 0;
 }
 
-/* 第三方登录 */
-.third-party-divider {
+/* 切换登录方式 */
+.switch-divider {
   gap: 16px;
 }
-.third-party-divider .line {
+.switch-divider .line {
   flex: 1;
   height: 1px;
   background: #e6e8eb;
 }
-.text-ph {
-  color: #bbb;
+.switch-text {
+  color: #5b8def;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+.switch-text:hover {
+  color: #3a6fd8;
+  text-decoration: underline;
 }
 
-.third-party-icons {
-  gap: 20px;
-}
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #f0f3fa;
-  color: #5b8def;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
+/* 密码可见切换 */
+.toggle-pwd {
   cursor: pointer;
+  margin-left: 8px;
+  user-select: none;
+}
+
+/* 验证码发送按钮 */
+.code-row {
+  padding-right: 4px;
+}
+.send-code-btn {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: #5b8def;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
   transition: all 0.2s ease;
 }
-.avatar:hover {
-  background: #5b8def;
-  color: #fff;
-  transform: scale(1.05);
+.send-code-btn:hover:not(:disabled) {
+  background: #eef3fd;
 }
-.anno {
-  background: #f5f5f5;
-  padding: 4px 8px;
-  border-radius: 4px;
+.send-code-btn:disabled {
+  color: #bbb;
+  cursor: not-allowed;
 }
 
 
