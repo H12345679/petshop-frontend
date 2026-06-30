@@ -15,7 +15,7 @@ const routes = [
     path: "/videos",
     name: "videos",
     component: () =>
-      import(/* webpackChunkName: "video" */ "../views/VideoListView.vue"),
+      import(/* webpackChunkName: "video" */ "../views/video/VideoListView.vue"),
   },
   {
     path: "/video/:id",
@@ -136,14 +136,14 @@ const routes = [
     path: "/refund",
     name: "refund",
     component: () =>
-      import(/* webpackChunkName: "order" */ "../views/RefundView.vue"),
+      import(/* webpackChunkName: "order" */ "../views/order/RefundView.vue"),
     meta: { requiresAuth: true },
   },
   {
     path: "/review",
     name: "review",
     component: () =>
-      import(/* webpackChunkName: "order" */ "../views/ReviewView.vue"),
+      import(/* webpackChunkName: "order" */ "../views/order/ReviewView.vue"),
     meta: { requiresAuth: true },
   },
   {

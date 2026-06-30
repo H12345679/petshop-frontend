@@ -1,5 +1,6 @@
 <template>
   <div id="cart-page">
+    <AppHeader />
     <div class="cart-container">
       <div class="page-header">
         <div class="section-title">我的购物车（{{ items.length }} 件商品）</div>
@@ -122,11 +123,12 @@
 
 <script>
 import { cartList, updateCartQty, deleteCart, toggleCartSelect } from "@/api/modules/cart.js";
+import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
 
 export default {
   name: "CartView",
-  components: { AppFooter },
+  components: { AppHeader, AppFooter },
   data() {
     return {
       items: [],

@@ -1,5 +1,6 @@
 <template>
   <div id="order-list-page">
+    <AppHeader />
     <div class="order-wrap">
       <div class="page-header">
         <div class="section-title">我的订单</div>
@@ -107,6 +108,7 @@
 import { myOrders, payOrder, cancelOrder, receiveOrder } from "@/api/modules/order.js";
 import { getUserInfo } from "@/api/modules/user.js";
 import { setStore } from "@/libs/storage.js";
+import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
 
 const TABS = [
@@ -120,7 +122,7 @@ const TABS = [
 
 export default {
   name: "OrderListView",
-  components: { AppFooter },
+  components: { AppHeader, AppFooter },
   data() {
     return {
       orders: [],
