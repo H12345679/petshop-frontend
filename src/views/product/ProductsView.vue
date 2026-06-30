@@ -150,7 +150,7 @@ export default {
         minPrice: null,
         maxPrice: null,
         page: 1,
-        size: 8
+        size: 10
       }
     };
   },
@@ -161,10 +161,9 @@ export default {
     discount() {
       if (!this.userInfo) return 1;
       const level = this.userInfo.memberLevelId || 0;
-      if (level > 0) {
-        return Math.max(0.7, 1 - level * 0.05);
-      }
-      return 1;
+      if (level === 2) return 0.95; // 银卡 95%
+      if (level >= 3) return 0.90;  // 金卡 90%
+      return 1; // 游客或普通会员(1) 100%
     }
   },
   created() {

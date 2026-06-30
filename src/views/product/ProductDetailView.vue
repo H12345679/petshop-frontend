@@ -210,12 +210,10 @@ export default {
   computed: {
     discount() {
       if (!this.userInfo) return 1;
-      // 简单模拟：memberLevelId 1 = 9.5折, 2 = 9折, 3 = 8.5折...
       const level = this.userInfo.memberLevelId || 0;
-      if (level > 0) {
-        return Math.max(0.7, 1 - level * 0.05);
-      }
-      return 1;
+      if (level === 2) return 0.95; // 银卡 95%
+      if (level >= 3) return 0.90;  // 金卡 90%
+      return 1; // 游客或普通会员(1) 100%
     },
     basePrice() {
       if (!this.product) return 0;
