@@ -102,6 +102,7 @@
 
 <script>
 import { manageRefunds, auditRefund } from "@/api/modules/order.js";
+import { getStore } from "@/libs/storage.js";
 
 export default {
   name: "AdminRefundsView",
@@ -112,8 +113,8 @@ export default {
         { label: "待审核", value: 0, count: null },
         { label: "已通过", value: 1, count: null },
         { label: "已驳回", value: 2, count: null },
-        { label: "管理员直退", value: "direct", count: null },
-      ],
+        { label: "管理员直退", value: "direct", count: null, adminOnly: true },
+      ].filter(t => !t.adminOnly || this.isAdmin),
       list: [],
       loading: true,
       current: 1,
@@ -133,6 +134,7 @@ export default {
       // Direct refund
       directForm: { orderNo: "", reason: "" },
       directLoading: false,
+      isAdmin: false,
     };
   },
   computed: {
@@ -151,7 +153,13 @@ export default {
       return pages;
     },
   },
-  created() { this.loadData(); },
+  created() {
+    const raw = getStore("userInfo");
+    if (raw) {
+      try { this.isAdmin = JSON.parse(raw).role === "ADMIN"; } catch (e) {}
+    }
+    this.loadData();
+  },
   methods: {
     statusClass(s) { return { 0:'warn', 1:'ok', 2:'cancel' }[s] || 'done'; },
     statusLabel(s) { return { 0:'待审核', 1:'已通过', 2:'已驳回' }[s] || '其他'; },
