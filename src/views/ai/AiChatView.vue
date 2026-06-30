@@ -87,7 +87,6 @@
               </el-input>
             </div>
             <div class="footer-tip">
-              说明 (E7)：免登录可匿名提问；登录后关联 user_id 即可查历史；sessionId 保持上下文。
             </div>
           </div>
         </div>
@@ -190,8 +189,17 @@ export default {
     },
     formatText(text) {
       if (!text) return "";
-      let html = text.replace(/\n/g, '<br/>');
-      html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def; cursor:pointer; text-decoration: underline;">$1</a>');
+      let html = text
+        // 1. 处理 **[text](url)** 格式（加粗包裹的标准链接）
+        .replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        // 2. 处理普通标准 [text](url) 格式
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        // 3. 兜底：【name】（ /product/123 ）或 【name】( /product/123 ) — 全角/半角括号带空格
+        .replace(/(【[^】]+】)\s*[（(]\s*(\/product\/\d+)\s*[）)]/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        // 4. 处理 **文字** 加粗（排除已转换的 <a> 标签内容）
+        .replace(/\*\*([^*<>]+)\*\*/g, '<strong>$1</strong>')
+        // 5. 换行
+        .replace(/\n/g, '<br/>');
       return html;
     },
     handleChatClick(e) {
@@ -220,7 +228,8 @@ export default {
       
       try {
         const token = getStore("token") || "";
-        const response = await fetch('/api/ai/chat/stream', {
+        // SSE 直连后端，跳过 webpack devServer 代理（代理层会缓冲流式数据）
+        const response = await fetch('http://localhost:8088/api/ai/chat/stream', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -234,16 +243,18 @@ export default {
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
+        let buffer = '';
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) {
             break;
           }
-          const chunk = decoder.decode(value, { stream: true });
+          buffer += decoder.decode(value, { stream: true });
           
-          // 处理后端发来的格式: data:{"text":"xxx"}\n\n
-          const lines = chunk.split('\n');
+          const lines = buffer.split('\n');
+          buffer = lines.pop(); // 保留最后一行（可能不完整）在 buffer 中，等下次拼
+          
           for (let line of lines) {
             if (line.startsWith('data:')) {
               let jsonStr = line.substring(5).trim();
@@ -254,7 +265,7 @@ export default {
                          this.currentAiMessage += obj.text;
                      }
                  } catch (e) {
-                     // ignore parse errors for partial chunks, though SseEmitter usually sends complete lines
+                     // ignore parse errors
                  }
               }
             }
