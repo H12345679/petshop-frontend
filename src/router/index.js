@@ -133,6 +133,20 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: "/refund",
+    name: "refund",
+    component: () =>
+      import(/* webpackChunkName: "order" */ "../views/RefundView.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/review",
+    name: "review",
+    component: () =>
+      import(/* webpackChunkName: "order" */ "../views/ReviewView.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
     path: "/ai-chat",
     name: "ai-chat",
     component: () =>
@@ -197,13 +211,13 @@ const routes = [
         meta: { title: "订单 / 订单管理" },
       },
       {
-        path: "products",
-        name: "admin-products",
+        path: "refunds",
+        name: "admin-refunds",
         component: () =>
           import(
-            /* webpackChunkName: "admin" */ "../views/admin/AdminProductsView.vue"
+            /* webpackChunkName: "admin" */ "../views/admin/AdminRefundsView.vue"
           ),
-        meta: { title: "商品 / 商品管理" },
+        meta: { title: "退单 / 退单审核" },
       },
       {
         path: "reviews",
@@ -222,15 +236,6 @@ const routes = [
             /* webpackChunkName: "admin" */ "../views/admin/AdminCouponsView.vue"
           ),
         meta: { title: "优惠券 / 优惠券管理" },
-      },
-      {
-        path: "messages",
-        name: "admin-messages",
-        component: () =>
-          import(
-            /* webpackChunkName: "admin" */ "../views/admin/AdminMessagesView.vue"
-          ),
-        meta: { title: "消息 / 消息推送" },
       },
       {
         path: 'users',
