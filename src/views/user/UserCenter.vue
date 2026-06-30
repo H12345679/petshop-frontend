@@ -109,7 +109,7 @@
         <!-- ========== 动态面板区域 ========== -->
         <keep-alive>
           <UserProfile
-            v-if="currentTab === 'profile' || currentTab === 'password'"
+            v-if="currentTab === 'profile'"
             :user-info="userInfo"
             @update-user="loadUserInfo"
             @logout="handleLogout"
@@ -145,6 +145,19 @@
             @notify="notify"
           />
         </keep-alive>
+
+        <!-- 修改密码弹窗 -->
+        <el-dialog
+          title="修改密码"
+          :visible.sync="showPasswordModal"
+          width="460px"
+          :close-on-click-modal="false"
+        >
+          <UserPassword
+            @notify="notify"
+            @logout="handleLogout"
+          />
+        </el-dialog>
       </div>
     </div>
 
@@ -161,6 +174,7 @@ import UserFavorites from "@/views/user/UserFavorites.vue";
 import UserCoupons from "@/views/user/UserCoupons.vue";
 import UserMembership from "@/views/user/UserMembership.vue";
 import UserMessages from "@/views/user/UserMessages.vue";
+import UserPassword from "@/views/user/UserPassword.vue";
 
 import { getUserInfo, getMembershipLevels } from "@/api/modules/user.js";
 import { getStore, setStore, removestore } from "@/libs/storage.js";
@@ -175,7 +189,8 @@ export default {
     UserFavorites,
     UserCoupons,
     UserMembership,
-    UserMessages
+    UserMessages,
+    UserPassword
   },
   data() {
     return {
@@ -188,7 +203,7 @@ export default {
         { key: "coupons",    label: "优惠券",      icon: "🎫" },
         { key: "membership", label: "会员中心",    icon: "👑" },
         { key: "messages",   label: "消息中心",    icon: "💬" },
-        { key: "password",   label: "🔒 修改密码", icon: "🔒" },
+        { key: "password",   label: "修改密码", icon: "🔒" },
       ],
 
       // 用户数据
@@ -203,6 +218,7 @@ export default {
       // UI
       loading: true,
       notification: null,
+      showPasswordModal: false,
     };
   },
   computed: {
@@ -246,7 +262,7 @@ export default {
     // ========== 菜单切换 ==========
     switchTab(key) {
       if (key === 'password') {
-        this.currentTab = 'profile'; // Keep it on profile view which now handles password too
+        this.showPasswordModal = true;
       } else {
         this.currentTab = key;
       }
