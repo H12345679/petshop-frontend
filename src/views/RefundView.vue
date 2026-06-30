@@ -1,11 +1,9 @@
 <template>
   <div id="refund-page">
-    <AppHeader />
-
-    <div class="container">
+    <div class="refund-wrap">
       <div class="section-title">申请退款 / 退货</div>
 
-      <!-- 加载中 -->
+      <!-- 加载 -->
       <div v-if="loading" class="loading-wrap">⏳ 加载中…</div>
 
       <template v-if="!loading && orderItem">
@@ -24,8 +22,8 @@
               <tr>
                 <td>
                   <div class="prod-cell">
-                    <img :src="orderItem.productImage || '/logo.png'" class="tbl-img" />
-                    <span>{{ orderItem.productName }} × {{ orderItem.quantity }}</span>
+                    <div class="prod-img"><img :src="orderItem.productImage || '/logo.png'" /></div>
+                    {{ orderItem.productName }} × {{ orderItem.quantity }}
                   </div>
                 </td>
                 <td class="price">¥{{ (orderItem.realPayAmount || 0).toFixed(2) }}</td>
@@ -40,9 +38,9 @@
         <div class="card">
           <div class="field">
             <label>退款类型</label>
-            <div class="tag-row">
-              <span :class="['tag', { accent: form.type === 1 }]" @click="form.type = 1">仅退款</span>
-              <span :class="['tag', { accent: form.type === 2 }]" @click="form.type = 2">退货退款</span>
+            <div class="chip-row">
+              <span :class="['chip', { on: form.type === 1 }]" @click="form.type = 1">仅退款</span>
+              <span :class="['chip', { on: form.type === 2 }]" @click="form.type = 2">退货退款</span>
             </div>
           </div>
 
@@ -50,7 +48,14 @@
             <label><span class="req">*</span> 退款金额</label>
             <div class="amount-row">
               <span class="currency">¥</span>
-              <input type="number" v-model.number="form.amount" :max="maxRefund" :min="0.01" step="0.01" class="amount-input" />
+              <input
+                type="number"
+                v-model.number="form.amount"
+                :max="maxRefund"
+                :min="0.01"
+                step="0.01"
+                class="amount-input"
+              />
               <span class="small muted">最多可退 ¥{{ maxRefund.toFixed(2) }}</span>
             </div>
           </div>
@@ -74,13 +79,14 @@
               :rows="3"
               placeholder="补充说明，便于商家审核…"
               maxlength="500"
+              show-word-limit
             />
           </div>
 
           <div class="field">
             <label>上传凭证（选填）</label>
             <div class="upload-row">
-              <div v-for="(img, idx) in form.images" :key="idx" class="upload-img">
+              <div v-for="(img, idx) in form.images" :key="idx" class="upload-item">
                 <img :src="img" />
               </div>
               <div v-if="form.images.length < 6" class="upload-add" @click="addImage">＋</div>
@@ -88,10 +94,10 @@
           </div>
 
           <div class="btn-row">
-            <button class="btn" @click="$router.back()">取消</button>
-            <button class="btn primary lg" @click="submitRefund" :disabled="submitting">
+            <span class="btn" @click="$router.back()">取消</span>
+            <span class="btn primary lg" :class="{ disabled: submitting }" @click="submitRefund">
               {{ submitting ? '提交中…' : '提交申请' }}
-            </button>
+            </span>
           </div>
         </div>
       </template>
@@ -108,12 +114,11 @@
 </template>
 
 <script>
+import AppFooter from "@/components/AppFooter.vue";
+
 export default {
   name: "RefundView",
-  components: {
-    AppHeader: () => import("@/components/AppHeader.vue"),
-    AppFooter: () => import("@/components/AppFooter.vue"),
-  },
+  components: { AppFooter },
   data() {
     return {
       loading: true,
@@ -126,7 +131,7 @@ export default {
   created() {
     const orderId = this.$route.query.orderId;
     const itemId = this.$route.query.itemId;
-    if (orderId && itemId) this.loadItem(orderId, itemId);
+    if (orderId) this.loadItem(orderId, itemId);
     else this.loading = false;
   },
   methods: {
@@ -137,26 +142,30 @@ export default {
         const orders = res.data?.records || [];
         for (const o of orders) {
           if (String(o.id) === String(orderId)) {
-            const item = (o.orderItems || []).find(i => String(i.id) === String(itemId));
+            const items = o.orderItems || [];
+            // 如果指定了 itemId，只退该明细；否则退整单第一项
+            const item = itemId
+              ? items.find(i => String(i.id) === String(itemId))
+              : items[0];
             if (item) {
               this.orderItem = item;
               this.maxRefund = Number(item.realPayAmount || 0);
               this.form.amount = this.maxRefund;
             }
+            break;
           }
         }
       } catch (e) { /* ignore */ }
       this.loading = false;
     },
-
     addImage() {
       const url = prompt("输入图片URL（模拟上传）");
       if (url && this.form.images.length < 6) this.form.images.push(url);
     },
-
     async submitRefund() {
+      if (this.submitting) return;
       if (!this.form.amount || this.form.amount <= 0) return this.$message.warning("请输入退款金额");
-      if (this.form.amount > this.maxRefund) return this.$message.warning("退款金额不可超过上限");
+      if (this.form.amount > this.maxRefund) return this.$message.warning("退款金额不可超过可退上限");
       if (!this.form.reason) return this.$message.warning("请选择退款原因");
       this.submitting = true;
       try {
@@ -169,7 +178,7 @@ export default {
           refundType: this.form.type,
           images: this.form.images,
         });
-        this.$message.success("退款申请已提交");
+        this.$message.success("退款申请已提交，等待商家处理");
         this.$router.push("/orders");
       } catch (e) {
         this.$message.error(e.message || "提交失败");
@@ -182,67 +191,72 @@ export default {
 </script>
 
 <style scoped>
-#refund-page { background:#f4f5f7; min-height:100vh; display:flex; flex-direction:column; }
-.container { width: 700px; max-width:100%; margin:0 auto; padding:24px 16px 40px; flex:1; }
-.section-title { font-size:22px; font-weight:700; color:#2c3e50; margin-bottom:20px; }
+#refund-page { display: flex; flex-direction: column; min-height: 100vh; background: #f4f5f7; }
+.refund-wrap { max-width: 700px; width: 100%; margin: 0 auto; padding: 24px 20px 40px; flex: 1; }
 
-.loading-wrap { text-align:center; padding:80px 0; color:#999; }
-.empty-state { text-align:center; padding:80px 0; color:#999; }
-.back-link { font-size:14px; color:#6b8dd6; text-decoration:none; font-weight:500; }
+.section-title { font-size: 22px; font-weight: 700; color: #2c3e50; margin-bottom: 20px; }
+.loading-wrap { text-align: center; padding: 80px; color: #888; }
+.empty-state { text-align: center; padding: 80px; color: #888; }
+.back-link { font-size: 14px; color: #5b8def; text-decoration: none; font-weight: 500; }
 
-/* ===== 卡片 ===== */
-.card { background:#fff; border-radius:12px; padding:20px 24px; margin-bottom:16px; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
-.card h3 { font-size:16px; font-weight:600; color:#2c3e50; margin:0 0 12px; }
+/* 卡片 */
+.card { background: #fff; border: 1px solid #cfd4da; border-radius: 8px; padding: 20px 24px; margin-bottom: 16px; }
+.card h3 { margin: 0 0 12px; font-size: 16px; font-weight: 600; color: #2c3e50; }
 
-/* ===== 商品表格 ===== */
-.tbl { width:100%; border-collapse:collapse; font-size:14px; }
-.tbl th { background:#f7f8fa; padding:10px; text-align:left; font-weight:600; color:#666; border-bottom:1px solid #eee; }
-.tbl td { padding:10px; border-bottom:1px solid #f5f5f5; vertical-align:middle; }
-.tbl tr:last-child td { border-bottom:none; }
-.prod-cell { display:flex; align-items:center; gap:10px; }
-.tbl-img { width:44px; height:44px; border-radius:6px; object-fit:cover; background:#f5f5f5; flex-shrink:0; }
-.price { color:#e74c3c; font-weight:600; }
-.tip { margin-top:8px; }
+/* 商品表格 */
+.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tbl th { background: #f7f8fa; text-align: left; padding: 10px; color: #666; font-weight: 600; border-bottom: 1px solid #cfd4da; }
+.tbl td { padding: 10px; border-bottom: 1px solid #eef0f3; vertical-align: middle; color: #555; }
+.tbl tr:last-child td { border-bottom: none; }
+.prod-cell { display: flex; align-items: center; gap: 10px; }
+.prod-img { width: 44px; height: 44px; border-radius: 6px; overflow: hidden; background: #f5f5f5; flex-shrink: 0; }
+.prod-img img { width: 100%; height: 100%; object-fit: cover; }
+.price { color: #d9534f; font-weight: 600; }
+.tip { margin-top: 8px; }
 
-/* ===== 表单字段 ===== */
-.field { margin-bottom:18px; }
-.field label { display:block; font-size:14px; color:#333; font-weight:500; margin-bottom:8px; }
-.req { color:#e74c3c; }
+/* 表单 */
+.field { margin-bottom: 18px; }
+.field label { display: block; font-size: 14px; color: #333; font-weight: 500; margin-bottom: 8px; }
+.req { color: #d9534f; }
 
-/* ===== 退款类型标签 ===== */
-.tag-row { display:flex; gap:8px; }
-.tag { padding:8px 22px; border-radius:100px; font-size:14px; cursor:pointer; background:#f0f2f5; color:#666; font-weight:500; transition:all .2s; border:1px solid transparent; }
-.tag:hover { border-color:#6b8dd6; }
-.tag.accent { background:#eef4ff; color:#6b8dd6; border-color:#6b8dd6; font-weight:600; }
+/* 类型选择 */
+.chip-row { display: flex; gap: 8px; }
+.chip { padding: 8px 22px; border-radius: 100px; font-size: 14px; cursor: pointer; background: #f0f2f5; color: #666; font-weight: 500; transition: .15s; border: 1px solid transparent; }
+.chip:hover { border-color: #5b8def; }
+.chip.on { background: #e7eefc; border-color: #5b8def; color: #5b8def; font-weight: 600; }
 
-/* ===== 退款金额 ===== */
-.amount-row { display:flex; align-items:center; gap:10px; }
-.currency { font-size:20px; color:#333; font-weight:600; }
+/* 金额 */
+.amount-row { display: flex; align-items: center; gap: 10px; }
+.currency { font-size: 20px; color: #333; font-weight: 600; }
 .amount-input {
-  width:160px; padding:10px 14px; font-size:18px; font-weight:700; color:#e74c3c;
-  border:1px solid #e0e0e0; border-radius:8px; outline:none;
+  width: 160px; padding: 10px 14px; font-size: 18px; font-weight: 700; color: #d9534f;
+  border: 1px solid #cfd4da; border-radius: 8px; outline: none;
 }
-.amount-input:focus { border-color:#6b8dd6; }
+.amount-input:focus { border-color: #5b8def; }
 
-/* ===== 上传凭证 ===== */
-.upload-row { display:flex; gap:8px; flex-wrap:wrap; }
-.upload-img { width:70px; height:70px; border-radius:8px; overflow:hidden; border:1px solid #eee; }
-.upload-img img { width:100%; height:100%; object-fit:cover; }
+/* 上传 */
+.upload-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.upload-item { width: 70px; height: 70px; border-radius: 8px; overflow: hidden; border: 1px solid #eef0f3; }
+.upload-item img { width: 100%; height: 100%; object-fit: cover; }
 .upload-add {
-  width:70px; height:70px; border:1px dashed #ccc; border-radius:8px;
-  display:flex; align-items:center; justify-content:center;
-  font-size:22px; color:#999; cursor:pointer; transition:all .2s;
+  width: 70px; height: 70px; border: 1px dashed #9aa1aa; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: #888; cursor: pointer; transition: .15s;
 }
-.upload-add:hover { border-color:#6b8dd6; color:#6b8dd6; }
+.upload-add:hover { border-color: #5b8def; color: #5b8def; }
 
-/* ===== 按钮 ===== */
-.btn-row { display:flex; gap:10px; margin-top:8px; }
-.btn { padding:10px 28px; border-radius:100px; font-size:14px; font-weight:600; cursor:pointer; border:1px solid #e0e0e0; background:#fff; color:#555; transition:opacity .2s; }
-.btn:hover { opacity:.85; }
-.btn.primary { background:linear-gradient(135deg,#6b8dd6,#8e37d7); color:#fff; border:none; }
-.btn.lg { padding:12px 36px; font-size:15px; }
-.btn:disabled { opacity:.4; cursor:not-allowed; }
+/* 按钮 */
+.btn-row { display: flex; gap: 10px; margin-top: 8px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 10px 28px; border: 1px solid #9aa1aa; border-radius: 6px;
+  background: #fff; color: #444; font-size: 14px; font-weight: 600; cursor: pointer; transition: .15s;
+}
+.btn:hover { opacity: .85; }
+.btn.primary { background: #5b8def; border-color: #5b8def; color: #fff; }
+.btn.lg { padding: 12px 36px; font-size: 15px; }
+.btn.disabled { opacity: .4; cursor: not-allowed; }
 
-.small { font-size:12px; }
-.muted { color:#999; }
+.small { font-size: 12px; }
+.muted { color: #888; }
 </style>

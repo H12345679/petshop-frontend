@@ -74,7 +74,8 @@
 
 <script>
 import { homeProducts, categoryTree } from "@/api/modules/home.js";
-import { getStore, removestore } from "@/libs/storage.js";
+import { getUserInfo } from "@/api/modules/user.js";
+import { getStore, setStore, removestore } from "@/libs/storage.js";
 
 export default {
   name: "HomeView",
@@ -109,6 +110,10 @@ export default {
     // 读本地登录态
     const u = getStore("userInfo");
     try { this.userInfo = u ? JSON.parse(u) : null; } catch (e) { this.userInfo = null; }
+    // 从 API 刷新最新用户信息（余额同步）
+    if (this.userInfo) {
+      this.refreshUserInfo();
+    }
     // 拉数据（都是公开接口，免登录可看）
     this.loadCategories();
     this.loadSection(this.sections[0], "HOT");
@@ -116,6 +121,15 @@ export default {
     this.loadSection(this.sections[2], "RECOMMEND");
   },
   methods: {
+    async refreshUserInfo() {
+      try {
+        const res = await getUserInfo();
+        if (res && res.data) {
+          this.userInfo = res.data;
+          setStore("userInfo", JSON.stringify(res.data));
+        }
+      } catch (e) { /* 使用本地缓存兜底 */ }
+    },
     async loadCategories() {
       try {
         const res = await categoryTree();
