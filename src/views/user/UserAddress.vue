@@ -6,7 +6,10 @@
     </div>
 
     <div class="address-form card" v-if="showAddressForm">
-      <h4>{{ editingAddressId ? '编辑地址' : '新增地址' }}</h4>
+      <div class="form-head">
+        <h4>{{ editingAddressId ? '编辑地址' : '新增地址' }}</h4>
+        <button class="btn map-btn" @click="mapPickerVisible = true">📍 地图选址</button>
+      </div>
       <div class="field-row">
         <div class="field col">
           <label>收货人 <span class="req">*</span></label>
@@ -66,14 +69,19 @@
       </div>
     </div>
     <div v-else-if="!loadingAddresses" class="empty">暂无收货地址，点击上方按钮新增</div>
+
+    <!-- 地图选点弹窗 -->
+    <MapPicker :visible.sync="mapPickerVisible" @select="onMapSelect" />
   </div>
 </template>
 
 <script>
 import { getAddresses, addAddress, updateAddress, deleteAddress, setDefaultAddress } from "@/api/modules/user.js";
+import MapPicker from "@/components/MapPicker.vue";
 
 export default {
   name: "UserAddress",
+  components: { MapPicker },
   data() {
     return {
       addresses: [],
@@ -83,6 +91,7 @@ export default {
       editingAddressId: null,
       addressForm: { receiver: "", phone: "", province: "", city: "", district: "", detail: "", isDefaultChecked: false },
       savingAddress: false,
+      mapPickerVisible: false,
     };
   },
   created() {
@@ -164,6 +173,14 @@ export default {
       } catch (e) {
         this.$emit('notify', "error", e.message || "删除失败");
       }
+    },
+    onMapSelect(data) {
+      if (data) {
+        this.addressForm.province = data.province || "";
+        this.addressForm.city = data.city || "";
+        this.addressForm.district = data.district || "";
+        this.addressForm.detail = data.detail || "";
+      }
     }
   }
 };
@@ -174,7 +191,15 @@ export default {
   background: #fff; border: 1px solid #e6e8eb; border-radius: 10px; padding: 20px;
 }
 .panel h3 { margin: 0; font-size: 16px; }
-.panel h4 { margin: 0 0 12px; font-size: 14px; }
+.panel h4 { margin: 0; font-size: 14px; }
+.form-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.map-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  border-color: #5b8def; color: #5b8def; font-size: 12px;
+  padding: 6px 14px; border-radius: 6px; background: #f0f4ff;
+  transition: all .15s;
+}
+.map-btn:hover { background: #e0eafc; border-color: #4a7de0; color: #4a7de0; }
 .panel-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
 
 /* 表单通用 */

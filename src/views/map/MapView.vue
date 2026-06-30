@@ -308,8 +308,11 @@ export default {
           // 初始模式：仅加载最近5家，不带半径限制（后端用 limit:5）
           this.fetchShops({ longitude: lng, latitude: lat, limit: 5 }, false);
         } else {
-          // 定位失败：使用默认城市中心，仍加载5家
+          // 定位失败：使用默认城市中心，同时初始化起点，确保距离切换正常工作
           this.locationFailed = true;
+          this.map.setZoomAndCenter(14, [DEFAULT_LNG, DEFAULT_LAT]);
+          this.setStartMarker(DEFAULT_LNG, DEFAULT_LAT, "默认位置（杭州）");
+          this.startPoint = { lng: DEFAULT_LNG, lat: DEFAULT_LAT };
           this.fetchShops(
             { longitude: DEFAULT_LNG, latitude: DEFAULT_LAT, limit: 5 },
             false
@@ -344,7 +347,15 @@ export default {
           }
         } else {
           this.locationFailed = true;
-          this.$message && this.$message.warning("定位失败，请手动搜索地址");
+          this.map.setZoomAndCenter(14, [DEFAULT_LNG, DEFAULT_LAT]);
+          this.setStartMarker(DEFAULT_LNG, DEFAULT_LAT, "默认位置（杭州）");
+          this.startPoint = { lng: DEFAULT_LNG, lat: DEFAULT_LAT };
+          if (this.searchMode) {
+            this.fetchShops({ longitude: DEFAULT_LNG, latitude: DEFAULT_LAT, radius: this.radius, limit: 50 }, true);
+          } else {
+            this.fetchShops({ longitude: DEFAULT_LNG, latitude: DEFAULT_LAT, limit: 5 }, false);
+          }
+          this.$message && this.$message.warning("自动定位失败，已切换至默认城市中心");
         }
       });
     },

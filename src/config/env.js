@@ -9,9 +9,9 @@ export const AMAP_CONFIG = {
   securityJsCode: "77b5607769c0e45c2ad22c6b454220ca",
 };
 
-/** 默认中心：深圳 */
-export const DEFAULT_LNG = 113.9;
-export const DEFAULT_LAT = 22.5;
+/** 默认中心：杭州（与数据库默认门店一致） */
+export const DEFAULT_LNG = 120.15;
+export const DEFAULT_LAT = 30.28;
 
 /** 默认搜索城市 */
-export const DEFAULT_CITY = "深圳";
+export const DEFAULT_CITY = "杭州";
