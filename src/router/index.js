@@ -232,6 +232,12 @@ const routes = [
           ),
         meta: { title: "消息 / 消息推送" },
       },
+      {
+        path: 'users',
+        name: 'AdminUsers',
+        component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminManage.vue'),
+        meta: { title: '用户 / 用户与会员管理' }
+      }
     ],
   },
 ];
