@@ -51,13 +51,20 @@
               
               <div class="avatar" v-if="msg.role === 'ai'">AI</div>
               <div class="bubble">
-                <div v-html="formatText(msg.content)"></div>
+                <div v-html="formatText(msg.content)" @click="handleChatClick"></div>
               </div>
             </div>
             
-            <div class="msg-row" v-if="loading">
+            <div class="msg-row" v-if="loading && (!currentAiMessage || currentAiMessage === '')">
               <div class="avatar">AI</div>
-              <div class="bubble typing">正在输入...</div>
+              <div class="bubble typing">正在思考...</div>
+            </div>
+            
+            <div class="msg-row" v-if="currentAiMessage">
+              <div class="avatar">AI</div>
+              <div class="bubble">
+                <div v-html="formatText(currentAiMessage)" @click="handleChatClick"></div>
+              </div>
             </div>
           </div>
           
@@ -106,7 +113,8 @@ export default {
       currentSessionId: "",
       messages: [],
       inputVal: "",
-      loading: false
+      loading: false,
+      currentAiMessage: ""
     };
   },
   created() {
@@ -182,7 +190,18 @@ export default {
     },
     formatText(text) {
       if (!text) return "";
-      return text.replace(/\n/g, '<br/>');
+      let html = text.replace(/\n/g, '<br/>');
+      html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def; cursor:pointer; text-decoration: underline;">$1</a>');
+      return html;
+    },
+    handleChatClick(e) {
+      const target = e.target;
+      if (target.classList.contains('ai-product-link')) {
+        const link = target.getAttribute('data-link');
+        if (link) {
+          this.$router.push(link);
+        }
+      }
     },
     sendQuick(text) {
       this.inputVal = text;
@@ -197,25 +216,68 @@ export default {
       this.scrollToBottom();
       
       this.loading = true;
+      this.currentAiMessage = "";
+      
       try {
-        const res = await aiChat({
-          sessionId: this.currentSessionId,
-          question: text
+        const token = getStore("token") || "";
+        const response = await fetch('/api/ai/chat/stream', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            sessionId: this.currentSessionId,
+            question: text
+          })
         });
-        if (res.data && res.data.answer) {
-          this.messages.push({ role: 'ai', content: res.data.answer });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) {
+            break;
+          }
+          const chunk = decoder.decode(value, { stream: true });
+          
+          // 处理后端发来的格式: data:{"text":"xxx"}\n\n
+          const lines = chunk.split('\n');
+          for (let line of lines) {
+            if (line.startsWith('data:')) {
+              let jsonStr = line.substring(5).trim();
+              if (jsonStr !== "") {
+                 try {
+                     let obj = JSON.parse(jsonStr);
+                     if (obj.text) {
+                         this.currentAiMessage += obj.text;
+                     }
+                 } catch (e) {
+                     // ignore parse errors for partial chunks, though SseEmitter usually sends complete lines
+                 }
+              }
+            }
+          }
+          this.scrollToBottom();
+        }
+
+        if (this.currentAiMessage) {
+          this.messages.push({ role: 'ai', content: this.currentAiMessage });
+          this.currentAiMessage = "";
         } else {
           this.messages.push({ role: 'ai', content: '抱歉，我没有理解您的问题。' });
         }
         
-        // 如果是已登录用户，发送成功后刷新一下左侧列表
         if (this.userInfo) {
           this.loadSessions();
         }
       } catch (e) {
+        console.error(e);
         this.messages.push({ role: 'ai', content: '网络异常，请稍后再试。' });
       } finally {
         this.loading = false;
+        this.currentAiMessage = "";
         this.scrollToBottom();
       }
     },
