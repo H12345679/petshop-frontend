@@ -1,4 +1,4 @@
-import { get, postJson, put } from "../axios.js";
+import { get, postJson, put, del } from "../axios.js";
 
 /**
  * 优惠券接口（对应后端 CouponController）。
@@ -34,4 +34,9 @@ export function createCoupon(data) {
 /** 更新优惠券 PUT /api/coupons/{id} */
 export function updateCoupon(id, data) {
   return put(`/coupons/${id}`, data);
+}
+
+/** 删除优惠券 DELETE /api/coupons/{id} */
+export function deleteCoupon(id) {
+  return del(`/coupons/${id}`);
 }

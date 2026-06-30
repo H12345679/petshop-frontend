@@ -17,11 +17,9 @@
       <router-link to="/messages" class="link">🔔 消息</router-link>
       <template v-if="userInfo">
         <router-link to="/orders" class="link" style="font-weight: 500;">📄 我的订单</router-link>
-        <router-link to="/coupons?tab=mine" class="link" style="font-weight: 500;">🎫 优惠券</router-link>
         <router-link to="/user/center" style="text-decoration: none; color: inherit; cursor: pointer;">
           <span>👤 {{ userInfo.nickname || userInfo.username }}</span>
         </router-link>
-        <router-link to="/addresses" class="link" style="font-weight: 500;">📍 地址管理</router-link>
         <router-link v-if="userInfo.role === 'ADMIN' || userInfo.role === 'MERCHANT'" to="/admin/shops" class="link"
           style="color: #ff5000; font-weight: 600;">管理后台</router-link>
         <span class="link" @click="logout">退出</span>

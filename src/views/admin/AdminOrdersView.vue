@@ -1,104 +1,123 @@
 <template>
   <div id="admin-orders-page">
-    <h2 class="page-title">📋 订单管理</h2>
+    <!-- ====== 搜索筛选栏 ====== -->
+    <div class="card row center wrap gap8" style="padding:12px 16px">
+      <span class="small muted">订单号</span>
+      <el-input v-model="filterOrderNo" placeholder="精确单号" size="small" style="width:200px" clearable @keyup.enter.native="search" />
+      <span class="small muted">门店</span>
+      <el-select v-model="filterShopId" placeholder="全部" size="small" style="width:130px" clearable>
+        <el-option v-for="s in shopList" :key="s.id" :label="s.name" :value="s.id" />
+      </el-select>
+      <span class="small muted">状态</span>
+      <el-select v-model="filterStatus" placeholder="全部" size="small" style="width:120px" clearable>
+        <el-option label="待支付" :value="0" />
+        <el-option label="待发货" :value="1" />
+        <el-option label="待收货" :value="2" />
+        <el-option label="待评价" :value="3" />
+        <el-option label="已完成" :value="4" />
+        <el-option label="已取消" :value="-1" />
+        <el-option label="退款中" :value="-2" />
+        <el-option label="已退款" :value="-3" />
+      </el-select>
+      <el-button type="primary" size="small" @click="search">查询</el-button>
+      <el-button size="small" @click="handleExport">导出</el-button>
+    </div>
 
-    <!-- Tab 切换 -->
+    <!-- ====== Tabs（下划线风格 + 计数） ====== -->
     <div class="tabs">
-      <span :class="['tab', { active: activeTab === 'orders' }]" @click="activeTab = 'orders'; loadOrders()">订单列表</span>
-      <span :class="['tab', { active: activeTab === 'refunds' }]" @click="activeTab = 'refunds'; loadRefunds()">退款审核</span>
+      <span
+        v-for="t in tabs" :key="t.value"
+        :class="['tab', { on: activeTab === t.value }]"
+        @click="switchTab(t.value)"
+      >
+        {{ t.label }}
+        <b v-if="t.count !== null" :style="{ color: t.countColor || '#d9534f' }">{{ t.count }}</b>
+      </span>
     </div>
 
-    <!-- ===================== 订单列表 ===================== -->
-    <div v-if="activeTab === 'orders'">
-      <div class="filters">
-        <el-select v-model="filterStatus" placeholder="订单状态" clearable @change="loadOrders" size="small" style="width:140px">
-          <el-option label="待支付" :value="0" />
-          <el-option label="待发货" :value="1" />
-          <el-option label="待收货" :value="2" />
-          <el-option label="待评价" :value="3" />
-          <el-option label="已完成" :value="4" />
-          <el-option label="已取消" :value="-1" />
-          <el-option label="退款中" :value="-2" />
-          <el-option label="已退款" :value="-3" />
+    <!-- ====== 订单表格 ====== -->
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>订单号</th>
+            <th>买家</th>
+            <th>商品</th>
+            <th>实付</th>
+            <th style="width:90px">状态</th>
+            <th style="width:150px">下单时间</th>
+            <th style="width:160px">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="loading"><td colspan="7" class="empty-td">⏳ 加载中…</td></tr>
+          <tr v-else-if="orders.length === 0"><td colspan="7" class="empty-td">暂无订单</td></tr>
+          <tr v-for="order in orders" :key="order.id">
+            <td class="small">{{ order.orderNo }}</td>
+            <td>{{ order.receiverName || '用户#'+order.userId }}</td>
+            <td class="small">{{ productSummary(order) }}</td>
+            <td class="price">¥{{ (order.payAmount || 0).toFixed(2) }}</td>
+            <td><span :class="['tag', statusTagClass(order.status)]">{{ order.statusName }}</span></td>
+            <td class="small muted">{{ fmtTime(order.createTime) }}</td>
+            <td class="small">
+              <span class="action-link" @click="showDetail(order)">详情</span>
+              <template v-if="order.status === 1">
+                <span class="muted"> · </span>
+                <b class="action-link accent" @click="openShipDialog(order)">发货</b>
+              </template>
+              <template v-if="order.status >= 2 && order.status <= 3">
+                <span class="muted"> · </span>
+                <span class="action-link" @click="showLogistics(order)">物流</span>
+              </template>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ====== 分页 ====== -->
+    <div class="pager" v-if="totalPages > 1">
+      <span :class="{ disabled: current <= 1 }" @click="goPage(current - 1)">‹</span>
+      <span v-for="p in pageRange" :key="p" :class="{ on: p === current }" @click="goPage(p)">{{ p }}</span>
+      <span :class="{ disabled: current >= totalPages }" @click="goPage(current + 1)">›</span>
+      <span class="total-hint">共 {{ total }} 单</span>
+    </div>
+
+    <!-- ====== 发货弹窗 ====== -->
+    <el-dialog title="发货" :visible.sync="showShipDialog" width="480px">
+      <div class="small muted mb12">订单 {{ shipTarget ? shipTarget.orderNo : '' }} · 待发货 → 待收货</div>
+      <div class="field">
+        <label>物流公司</label>
+        <el-select v-model="shipForm.courierCompany" placeholder="顺丰 / 中通 / 圆通 ..." style="width:100%">
+          <el-option label="顺丰速运" value="顺丰速运" />
+          <el-option label="中通快递" value="中通快递" />
+          <el-option label="圆通速递" value="圆通速递" />
+          <el-option label="韵达快递" value="韵达快递" />
+          <el-option label="申通快递" value="申通快递" />
+          <el-option label="京东物流" value="京东物流" />
+          <el-option label="其他" value="其他" />
         </el-select>
-        <el-input v-model="filterOrderNo" placeholder="订单号" size="small" style="width:200px" clearable @keyup.enter="loadOrders" />
-        <el-button size="small" @click="loadOrders">搜索</el-button>
       </div>
-
-      <div v-if="loading" class="loading-wrap">⏳ 加载中…</div>
-
-      <div v-if="!loading" class="order-list">
-        <div v-for="order in orders" :key="order.id" class="order-card">
-          <div class="order-header">
-            <span class="order-no">{{ order.orderNo }}</span>
-            <span :class="['status-tag', statusClass(order.status)]">{{ order.statusName }}</span>
-          </div>
-          <div class="order-body">
-            <div class="order-items">
-              <div v-for="item in (order.orderItems || [])" :key="item.id" class="order-item">
-                <img :src="item.productImage || '/logo.png'" class="oi-img" />
-                <div class="oi-info">
-                  <div class="oi-name">{{ item.productName }}</div>
-                  <div v-if="item.specName" class="oi-spec">{{ item.specName }}</div>
-                </div>
-                <div class="oi-price">¥{{ Number(item.price || 0).toFixed(2) }} × {{ item.quantity }}</div>
-              </div>
-            </div>
-            <div class="order-user">
-              用户ID: {{ order.userId }} | 收货人: {{ order.receiverName }} | {{ order.receiverPhone }}
-            </div>
-            <div class="order-amount">
-              实付：<span class="pay-amount">¥{{ Number(order.payAmount || 0).toFixed(2) }}</span>
-            </div>
-          </div>
-          <div class="order-footer">
-            <div class="order-time">{{ order.createTime }}</div>
-            <div class="order-actions">
-              <el-button v-if="order.status === 1" type="primary" size="mini" @click="handleShip(order)">发货</el-button>
-              <el-button size="mini" @click="showOrderDetail(order)">详情</el-button>
-            </div>
-          </div>
-        </div>
-        <div v-if="orders.length === 0" class="empty-state">暂无订单</div>
+      <div class="field">
+        <label>物流单号</label>
+        <el-input v-model="shipForm.trackingNumber" placeholder="SF1234567890" />
       </div>
+      <span slot="footer">
+        <el-button @click="showShipDialog = false">取消</el-button>
+        <el-button type="primary" :loading="shipLoading" @click="confirmShip">确认发货</el-button>
+      </span>
+    </el-dialog>
 
-      <div v-if="hasMore" class="load-more">
-        <el-button @click="loadMore">加载更多</el-button>
-      </div>
-    </div>
-
-    <!-- ===================== 退款审核 ===================== -->
-    <div v-if="activeTab === 'refunds'">
-      <div v-if="refundLoading" class="loading-wrap">⏳ 加载中…</div>
-      <div v-if="!refundLoading" class="refund-list">
-        <div v-for="rf in refunds" :key="rf.id" class="refund-card">
-          <div class="refund-header">
-            <span class="refund-no">{{ rf.refundNo }}</span>
-            <span :class="['refund-status', refundStatusClass(rf.status)]">{{ refundStatusLabel(rf.status) }}</span>
-          </div>
-          <div class="refund-body">
-            <div class="refund-info">订单号：{{ rf.orderId }}</div>
-            <div class="refund-info">退款金额：<span class="pay-amount">¥{{ Number(rf.amount || 0).toFixed(2) }}</span></div>
-            <div class="refund-info">退款原因：{{ rf.reason }}</div>
-            <div v-if="rf.auditRemark" class="refund-info">审核备注：{{ rf.auditRemark }}</div>
-          </div>
-          <div v-if="rf.status === 0" class="refund-actions">
-            <el-button type="primary" size="mini" @click="auditRefund(rf, 1)">通过退款</el-button>
-            <el-button type="danger" size="mini" @click="auditRefund(rf, 2)">拒绝</el-button>
-          </div>
-        </div>
-        <div v-if="refunds.length === 0" class="empty-state">暂无退款申请</div>
-      </div>
-    </div>
-
-    <!-- ===================== 订单详情弹窗 ===================== -->
-    <el-dialog title="订单详情" :visible.sync="showDetail" width="640px">
+    <!-- ====== 订单详情弹窗 ====== -->
+    <el-dialog title="订单详情" :visible.sync="showDetailDialog" width="640px">
       <div v-if="detailOrder" class="detail-body">
+        <!-- 状态横幅 -->
         <div class="detail-status-bar" :class="'ds-' + detailOrder.status">
-          <span class="ds-icon">{{ detailOrder.status === 0 ? '⏳' : detailOrder.status === 1 ? '📦' : detailOrder.status === 2 ? '🚚' : detailOrder.status === 3 ? '⭐' : detailOrder.status === 4 ? '✅' : detailOrder.status === -1 ? '❌' : detailOrder.status === -2 ? '🔁' : '✅' }}</span>
+          <span class="ds-icon">{{ statusIcon(detailOrder.status) }}</span>
           <span class="ds-text">{{ detailOrder.statusName }}</span>
         </div>
 
+        <!-- 商品清单 -->
         <div class="di-section">
           <div class="di-label">📦 商品清单</div>
           <div v-for="item in (detailOrder.orderItems || [])" :key="item.id" class="di-item">
@@ -111,12 +130,16 @@
           </div>
         </div>
 
+        <!-- 收货信息 -->
         <div class="di-section">
           <div class="di-label">📍 收货信息</div>
           <div class="di-row"><span class="di-key">收货人</span><span class="di-val">{{ detailOrder.receiverName }} {{ detailOrder.receiverPhone }}</span></div>
           <div class="di-row"><span class="di-key">地址</span><span class="di-val">{{ detailOrder.receiverAddress }}</span></div>
+          <div class="di-row" v-if="detailOrder.courierCompany"><span class="di-key">物流公司</span><span class="di-val">{{ detailOrder.courierCompany }}</span></div>
+          <div class="di-row" v-if="detailOrder.trackingNumber"><span class="di-key">物流单号</span><span class="di-val">{{ detailOrder.trackingNumber }}</span></div>
         </div>
 
+        <!-- 金额明细 -->
         <div class="di-section">
           <div class="di-label">💰 金额明细</div>
           <div class="di-row"><span class="di-key">商品总额</span><span class="di-val">¥{{ Number(detailOrder.totalAmount || 0).toFixed(2) }}</span></div>
@@ -124,6 +147,7 @@
           <div class="di-row total"><span class="di-key">实付金额</span><span class="di-val pay">¥{{ Number(detailOrder.payAmount || 0).toFixed(2) }}</span></div>
         </div>
 
+        <!-- 订单信息 -->
         <div class="di-section">
           <div class="di-label">📋 订单信息</div>
           <div class="di-row"><span class="di-key">订单编号</span><span class="di-val">{{ detailOrder.orderNo }}</span></div>
@@ -140,191 +164,288 @@
 </template>
 
 <script>
-import { manageOrders, shipOrder, manageRefunds, auditRefund } from "@/api/modules/order.js";
+import { manageOrders, shipOrder } from "@/api/modules/order.js";
+import { get } from "@/api/axios.js";
 
 export default {
   name: "AdminOrdersView",
   data() {
     return {
-      activeTab: "orders",
+      // Filters
+      filterOrderNo: "",
+      filterShopId: null,
+      filterStatus: null,
+      shopList: [],
+      // Tabs
+      activeTab: null,
+      tabs: [
+        { label: "全部", value: null, count: null, countColor: null },
+        { label: "待支付", value: 0, count: null, countColor: null },
+        { label: "待发货", value: 1, count: null, countColor: "#d9534f" },
+        { label: "待收货", value: 2, count: null, countColor: null },
+        { label: "待评价", value: 3, count: null, countColor: null },
+        { label: "已完成", value: 4, count: null, countColor: null },
+        { label: "退款/取消", value: "refund", count: null, countColor: null },
+      ],
       // Orders
       orders: [],
+      loading: true,
       current: 1,
-      total: 0,
       pageSize: 10,
-      loading: false,
-      filterStatus: null,
-      filterOrderNo: "",
-      // Refunds
-      refunds: [],
-      refundLoading: false,
+      total: 0,
+      // Ship dialog
+      showShipDialog: false,
+      shipTarget: null,
+      shipForm: { courierCompany: "", trackingNumber: "" },
+      shipLoading: false,
       // Detail dialog
-      showDetail: false,
+      showDetailDialog: false,
       detailOrder: null,
     };
   },
   computed: {
-    hasMore() {
-      return this.orders.length < this.total;
+    totalPages() { return Math.max(1, Math.ceil(this.total / this.pageSize)); },
+    pageRange() {
+      const pages = [];
+      const tp = this.totalPages;
+      const c = this.current;
+      let s = Math.max(1, c - 2);
+      let e = Math.min(tp, c + 2);
+      if (e - s < 4) {
+        if (s === 1) e = Math.min(tp, s + 4);
+        else s = Math.max(1, e - 4);
+      }
+      for (let i = s; i <= e; i++) pages.push(i);
+      return pages;
     },
   },
   created() {
     this.loadOrders();
+    this.loadShops();
   },
   methods: {
+    async loadShops() {
+      try {
+        const res = await get("/shops");
+        this.shopList = res.data?.records || res.data || [];
+      } catch (e) { /* ignore */ }
+    },
+
     async loadOrders() {
       this.loading = true;
-      this.current = 1;
       try {
-        const params = { current: 1, size: this.pageSize };
-        if (this.filterStatus !== null && this.filterStatus !== "") params.status = this.filterStatus;
+        const params = { current: this.current, size: this.pageSize };
         if (this.filterOrderNo) params.orderNo = this.filterOrderNo;
+        if (this.filterShopId) params.shopId = this.filterShopId;
+        // 对于 "退款/取消" tab，可能的后端状态是多个负值，这里统一不传 status 由前端二次过滤
+        if (this.activeTab === "refund") {
+          // 不传status，从全部中筛选
+        } else if (this.activeTab !== null && this.activeTab !== "") {
+          params.status = this.activeTab;
+        } else if (this.filterStatus !== null && this.filterStatus !== "") {
+          params.status = this.filterStatus;
+        }
         const res = await manageOrders(params);
-        this.orders = res.data?.records || [];
+        let records = res.data?.records || [];
         this.total = res.data?.total || 0;
+        // 退款/取消：前端过滤负状态
+        if (this.activeTab === "refund") {
+          records = records.filter(o => o.status < 0);
+        }
+        this.orders = records;
       } catch (e) {
         this.$message.error("加载订单失败");
+        this.orders = [];
       } finally {
         this.loading = false;
       }
     },
 
-    async loadMore() {
-      this.current++;
-      try {
-        const params = { current: this.current, size: this.pageSize };
-        if (this.filterStatus !== null && this.filterStatus !== "") params.status = this.filterStatus;
-        if (this.filterOrderNo) params.orderNo = this.filterOrderNo;
-        const res = await manageOrders(params);
-        this.orders = this.orders.concat(res.data?.records || []);
-      } catch (e) {
-        this.$message.error("加载更多失败");
-        this.current--;
-      }
+    search() {
+      this.current = 1;
+      this.activeTab = null;
+      this.loadOrders();
     },
 
-    showOrderDetail(order) {
-      this.detailOrder = order;
-      this.showDetail = true;
+    switchTab(value) {
+      this.activeTab = value;
+      this.current = 1;
+      this.filterOrderNo = "";
+      this.filterStatus = null;
+      this.loadOrders();
     },
 
-    async handleShip(order) {
-      this.$confirm(`确认发货（订单：${order.orderNo}）？`, "发货确认", {
-        type: "warning",
-      }).then(async () => {
-        try {
-          await shipOrder(order.id);
-          this.$message.success("已标记为发货");
-          this.loadOrders();
-        } catch (e) {
-          this.$message.error(e.message || "发货失败");
+    goPage(page) {
+      if (page < 1 || page > this.totalPages) return;
+      this.current = page;
+      this.loadOrders();
+    },
+
+    productSummary(order) {
+      const items = order.orderItems || [];
+      if (items.length === 0) return "—";
+      const first = items[0].productName || "商品";
+      return items.length === 1 ? first : first + " 等" + items.length + "件";
+    },
+
+    fmtTime(t) {
+      if (!t) return "";
+      // 后端返回格式可能是 "2026-06-23T12:00:00" 或 "2026-06-23 12:00:00"
+      const s = String(t);
+      if (s.length >= 16) {
+        // MM-DD HH:mm
+        const parts = s.split(/[T ]/);
+        if (parts.length >= 2) {
+          const d = parts[0];
+          const time = parts[1].substring(0, 5);
+          const md = d.length >= 10 ? d.substring(5, 10) : d;
+          return md + " " + time;
         }
-      }).catch(() => {});
-    },
-
-    async loadRefunds() {
-      this.refundLoading = true;
-      try {
-        const res = await manageRefunds({ current: 1, size: 50 });
-        this.refunds = res.data?.records || [];
-      } catch (e) {
-        this.$message.error("加载退款列表失败");
-      } finally {
-        this.refundLoading = false;
       }
+      return s.substring(0, 16);
     },
 
-    async auditRefund(rf, status) {
-      const label = status === 1 ? "通过退款" : "拒绝退款";
-      this.$prompt("请输入审核备注：", label, {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-      }).then(async ({ value }) => {
-        try {
-          await auditRefund(rf.id, { status, auditRemark: value || "" });
-          this.$message.success(status === 1 ? "退款已通过" : "已拒绝退款");
-          this.loadRefunds();
-        } catch (e) {
-          this.$message.error(e.message || "操作失败");
-        }
-      }).catch(() => {});
-    },
-
-    statusClass(status) {
+    statusTagClass(status) {
       const map = {
-        0: "tag-pending", 1: "tag-ship", 2: "tag-receive",
-        3: "tag-review", 4: "tag-done",
-        "-1": "tag-cancel", "-2": "tag-refund", "-3": "tag-refunded",
+        0: "warn",       // 待支付 → 橙色
+        1: "accent",     // 待发货 → 蓝色
+        2: "accent",     // 待收货 → 蓝色(物流)
+        3: "accent",     // 待评价
+        4: "",           // 已完成 → 灰色
+        "-1": "danger",  // 已取消
+        "-2": "warn",    // 退款中
+        "-3": "ok",      // 已退款
+        "-4": "ok",      // 管理员退款
       };
-      return map[status] || "";
+      return map[String(status)] || "";
     },
 
-    refundStatusClass(status) {
-      const map = { 0: "rs-pending", 1: "rs-approved", 2: "rs-rejected" };
-      return map[status] || "";
+    statusIcon(status) {
+      const map = {
+        0: "⏳", 1: "📦", 2: "🚚", 3: "⭐", 4: "✅",
+        "-1": "❌", "-2": "🔁", "-3": "✅", "-4": "✅",
+      };
+      return map[String(status)] || "📋";
     },
 
-    refundStatusLabel(status) {
-      const map = { 0: "待审核", 1: "已退款", 2: "已拒绝" };
-      return map[status] || "未知";
+    showDetail(order) {
+      this.detailOrder = order;
+      this.showDetailDialog = true;
+    },
+
+    openShipDialog(order) {
+      this.shipTarget = order;
+      this.shipForm = { courierCompany: "", trackingNumber: "" };
+      this.showShipDialog = true;
+    },
+
+    async confirmShip() {
+      if (!this.shipTarget) return;
+      this.shipLoading = true;
+      try {
+        await shipOrder(
+          this.shipTarget.id,
+          this.shipForm.courierCompany || null,
+          this.shipForm.trackingNumber || null
+        );
+        this.$message.success("发货成功");
+        this.showShipDialog = false;
+        this.loadOrders();
+      } catch (e) {
+        this.$message.error(e.message || "发货失败");
+      } finally {
+        this.shipLoading = false;
+      }
+    },
+
+    showLogistics(order) {
+      const info = [];
+      if (order.courierCompany) info.push("物流公司：" + order.courierCompany);
+      if (order.trackingNumber) info.push("单号：" + order.trackingNumber);
+      if (info.length === 0) info.push("暂无物流信息");
+      this.$alert(info.join("\n"), "物流信息", { confirmButtonText: "知道了" });
+    },
+
+    handleExport() {
+      this.$message.info("导出功能开发中…");
     },
   },
 };
 </script>
 
 <style scoped>
-.page-title { font-size: 20px; font-weight: 700; color: #2c3e50; margin-bottom: 20px; }
-.tabs { display: flex; gap: 4px; background: #fff; border-radius: 8px; padding: 6px; margin-bottom: 16px; }
-.tab { padding: 6px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; color: #666; transition: all 0.2s; font-weight: 500; }
-.tab:hover { background: #f0f2f5; }
-.tab.active { background: linear-gradient(135deg, #6b8dd6, #8e37d7); color: #fff; }
-.filters { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-.loading-wrap { text-align: center; padding: 60px; color: #999; font-size: 15px; }
-.empty-state { text-align: center; padding: 60px; color: #999; }
+/* ====== 搜索筛选 ====== */
+.row { display: flex; gap: 14px; }
+.center { align-items: center; }
+.wrap { flex-wrap: wrap; }
+.gap8 { gap: 8px; }
 
-/* 订单卡片 */
-.order-card { background: #fff; border-radius: 10px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
-.order-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid #f5f5f5; }
-.order-no { font-size: 13px; color: #999; }
-.status-tag { font-size: 12px; padding: 2px 10px; border-radius: 100px; font-weight: 600; }
-.tag-pending { background: #fff3e0; color: #f57c00; }
-.tag-ship { background: #e3f2fd; color: #1976d2; }
-.tag-receive { background: #e8f5e9; color: #388e3c; }
-.tag-review { background: #f3e5f5; color: #7b1fa2; }
-.tag-done { background: #f5f5f5; color: #888; }
-.tag-cancel { background: #fbe9e7; color: #d84315; }
-.tag-refund { background: #fff3e0; color: #e65100; }
-.tag-refunded { background: #e8f5e9; color: #2e7d32; }
-.order-body { padding: 12px 16px; }
-.order-item { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
-.oi-img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; background: #f5f5f5; }
-.oi-info { flex: 1; min-width: 0; }
-.oi-name { font-size: 13px; font-weight: 500; }
-.oi-spec { font-size: 11px; color: #999; }
-.oi-price { font-size: 13px; color: #666; white-space: nowrap; }
-.order-user { font-size: 12px; color: #999; margin-top: 8px; }
-.order-amount { font-size: 14px; margin-top: 4px; }
-.pay-amount { font-size: 16px; font-weight: 700; color: #e74c3c; }
-.order-footer { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-top: 1px solid #f5f5f5; }
-.order-time { font-size: 12px; color: #bbb; }
-.order-actions { display: flex; gap: 6px; }
-.load-more { text-align: center; padding: 20px; }
+/* ====== 卡片 ====== */
+.card { background: #fff; border: 1px solid #cfd4da; border-radius: 8px; margin-bottom: 16px; }
 
-/* 退款卡片 */
-.refund-card { background: #fff; border-radius: 10px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
-.refund-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid #f5f5f5; }
-.refund-no { font-size: 13px; color: #999; }
-.refund-status { font-size: 12px; padding: 2px 10px; border-radius: 100px; font-weight: 600; }
-.rs-pending { background: #fff3e0; color: #f57c00; }
-.rs-approved { background: #e8f5e9; color: #2e7d32; }
-.rs-rejected { background: #fbe9e7; color: #d84315; }
-.refund-body { padding: 12px 16px; }
-.refund-info { font-size: 13px; color: #555; margin-bottom: 4px; }
-.refund-actions { padding: 10px 16px; border-top: 1px solid #f5f5f5; display: flex; gap: 8px; }
+/* ====== Tabs（下划线风格，对齐 wireframe.css） ====== */
+.tabs { display: flex; gap: 0; border-bottom: 1px solid #cfd4da; margin-bottom: 14px; flex-wrap: wrap; }
+.tab {
+  padding: 8px 16px; font-size: 13px; color: #666; border-bottom: 2px solid transparent;
+  cursor: pointer; white-space: nowrap; transition: color .15s;
+}
+.tab:hover { color: #5b8def; }
+.tab.on { color: #5b8def; border-bottom-color: #5b8def; font-weight: 600; }
+.tab b { margin-left: 4px; font-weight: 700; }
 
-/* 订单详情弹窗 */
+/* ====== 表格（对齐 wireframe.css .tbl） ====== */
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; }
+.tbl th {
+  background: #f7f8fa; text-align: left; padding: 10px; border-bottom: 1px solid #cfd4da;
+  color: #555; font-weight: 600; white-space: nowrap;
+}
+.tbl td { padding: 10px; border-bottom: 1px solid #eef0f3; color: #555; vertical-align: middle; }
+.tbl tr:hover td { background: #fafbfc; }
+.tbl tr:last-child td { border-bottom: none; }
+.empty-td { text-align: center; padding: 40px !important; color: #888; }
+
+.price { color: #d9534f; font-weight: 700; }
+.small { font-size: 12px; }
+.muted { color: #888; }
+
+/* ====== 状态标签（对齐 wireframe.css .tag） ====== */
+.tag {
+  display: inline-block; background: #e9ecf1; border: 1px solid #cfd4da; border-radius: 4px;
+  padding: 1px 8px; font-size: 12px; color: #555;
+}
+.tag.accent { background: #e7eefc; border-color: #bcd0f6; color: #5b8def; }
+.tag.warn { background: #fcefe2; border-color: #f0cda6; color: #e6914e; }
+.tag.ok { background: #e6f4ec; border-color: #b6dcc6; color: #4caf7d; }
+.tag.danger { background: #fbe7e6; border-color: #f0c2c0; color: #d9534f; }
+
+/* ====== 操作链接 ====== */
+.action-link { cursor: pointer; color: #5b8def; }
+.action-link:hover { opacity: .8; }
+.action-link.accent { color: #5b8def; }
+
+/* ====== 分页（对齐 wireframe.css .pager） ====== */
+.pager { display: flex; gap: 6px; justify-content: flex-end; margin-top: 14px; align-items: center; }
+.pager span {
+  min-width: 30px; height: 30px; border: 1px solid #cfd4da; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center; font-size: 13px;
+  color: #555; background: #fff; padding: 0 8px; cursor: pointer;
+}
+.pager span:hover { border-color: #5b8def; color: #5b8def; }
+.pager span.on { background: #5b8def; border-color: #5b8def; color: #fff; }
+.pager span.disabled { opacity: .3; cursor: not-allowed; }
+.total-hint { border: none !important; background: transparent !important; color: #888; font-size: 12px; cursor: default !important; }
+
+/* ====== 表单 ====== */
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 13px; color: #555; margin-bottom: 5px; }
+.mb12 { margin-bottom: 12px; }
+
+/* ====== 订单详情弹窗（复用原样式） ====== */
 .detail-body { max-height: 70vh; overflow-y: auto; }
-.detail-status-bar { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-radius: 10px; margin-bottom: 16px; font-size: 16px; font-weight: 600; }
+.detail-status-bar {
+  display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-radius: 10px;
+  margin-bottom: 16px; font-size: 16px; font-weight: 600;
+}
 .ds-0 { background: #fff8e1; color: #f57c00; }
 .ds-1 { background: #e3f2fd; color: #1976d2; }
 .ds-2 { background: #e8f5e9; color: #388e3c; }

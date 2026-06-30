@@ -1,15 +1,11 @@
 <template>
   <div id="admin-refunds-page">
-    <div class="page-head">
-      <span class="page-title">交易 / 退单审核</span>
-    </div>
-
-    <!-- Tabs（下划线风格） -->
+    <!-- ====== Tabs（下划线风格 + 计数） ====== -->
     <div class="tabs">
       <span v-for="t in statusTabs" :key="t.value"
         :class="['tab', { on: activeTab === t.value }]"
         @click="activeTab = t.value; loadData()"
-      >{{ t.label }} <b v-if="t.count" style="color:#d9534f">{{ t.count }}</b></span>
+      >{{ t.label }} <b v-if="t.count !== null" style="color:#d9534f">{{ t.count }}</b></span>
     </div>
 
     <!-- ====== 退单列表 ====== -->
@@ -25,7 +21,7 @@
               <th>上限</th>
               <th>原因</th>
               <th style="width:90px">状态</th>
-              <th style="width:150px">操作</th>
+              <th style="width:160px">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -33,7 +29,7 @@
             <tr v-else-if="list.length === 0"><td colspan="8" class="empty-td">暂无数据</td></tr>
             <tr v-for="rf in list" :key="rf.id">
               <td class="small">{{ rf.refundNo }}</td>
-              <td class="small">{{ rf.orderNo ? rf.orderNo.substring(0,14)+'…' : 'ORD…'+String(rf.orderId).slice(-4) }}</td>
+              <td class="small">{{ truncateOrderNo(rf.orderNo) }}</td>
               <td>{{ rf.buyerName || '用户#'+rf.userId }}</td>
               <td class="price">¥{{ (rf.amount || 0).toFixed(2) }}</td>
               <td class="small muted">¥{{ (rf.maxRefund || 0).toFixed(2) }}</td>
@@ -54,7 +50,7 @@
         </table>
       </div>
 
-      <!-- 分页（右对齐） -->
+      <!-- 分页 -->
       <div class="pager" v-if="totalPages > 1">
         <span :class="{ disabled: current <= 1 }" @click="goPage(current - 1)">‹</span>
         <span v-for="p in pageRange" :key="p" :class="{ on: p === current }" @click="goPage(p)">{{ p }}</span>
@@ -81,7 +77,7 @@
       </div>
     </template>
 
-    <!-- ===== 审核弹窗 ===== -->
+    <!-- ====== 审核弹窗 ====== -->
     <el-dialog title="退单审核" :visible.sync="showAudit" width="480px">
       <div class="small muted mb8">退单 {{ auditRefundNo }} · 订单 {{ auditOrderNo }}</div>
       <div class="audit-box">
@@ -113,16 +109,17 @@ export default {
     return {
       activeTab: 0,
       statusTabs: [
-        { label: "待审核", value: 0 },
-        { label: "已通过", value: 1 },
-        { label: "已驳回", value: 2 },
-        { label: "管理员直退", value: "direct" },
+        { label: "待审核", value: 0, count: null },
+        { label: "已通过", value: 1, count: null },
+        { label: "已驳回", value: 2, count: null },
+        { label: "管理员直退", value: "direct", count: null },
       ],
       list: [],
       loading: true,
       current: 1,
       pageSize: 10,
       total: 0,
+      // Audit dialog
       showAudit: false,
       auditTarget: null,
       auditRefundNo: "",
@@ -133,6 +130,7 @@ export default {
       auditReason: "",
       auditRemark: "",
       auditLoading: false,
+      // Direct refund
       directForm: { orderNo: "", reason: "" },
       directLoading: false,
     };
@@ -143,13 +141,13 @@ export default {
       const pages = [];
       const tp = this.totalPages;
       const c = this.current;
-      let start = Math.max(1, c - 2);
-      let end = Math.min(tp, c + 2);
-      if (end - start < 4) {
-        if (start === 1) end = Math.min(tp, start + 4);
-        else start = Math.max(1, end - 4);
+      let s = Math.max(1, c - 2);
+      let e = Math.min(tp, c + 2);
+      if (e - s < 4) {
+        if (s === 1) e = Math.min(tp, s + 4);
+        else s = Math.max(1, e - 4);
       }
-      for (let i = start; i <= end; i++) pages.push(i);
+      for (let i = s; i <= e; i++) pages.push(i);
       return pages;
     },
   },
@@ -157,6 +155,12 @@ export default {
   methods: {
     statusClass(s) { return { 0:'warn', 1:'ok', 2:'cancel' }[s] || 'done'; },
     statusLabel(s) { return { 0:'待审核', 1:'已通过', 2:'已驳回' }[s] || '其他'; },
+
+    truncateOrderNo(no) {
+      if (!no) return '—';
+      return no.length > 14 ? no.substring(0, 14) + '…' : no;
+    },
+
     async loadData() {
       if (this.activeTab === 'direct') return;
       this.loading = true;
@@ -170,6 +174,7 @@ export default {
       } catch (e) { this.list = []; }
       this.loading = false;
     },
+
     async goPage(page) {
       if (page < 1 || page > this.totalPages) return;
       this.current = page;
@@ -183,6 +188,7 @@ export default {
       } catch (e) { this.list = []; }
       this.loading = false;
     },
+
     auditRefund(rf, result) {
       this.auditTarget = rf;
       this.auditRefundNo = rf.refundNo || '';
@@ -194,6 +200,7 @@ export default {
       this.auditRemark = result === 1 ? '同意退款，金额已返回您的余额账号' : '';
       this.showAudit = true;
     },
+
     async doAudit(result) {
       if (!this.auditTarget) return;
       this.auditLoading = true;
@@ -208,7 +215,21 @@ export default {
         this.auditLoading = false;
       }
     },
-    showDetail(rf) { this.$message.info("退单详情：" + (rf.refundNo || rf.id)); },
+
+    showDetail(rf) {
+      const info = [];
+      if (rf.refundNo) info.push("退单号：" + rf.refundNo);
+      if (rf.orderNo) info.push("订单号：" + rf.orderNo);
+      if (rf.buyerName) info.push("买家：" + rf.buyerName);
+      if (rf.productName) info.push("商品：" + rf.productName);
+      info.push("退款金额：¥" + (rf.amount || 0).toFixed(2));
+      info.push("可退上限：¥" + (rf.maxRefund || 0).toFixed(2));
+      if (rf.reason) info.push("原因：" + rf.reason);
+      if (rf.auditRemark) info.push("审核意见：" + rf.auditRemark);
+      if (rf.auditTime) info.push("审核时间：" + rf.auditTime);
+      this.$alert(info.join("\n"), "退单详情", { confirmButtonText: "知道了" });
+    },
+
     async submitDirectRefund() {
       const orderNo = this.directForm.orderNo.trim();
       const reason = this.directForm.reason.trim();
@@ -231,58 +252,77 @@ export default {
 </script>
 
 <style scoped>
-.page-head { margin-bottom:16px; }
-.page-title { font-size:17px; font-weight:600; color:#2c3e50; }
+/* ====== Tabs（下划线风格，对齐 wireframe.css） ====== */
+.tabs { display: flex; gap: 0; border-bottom: 1px solid #cfd4da; margin-bottom: 14px; flex-wrap: wrap; }
+.tab {
+  padding: 8px 16px; font-size: 13px; color: #666; border-bottom: 2px solid transparent;
+  cursor: pointer; white-space: nowrap; transition: color .15s;
+}
+.tab:hover { color: #5b8def; }
+.tab.on { color: #5b8def; border-bottom-color: #5b8def; font-weight: 600; }
+.tab b { margin-left: 4px; }
 
-/* Tabs（下划线风格） */
-.tabs { display:flex; gap:0; border-bottom:1px solid #cfd4da; margin-bottom:14px; flex-wrap:wrap; }
-.tab { padding:8px 16px; font-size:13px; color:#666; border-bottom:2px solid transparent; cursor:pointer; white-space:nowrap; transition:color .15s; }
-.tab:hover { color:#5b8def; }
-.tab.on { color:#5b8def; border-bottom-color:#5b8def; font-weight:600; }
+/* ====== 卡片 ====== */
+.card { background: #fff; border: 1px solid #cfd4da; border-radius: 8px; margin-bottom: 16px; }
 
-.card { background:#fff; border:1px solid #cfd4da; border-radius:8px; margin-bottom:16px; }
+/* ====== 表格（对齐 wireframe.css .tbl） ====== */
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tbl th {
+  background: #f7f8fa; text-align: left; padding: 10px; border-bottom: 1px solid #cfd4da;
+  color: #555; font-weight: 600; white-space: nowrap;
+}
+.tbl td { padding: 10px; border-bottom: 1px solid #eef0f3; color: #555; vertical-align: middle; }
+.tbl tr:hover td { background: #fafbfc; }
+.tbl tr:last-child td { border-bottom: none; }
+.empty-td { text-align: center; padding: 40px !important; color: #888; }
 
-.tbl { width:100%; border-collapse:collapse; font-size:13px; }
-.tbl th { background:#f7f8fa; text-align:left; padding:10px; border-bottom:1px solid #cfd4da; color:#555; font-weight:600; white-space:nowrap; }
-.tbl td { padding:10px; border-bottom:1px solid #eef0f3; color:#555; vertical-align:middle; }
-.tbl tr:hover td { background:#fafbfc; }
-.tbl tr:last-child td { border-bottom:none; }
-.tbl .small { font-size:12px; }
-.empty-td { text-align:center; padding:40px !important; color:#888; }
+.price { color: #d9534f; font-weight: 700; }
+.small { font-size: 12px; }
+.muted { color: #888; }
 
-.price { color:#d9534f; font-weight:700; }
-.muted { color:#888; }
+/* ====== 状态标签（对齐 wireframe.css .tag） ====== */
+.tag {
+  display: inline-block; background: #e9ecf1; border: 1px solid #cfd4da; border-radius: 4px;
+  padding: 1px 8px; font-size: 12px; color: #555;
+}
+.tag.warn { background: #fcefe2; border-color: #f0cda6; color: #e6914e; }
+.tag.ok { background: #e6f4ec; border-color: #b6dcc6; color: #4caf7d; }
+.tag.cancel { background: #fbe7e6; border-color: #f0c2c0; color: #d9534f; }
+.tag.done { background: #f0f0f0; border-color: #d0d0d0; color: #888; }
 
-.tag { display:inline-block; background:#e9ecf1; border:1px solid #cfd4da; border-radius:4px; padding:1px 8px; font-size:12px; color:#555; }
-.tag.warn { background:#fcefe2; border-color:#f0cda6; color:#e6914e; }
-.tag.ok { background:#e6f4ec; border-color:#b6dcc6; color:#4caf7d; }
-.tag.cancel { background:#fbe7e6; border-color:#f0c2c0; color:#d9534f; }
-.tag.done { background:#f0f0f0; border-color:#d0d0d0; color:#888; }
+/* ====== 操作链接 ====== */
+.actions .action-link { cursor: pointer; }
+.actions .action-link.ok { color: #4caf7d; }
+.actions .action-link.danger { color: #d9534f; }
+.actions .action-link:hover { opacity: .8; }
 
-.actions .action-link { cursor:pointer; }
-.actions .action-link.ok { color:#4caf7d; }
-.actions .action-link.danger { color:#d9534f; }
-.actions .action-link:hover { opacity:.8; }
+/* ====== 分页（对齐 wireframe.css .pager） ====== */
+.pager { display: flex; gap: 6px; justify-content: flex-end; margin-top: 14px; align-items: center; }
+.pager span {
+  min-width: 30px; height: 30px; border: 1px solid #cfd4da; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center; font-size: 13px;
+  color: #555; background: #fff; padding: 0 8px; cursor: pointer;
+}
+.pager span:hover { border-color: #5b8def; color: #5b8def; }
+.pager span.on { background: #5b8def; border-color: #5b8def; color: #fff; }
+.pager span.disabled { opacity: .3; cursor: not-allowed; }
 
-/* 分页（右对齐） */
-.pager { display:flex; gap:6px; justify-content:flex-end; margin-top:14px; align-items:center; }
-.pager span { min-width:30px; height:30px; border:1px solid #cfd4da; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px; color:#555; background:#fff; padding:0 8px; cursor:pointer; }
-.pager span:hover { border-color:#5b8def; color:#5b8def; }
-.pager span.on { background:#5b8def; border-color:#5b8def; color:#fff; }
-.pager span.disabled { opacity:.3; cursor:not-allowed; }
+/* ====== 直退卡片 ====== */
+.direct-card {
+  background: #fff; border: 1px solid #cfd4da; border-radius: 8px; padding: 20px;
+}
+.direct-card h3 { font-size: 15px; font-weight: 600; margin: 0 0 8px; color: #2c3e50; }
 
-/* 直退卡片 */
-.direct-card { background:#fff; border:1px solid #cfd4da; border-radius:8px; padding:20px; }
-.direct-card h3 { font-size:15px; font-weight:600; margin:0 0 8px; color:#2c3e50; }
-.field { margin-bottom:14px; }
-.field label { display:block; font-size:13px; color:#555; margin-bottom:5px; }
-.mt12 { margin-top:12px; }
-.mb12 { margin-bottom:12px; }
+/* ====== 表单 ====== */
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 13px; color: #555; margin-bottom: 5px; }
+.mt8 { margin-top: 8px; }
+.mt12 { margin-top: 12px; }
+.mb8 { margin-bottom: 8px; }
+.mb12 { margin-bottom: 12px; }
 
-/* 审核弹窗 */
-.audit-box { background:#fafbfc; border:1px solid #eef0f3; border-radius:6px; padding:12px; }
-.audit-row { display:flex; justify-content:space-between; padding:6px 0; font-size:13px; }
-.audit-row .muted { color:#888; }
-
-.small { font-size:12px; }
+/* ====== 审核弹窗 ====== */
+.audit-box { background: #fafbfc; border: 1px solid #eef0f3; border-radius: 6px; padding: 12px; }
+.audit-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+.audit-row .muted { color: #888; }
 </style>

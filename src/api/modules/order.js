@@ -21,6 +21,11 @@ export function payOrder(id, payType) {
   return put(`/orders/${id}/pay`, { payType });
 }
 
+/** 获取单笔订单详情（含 orderItems） GET /api/orders/{id} */
+export function getOrderById(id) {
+  return get(`/orders/${id}`);
+}
+
 /** 取消订单 PUT /api/orders/{id}/cancel body { cancelReason } */
 export function cancelOrder(id, reason) {
   return put(`/orders/${id}/cancel`, { cancelReason: reason });
@@ -43,9 +48,9 @@ export function manageOrders(params) {
   return get("/orders/manage", params);
 }
 
-/** 商家发货 PUT /api/orders/{id}/ship */
-export function shipOrder(id) {
-  return put(`/orders/${id}/ship`);
+/** 商家发货 PUT /api/orders/{id}/ship body { courierCompany, trackingNumber } */
+export function shipOrder(id, courierCompany, trackingNumber) {
+  return put(`/orders/${id}/ship`, { courierCompany, trackingNumber });
 }
 
 // ==================== 退单 ====================
@@ -85,4 +90,9 @@ export function replyReview(id, reply) {
 /** 删除评价 DELETE /api/reviews/{id} */
 export function deleteReview(id) {
   return del(`/reviews/${id}`);
+}
+
+/** 恢复已删除评价 PUT /api/reviews/{id}/restore */
+export function restoreReview(id) {
+  return put(`/reviews/${id}/restore`);
 }
