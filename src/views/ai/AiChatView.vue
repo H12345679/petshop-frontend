@@ -51,13 +51,20 @@
               
               <div class="avatar" v-if="msg.role === 'ai'">AI</div>
               <div class="bubble">
-                <div v-html="formatText(msg.content)"></div>
+                <div v-html="formatText(msg.content)" @click="handleChatClick"></div>
               </div>
             </div>
             
-            <div class="msg-row" v-if="loading">
+            <div class="msg-row" v-if="loading && (!currentAiMessage || currentAiMessage === '')">
               <div class="avatar">AI</div>
-              <div class="bubble typing">正在输入...</div>
+              <div class="bubble typing">正在思考...</div>
+            </div>
+            
+            <div class="msg-row" v-if="currentAiMessage">
+              <div class="avatar">AI</div>
+              <div class="bubble">
+                <div v-html="formatText(currentAiMessage)" @click="handleChatClick"></div>
+              </div>
             </div>
           </div>
           
@@ -78,9 +85,6 @@
                   <el-button type="primary" @click="handleSend" :loading="loading">发送</el-button>
                 </template>
               </el-input>
-            </div>
-            <div class="footer-tip">
-              说明 (E7)：免登录可匿名提问；登录后关联 user_id 即可查历史；sessionId 保持上下文。
             </div>
           </div>
         </div>
@@ -106,7 +110,8 @@ export default {
       currentSessionId: "",
       messages: [],
       inputVal: "",
-      loading: false
+      loading: false,
+      currentAiMessage: ""
     };
   },
   created() {
@@ -182,7 +187,27 @@ export default {
     },
     formatText(text) {
       if (!text) return "";
-      return text.replace(/\n/g, '<br/>');
+      let html = text
+        // 1. 处理 **[text](url)** 格式（加粗包裹的标准链接）
+        .replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        // 2. 处理普通标准 [text](url) 格式
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        // 3. 兜底：【name】（ /product/123 ）或 【name】( /product/123 ) — 全角/半角括号带空格
+        .replace(/(【[^】]+】)\s*[（(]\s*(\/product\/\d+)\s*[）)]/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        // 4. 处理 **文字** 加粗（排除已转换的 <a> 标签内容）
+        .replace(/\*\*([^*<>]+)\*\*/g, '<strong>$1</strong>')
+        // 5. 换行
+        .replace(/\n/g, '<br/>');
+      return html;
+    },
+    handleChatClick(e) {
+      const target = e.target;
+      if (target.classList.contains('ai-product-link')) {
+        const link = target.getAttribute('data-link');
+        if (link) {
+          this.$router.push(link);
+        }
+      }
     },
     sendQuick(text) {
       this.inputVal = text;
@@ -197,25 +222,71 @@ export default {
       this.scrollToBottom();
       
       this.loading = true;
+      this.currentAiMessage = "";
+      
       try {
-        const res = await aiChat({
-          sessionId: this.currentSessionId,
-          question: text
+        const token = getStore("token") || "";
+        // SSE 直连后端，跳过 webpack devServer 代理（代理层会缓冲流式数据）
+        const response = await fetch('http://localhost:8088/api/ai/chat/stream', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            sessionId: this.currentSessionId,
+            question: text
+          })
         });
-        if (res.data && res.data.answer) {
-          this.messages.push({ role: 'ai', content: res.data.answer });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) {
+            break;
+          }
+          buffer += decoder.decode(value, { stream: true });
+          
+          const lines = buffer.split('\n');
+          buffer = lines.pop(); // 保留最后一行（可能不完整）在 buffer 中，等下次拼
+          
+          for (let line of lines) {
+            if (line.startsWith('data:')) {
+              let jsonStr = line.substring(5).trim();
+              if (jsonStr !== "") {
+                 try {
+                     let obj = JSON.parse(jsonStr);
+                     if (obj.text) {
+                         this.currentAiMessage += obj.text;
+                     }
+                 } catch (e) {
+                     // ignore parse errors
+                 }
+              }
+            }
+          }
+          this.scrollToBottom();
+        }
+
+        if (this.currentAiMessage) {
+          this.messages.push({ role: 'ai', content: this.currentAiMessage });
+          this.currentAiMessage = "";
         } else {
           this.messages.push({ role: 'ai', content: '抱歉，我没有理解您的问题。' });
         }
         
-        // 如果是已登录用户，发送成功后刷新一下左侧列表
         if (this.userInfo) {
           this.loadSessions();
         }
       } catch (e) {
+        console.error(e);
         this.messages.push({ role: 'ai', content: '网络异常，请稍后再试。' });
       } finally {
         this.loading = false;
+        this.currentAiMessage = "";
         this.scrollToBottom();
       }
     },
