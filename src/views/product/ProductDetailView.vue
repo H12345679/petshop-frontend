@@ -355,7 +355,19 @@ export default {
         return;
       }
       if (this.currentStock === 0) return;
-      alert("结算页面暂未开放，敬请期待！");
+      
+      const checkoutItems = [{
+        productId: this.product.id,
+        skuId: this.currentSku ? this.currentSku.id : 0,
+        quantity: this.quantity,
+        productName: this.product.name,
+        productImage: this.product.mainImage,
+        specName: this.currentSku ? this.currentSku.skuName : "",
+        price: Number(this.currentPrice),
+      }];
+      
+      localStorage.setItem("CHECKOUT_ITEMS", JSON.stringify(checkoutItems));
+      this.$router.push("/checkout");
     },
     async checkFavStatus() {
       if (!this.userInfo || !this.product) return;

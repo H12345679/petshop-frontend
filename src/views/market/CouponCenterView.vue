@@ -1,5 +1,6 @@
 <template>
   <div id="coupon-center-page">
+    <AppHeader />
     <div class="coupon-container">
       <!-- 页面头部 -->
       <div class="page-head">
@@ -109,14 +110,18 @@
         <span :class="{ disabled: current >= totalPages }" @click="goPage(current + 1)">›</span>
       </div>
     </div>
+    <AppFooter />
   </div>
 </template>
 
 <script>
+import AppHeader from "@/components/AppHeader.vue";
+import AppFooter from "@/components/AppFooter.vue";
 import { couponList, receiveCoupon, myCoupons } from "@/api/modules/coupon.js";
 
 export default {
   name: "CouponCenterView",
+  components: { AppHeader, AppFooter },
   data() {
     return {
       activeTab: "center",
@@ -280,8 +285,12 @@ export default {
 #coupon-center-page {
   background: #f6f8fb;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 .coupon-container {
+  flex: 1;
+  width: 100%;
   max-width: 1000px;
   margin: 0 auto;
   padding: 24px 20px 80px;
