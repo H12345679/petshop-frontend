@@ -123,3 +123,20 @@ export function readMessage(id) {
 export function readAllMessages() {
   return put("/messages/my/read-all");
 }
+
+// ==================== 后台用户管理（ADMIN） ====================
+
+/** 用户管理列表：GET /api/users/manage */
+export function getUserManageList(params) {
+  return get("/users/manage", params);
+}
+
+/** 启用/禁用用户：PUT /api/users/{id}/status */
+export function updateUserStatus(id, status) {
+  return put(`/users/${id}/status`, { status });
+}
+
+/** 变更用户角色：PUT /api/users/{id}/role */
+export function updateUserRole(id, role) {
+  return put(`/users/${id}/role`, { role });
+}

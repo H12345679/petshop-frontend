@@ -79,6 +79,12 @@ const routes = [
         name: 'admin-products',
         component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminProductsView.vue'),
         meta: { title: '商品 / 商品管理' }
+      },
+      {
+        path: 'users',
+        name: 'AdminUsers',
+        component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminManage.vue'),
+        meta: { title: '用户 / 用户与会员管理' }
       }
     ]
   }
