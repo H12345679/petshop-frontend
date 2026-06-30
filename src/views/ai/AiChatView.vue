@@ -86,8 +86,6 @@
                 </template>
               </el-input>
             </div>
-            <div class="footer-tip">
-            </div>
           </div>
         </div>
       </div>
