@@ -13,7 +13,7 @@
       
       <div class="menu-group">运营</div>
       <router-link to="/admin/videos">🎬 视频管理</router-link>
-      <a>🔔 消息推送</a>
+
       <div class="menu-group">用户</div>
       <router-link to="/admin/users">👥 用户与会员</router-link>
       <div class="menu-group">系统</div>
@@ -62,7 +62,7 @@ export default {
 <style scoped>
 /* Admin 基础布局 */
 .admin-layout { display: flex; height: 100vh; background: #f4f5f7; font-size: 14px; color: #333; }
-.aside { width: 280px; background: #2c303a; border-right: none; display: flex; flex-direction: column; flex-shrink: 0; color: #aeb9c2; }
+.aside { width: 280px; background: #2c303a; border-right: none; display: flex; flex-direction: column; flex-shrink: 0; color: #aeb9c2; overflow-y: auto; }
 .brand { padding: 24px 20px; font-size: 22px; font-weight: 700; color: #fff; background: #242830; margin-bottom: 12px; display: flex; align-items: center; letter-spacing: 1px; }
 .menu-group { padding: 20px 20px 10px; font-size: 15px; color: #76838f; font-weight: 600; text-decoration: none;}
 .aside a { display: block; padding: 16px 24px; font-size: 16px; color: #aeb9c2; text-decoration: none; cursor: pointer; border-left: 4px solid transparent; transition: all 0.3s ease; }
