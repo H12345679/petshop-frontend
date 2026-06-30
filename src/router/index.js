@@ -185,7 +185,7 @@ const routes = [
         path: 'logs',
         name: 'AdminLogs',
         component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminLogsView.vue'),
-        meta: { title: '后台管理 - 日志审核' }
+        meta: { title: '后台管理 - 日志审核', requiresSuperAdmin: true }
       },
       {
         path: "orders",
@@ -267,6 +267,14 @@ router.beforeEach((to, from, next) => {
     ) {
       alert("越权访问：仅限管理员或商家访问后台");
       return next("/");
+    }
+  }
+
+  // 检查是否需要超级管理员权限
+  if (to.matched.some((r) => r.meta && r.meta.requiresSuperAdmin)) {
+    if (!userInfo || userInfo.role !== "ADMIN") {
+      alert("越权访问，仅系统管理员可查看该页面");
+      return next("/admin");
     }
   }
 

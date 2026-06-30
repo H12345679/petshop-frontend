@@ -15,7 +15,7 @@
       <router-link to="/admin/videos">🎬 视频管理</router-link>
       <a>🔔 消息推送</a>
       <div class="menu-group">系统</div>
-      <router-link to="/admin/logs">📝 日志审核</router-link>
+      <router-link to="/admin/logs" v-if="userInfo && userInfo.role === 'ADMIN'">📝 日志审核</router-link>
       <router-link to="/admin/coupons">🎫 优惠券管理</router-link>
       <router-link to="/admin/messages">🔔 消息推送</router-link>
       <div style="flex: 1;"></div>
