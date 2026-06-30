@@ -68,6 +68,9 @@
           <span class="spacer"></span>
           <span :class="['tag', rv.reply ? 'ok' : 'warn']">{{ rv.reply ? '已回复' : '待回复' }}</span>
 
+          <!-- 回复按钮（正常评价且未回复 — ADMIN 和 MERCHANT 都可回复） -->
+          <span v-if="showDeleted === 0 && !rv.reply && !rv._showReplyInput" class="reply-link" @click="showReplyInput(rv)">💬 回复</span>
+
           <!-- 操作：仅 ADMIN 可删除/恢复 -->
           <template v-if="isAdmin">
             <!-- 删除（仅正常评价） -->
@@ -356,6 +359,9 @@ export default {
 }
 .tag.warn { background: #fcefe2; border-color: #f0cda6; color: #e6914e; }
 .tag.ok { background: #e6f4ec; border-color: #b6dcc6; color: #4caf7d; }
+
+.reply-link { font-size: 12px; color: #5b8def; cursor: pointer; margin-left: 12px; font-weight: 600; }
+.reply-link:hover { opacity: .8; }
 
 .delete-link { font-size: 12px; color: #d9534f; cursor: pointer; margin-left: 12px; }
 .delete-link:hover { opacity: .8; }

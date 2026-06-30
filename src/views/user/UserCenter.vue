@@ -42,7 +42,7 @@
       <div class="uc-content">
         <!-- 资产卡片 -->
         <div class="kpi-row">
-          <div class="kpi-card" @click="switchTab('profile')">
+          <div class="kpi-card" @click="$router.push('/recharge')">
             <div class="kpi-label">账户余额</div>
             <div class="kpi-val">¥{{ userInfo ? userInfo.balance : '--' }}</div>
             <div class="kpi-act">充值 ›</div>
