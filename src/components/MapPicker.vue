@@ -1,6 +1,7 @@
 <template>
-  <div class="map-picker-mask" v-if="visible" @click.self="close">
-    <div class="map-picker-container">
+  <div class="map-picker-root">
+    <div class="map-picker-mask" v-if="visible" @click.self="close">
+      <div class="map-picker-container">
       <!-- 头部 -->
       <div class="map-picker-header">
         <h3>📍 地图选址</h3>
@@ -66,6 +67,7 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
 
 <script>
@@ -109,7 +111,12 @@ export default {
   watch: {
     visible(val) {
       if (val) {
-        this.$nextTick(() => this.initMap());
+        this.$nextTick(() => {
+          if (this.$el && this.$el.parentNode !== document.body) {
+            document.body.appendChild(this.$el);
+          }
+          this.initMap();
+        });
       } else {
         this.destroyMap();
       }
@@ -123,8 +130,18 @@ export default {
     this._autoComplete = null;
     this._searchTimer = null;
   },
+  mounted() {
+    this.$nextTick(() => {
+      if (this.$el && this.$el.parentNode !== document.body) {
+        document.body.appendChild(this.$el);
+      }
+    });
+  },
   beforeDestroy() {
     this.destroyMap();
+    if (this.$el && this.$el.parentNode) {
+      this.$el.parentNode.removeChild(this.$el);
+    }
   },
   methods: {
     /* ===== 地图初始化 ===== */
@@ -289,7 +306,7 @@ export default {
 /* ===== 遮罩层 ===== */
 .map-picker-mask {
   position: fixed;
-  z-index: 2000;
+  z-index: 999999 !important;
   top: 0; left: 0;
   width: 100%; height: 100%;
   background: rgba(0, 0, 0, 0.45);
