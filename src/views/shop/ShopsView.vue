@@ -76,7 +76,7 @@ export default {
       total: 0,
       query: {
         page: 1,
-        size: 12,
+        size: 10,
         name: "",
         status: ""
       }

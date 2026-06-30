@@ -40,10 +40,10 @@
                 <el-image :src="video.productMainImage || ''" class="product-img" fit="cover">
                   <div slot="error" class="image-slot">暂无图片</div>
                 </el-image>
-                <div class="product-info">
-                   <div class="product-name">{{ video.productName }}</div>
-                   <div class="product-price">￥{{ video.productPrice }}</div>
-                </div>
+                 <div class="product-info">
+                    <div class="product-name">{{ video.productName }}</div>
+                    <div class="product-price">￥{{ currentProductPrice }} <span v-if="discount < 1" style="text-decoration: line-through; font-size: 12px; color: #999; margin-left: 4px; font-weight: normal;">¥{{ video.productPrice }}</span></div>
+                 </div>
                 <div class="product-action">
                    <el-button size="medium" @click="goToProduct(video.productId)">查看详情</el-button>
                    <el-button size="medium" type="primary">立即购买</el-button>
@@ -93,6 +93,19 @@ export default {
       video: null,
       recommendList: []
     };
+  },
+  computed: {
+    discount() {
+      if (!this.userInfo) return 1;
+      const level = this.userInfo.memberLevelId || 0;
+      if (level === 2) return 0.95;
+      if (level >= 3) return 0.90;
+      return 1;
+    },
+    currentProductPrice() {
+      if (!this.video || !this.video.productPrice) return 0;
+      return parseFloat((this.video.productPrice * this.discount).toFixed(2));
+    }
   },
   watch: {
     '$route.params.id': {
