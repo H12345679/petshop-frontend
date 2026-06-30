@@ -1,0 +1,475 @@
+<template>
+  <div class="video-admin-container">
+    <!-- 搜索筛选区 -->
+    <el-card shadow="never" class="filter-card">
+      <el-form :inline="true" :model="query" size="small" class="filter-form">
+        <el-form-item label="标题">
+          <el-input v-model="query.title" placeholder="模糊搜索" clearable @keyup.enter.native="doSearch" style="width: 200px" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="doSearch">查询</el-button>
+        </el-form-item>
+        <el-form-item style="float: right; margin-right: 0;">
+          <el-button type="primary" icon="el-icon-plus" @click="openAddModal">上传视频</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
+
+    <!-- 列表区 -->
+    <el-card shadow="never" class="table-card">
+      <el-table :data="list" style="width: 100%" v-loading="loading">
+        <el-table-column label="封面" width="100" align="center">
+          <template slot-scope="scope">
+            <el-image 
+              v-if="scope.row.cover" 
+              :src="scope.row.cover" 
+              style="width: 72px; height: 42px; border-radius: 4px;"
+              fit="cover"
+              :preview-src-list="[scope.row.cover]">
+            </el-image>
+            <div v-else class="no-cover">▶</div>
+          </template>
+        </el-table-column>
+        <el-table-column label="标题" min-width="200">
+          <template slot-scope="scope">
+            <div class="video-title">{{ scope.row.title }}</div>
+            <el-tag v-if="scope.row.status === 0" type="danger" size="mini">已下架</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="关联商品" width="120">
+          <template slot-scope="scope">
+            <span class="muted-text">{{ scope.row.productId || '—' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="views" label="播放量" width="100"></el-table-column>
+        <el-table-column label="所属店" width="150">
+          <template slot-scope="scope">
+            <span>{{ getShopName(scope.row.shopId) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="发布时间" width="160">
+          <template slot-scope="scope">
+            <span class="muted-text">{{ formatDate(scope.row.createTime) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="160" fixed="right">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" @click="openEditModal(scope.row)">编辑</el-button>
+            <el-divider direction="vertical"></el-divider>
+            <el-link :href="scope.row.url" target="_blank" type="primary" :underline="false" style="font-size: 12px; margin: 0 5px;" :disabled="!scope.row.url">预览</el-link>
+            <el-divider direction="vertical"></el-divider>
+            <el-button type="text" size="small" class="danger-text" @click="handleDelete(scope.row.id)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      
+      <!-- 分页 -->
+      <div class="pagination-wrap">
+        <el-pagination
+          @current-change="changePage"
+          :current-page="query.current"
+          :page-size="query.size"
+          layout="total, prev, pager, next"
+          :total="total">
+        </el-pagination>
+      </div>
+    </el-card>
+
+    <!-- 上传/编辑 弹窗 -->
+    <el-dialog :title="isEdit ? '编辑视频' : '上传 / 编辑视频'" :visible.sync="modalVisible" width="600px" custom-class="video-dialog" :close-on-click-modal="false">
+      <el-form ref="videoForm" :model="formData" :rules="rules" label-width="90px" label-position="left">
+        <el-form-item label="视频文件" prop="url" class="is-required">
+          <div class="upload-area" @click="triggerUpload('video')">
+            <template v-if="formData.url">
+              <div class="upload-success">
+                <i class="el-icon-video-camera-solid" style="font-size: 24px; color: #409EFF; margin-bottom: 8px;"></i>
+                <div style="color: #409EFF">已上传，点击重新上传</div>
+                <div class="file-name">{{formData.url}}</div>
+              </div>
+            </template>
+            <template v-else>
+              <i class="el-icon-upload" style="font-size: 28px; color: #C0C4CC; margin-bottom: 8px;"></i>
+              <div>点击上传视频（本地/OSS）</div>
+              <div class="upload-tip">上传成功返回 url</div>
+            </template>
+          </div>
+        </el-form-item>
+
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item label="视频封面" label-width="80px">
+              <div class="cover-upload-area" @click="triggerUpload('cover')">
+                <img v-if="formData.cover" :src="formData.cover" class="cover-img" />
+                <div v-else class="cover-placeholder">＋ 封面图</div>
+              </div>
+            </el-form-item>
+          </el-col>
+          <el-col :span="16">
+            <el-form-item label="视频标题" prop="title">
+              <el-input v-model="formData.title" placeholder="如：调皮的小加菲猫吃罐头瞬间" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="关联商品">
+              <el-input v-model.number="formData.productId" placeholder="选填，输入商品ID" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="所属门店" prop="shopId">
+              <el-select v-model="formData.shopId" placeholder="选择门店" style="width: 100%">
+                <el-option v-for="s in shopOptions" :key="s.id" :label="s.name" :value="s.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-form-item label="视频简介">
+          <el-input type="textarea" v-model="formData.description" :rows="3" placeholder="这是店里新来的加菲猫，超能吃..." />
+        </el-form-item>
+
+        <el-form-item label="状态">
+          <el-radio-group v-model="formData.status">
+            <el-radio :label="1">上架</el-radio>
+            <el-radio :label="0">下架</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+        <div class="ai-tip">💡 选做：可接入大模型（通义万相）AI 生成宠物介绍视频。</div>
+        <div class="footer-btns">
+          <el-button @click="modalVisible = false" size="small">取消</el-button>
+          <el-button type="primary" @click="saveVideo" :loading="uploading" size="small">保存</el-button>
+        </div>
+      </div>
+      
+      <!-- 隐藏的文件输入 -->
+      <input type="file" ref="coverInput" accept="image/*" style="display:none" @change="onCoverSelected" />
+      <input type="file" ref="videoInput" accept="video/*" style="display:none" @change="onVideoSelected" />
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import { getVideoList, createVideo, updateVideo, deleteVideo, uploadVideoFile } from "@/api/modules/video.js";
+import { uploadImage } from "@/api/modules/product.js";
+import { searchShops } from "@/api/modules/shop.js";
+
+export default {
+  name: "AdminVideosView",
+  data() {
+    return {
+      loading: false,
+      query: {
+        current: 1,
+        size: 10,
+        title: "",
+        shopId: ""
+      },
+      list: [],
+      total: 0,
+      shopOptions: [],
+      
+      modalVisible: false,
+      isEdit: false,
+      uploading: false,
+      formData: {
+        id: null,
+        title: "",
+        cover: "",
+        url: "",
+        description: "",
+        productId: null,
+        shopId: "",
+        status: 1
+      },
+      rules: {
+        title: [{ required: true, message: '请输入视频标题', trigger: 'blur' }],
+        shopId: [{ required: true, message: '请选择所属门店', trigger: 'change' }]
+      }
+    };
+  },
+  mounted() {
+    this.fetchShops().then(() => {
+      // 默认选中第一个门店
+      if (this.shopOptions.length > 0) {
+        this.query.shopId = this.shopOptions[0].id;
+      }
+      this.fetchData();
+    });
+  },
+  methods: {
+    formatDate(ds) {
+      if (!ds) return "-";
+      return ds.substring(0, 16).replace("T", " ");
+    },
+    getShopName(id) {
+      const shop = this.shopOptions.find(s => s.id === id);
+      return shop ? shop.name : id;
+    },
+    async fetchShops() {
+      try {
+        const res = await searchShops({ size: 100 });
+        this.shopOptions = res.data.records || [];
+      } catch (e) {
+        this.$message.error("加载店铺失败: " + (e.message || e));
+      }
+    },
+    async fetchData() {
+      this.loading = true;
+      try {
+        const res = await getVideoList(this.query);
+        this.list = res.data.records || [];
+        this.total = res.data.total || 0;
+      } catch (e) {
+        this.$message.error("获取视频列表失败: " + (e.message || e));
+      } finally {
+        this.loading = false;
+      }
+    },
+    doSearch() {
+      this.query.current = 1;
+      this.fetchData();
+    },
+    changePage(p) {
+      this.query.current = p;
+      this.fetchData();
+    },
+    async handleDelete(id) {
+      this.$confirm('确定要删除这个视频吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        try {
+          await deleteVideo(id);
+          this.$message.success("删除成功");
+          this.fetchData();
+        } catch (e) {
+          this.$message.error(e.message || "删除失败");
+        }
+      }).catch(() => {});
+    },
+    openAddModal() {
+      this.isEdit = false;
+      this.formData = {
+        id: null,
+        title: "",
+        cover: "",
+        url: "",
+        description: "",
+        productId: null,
+        shopId: this.shopOptions.length > 0 ? this.shopOptions[0].id : "",
+        status: 1
+      };
+      if (this.$refs.videoForm) {
+        this.$refs.videoForm.clearValidate();
+      }
+      this.modalVisible = true;
+    },
+    openEditModal(p) {
+      this.isEdit = true;
+      this.formData = {
+        id: p.id,
+        title: p.title,
+        cover: p.cover || "",
+        url: p.url || "",
+        description: p.description || "",
+        productId: p.productId,
+        shopId: p.shopId,
+        status: p.status
+      };
+      if (this.$refs.videoForm) {
+        this.$refs.videoForm.clearValidate();
+      }
+      this.modalVisible = true;
+    },
+    triggerUpload(type) {
+      if (type === 'cover') {
+        this.$refs.coverInput.click();
+      } else {
+        this.$refs.videoInput.click();
+      }
+    },
+    async onCoverSelected(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      this.uploading = true;
+      try {
+        const res = await uploadImage(file);
+        if (res.data && res.data.url) {
+          this.formData.cover = res.data.url;
+        }
+      } catch (err) {
+        this.$message.error("封面上传失败: " + (err.message || err));
+      } finally {
+        this.uploading = false;
+        e.target.value = "";
+      }
+    },
+    async onVideoSelected(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      this.uploading = true;
+      try {
+        const res = await uploadVideoFile(file);
+        if (res.data && res.data.url) {
+          this.formData.url = res.data.url;
+          if (this.$refs.videoForm) {
+            this.$refs.videoForm.validateField('url'); // clear url error if any
+          }
+        }
+      } catch (err) {
+        this.$message.error("视频上传失败: " + (err.message || err));
+      } finally {
+        this.uploading = false;
+        e.target.value = "";
+      }
+    },
+    saveVideo() {
+      this.$refs.videoForm.validate(async (valid) => {
+        if (!valid) return;
+        if (!this.formData.url) {
+          this.$message.warning("请上传视频文件");
+          return;
+        }
+        
+        const payload = { ...this.formData };
+        if (!payload.productId) {
+          payload.productId = 0;
+        }
+        
+        this.uploading = true;
+        try {
+          if (this.isEdit) {
+            await updateVideo(payload.id, payload);
+          } else {
+            await createVideo(payload);
+          }
+          this.$message.success("保存成功");
+          this.modalVisible = false;
+          this.fetchData();
+        } catch (e) {
+          this.$message.error(e.message || "保存失败");
+        } finally {
+          this.uploading = false;
+        }
+      });
+    }
+  }
+};
+</script>
+
+<style scoped>
+.video-admin-container {
+  padding: 24px;
+}
+.filter-card {
+  margin-bottom: 16px;
+}
+.filter-form .el-form-item {
+  margin-bottom: 0;
+}
+.no-cover {
+  width: 72px;
+  height: 42px;
+  background: #f0f2f5;
+  color: #c0c4cc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  margin: 0 auto;
+}
+.video-title {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.muted-text {
+  color: #909399;
+}
+.danger-text {
+  color: #F56C6C;
+}
+.pagination-wrap {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Upload Area Styles */
+.upload-area {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #606266;
+  background-color: #fafafa;
+  transition: border-color 0.3s;
+}
+.upload-area:hover {
+  border-color: #409EFF;
+}
+.upload-tip {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 4px;
+}
+.upload-success {
+  text-align: center;
+}
+.file-name {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 4px;
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cover-upload-area {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fafafa;
+  transition: border-color 0.3s;
+}
+.cover-upload-area:hover {
+  border-color: #409EFF;
+}
+.cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cover-placeholder {
+  color: #909399;
+  font-size: 14px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ai-tip {
+  font-size: 12px;
+  color: #909399;
+}
+</style>
