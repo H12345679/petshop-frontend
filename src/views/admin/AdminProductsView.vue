@@ -410,10 +410,12 @@ export default {
       this.fetchData();
     },
     getCategoryName(id) {
+      if (!id) return "-";
       for (const group of this.categoryTreeData) {
+        if (group.id == id) return group.name;
         if (group.children) {
           for (const child of group.children) {
-            if (child.id === id) return child.name;
+            if (child.id == id) return group.name + " - " + child.name;
           }
         }
       }
