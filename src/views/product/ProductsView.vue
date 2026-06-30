@@ -3,7 +3,11 @@
     <AppHeader />
 
     <div class="container">
-      <div class="breadcrumb small muted mb12">首页 / 全部商品{{ currentCategoryName ? ' / ' + currentCategoryName : '' }}</div>
+      <div class="breadcrumb small muted mb12">
+        <router-link to="/" class="bc-link">首页</router-link> / 
+        <a href="/products" class="bc-link">全部商品</a>
+        <span v-if="currentCategoryName"> / {{ currentCategoryName }}</span>
+      </div>
       
       <div class="row layout-body">
         <!-- 左侧分类树 -->
@@ -30,10 +34,12 @@
           <!-- 筛选条 -->
           <div class="filter-card card">
             <div class="filter-row wrap gap8">
-              <span class="small muted label">类型：</span>
-              <span class="tag" :class="{ accent: query.type === '' }" @click="selectType('')">全部</span>
-              <span class="tag" :class="{ accent: query.type === 1 }" @click="selectType(1)">宠物</span>
-              <span class="tag" :class="{ accent: query.type === 2 }" @click="selectType(2)">周边商品</span>
+              <template v-if="!query.categoryId">
+                <span class="small muted label">类型：</span>
+                <span class="tag" :class="{ accent: query.type === '' }" @click="selectType('')">全部</span>
+                <span class="tag" :class="{ accent: query.type === 1 }" @click="selectType(1)">宠物</span>
+                <span class="tag" :class="{ accent: query.type === 2 }" @click="selectType(2)">周边商品</span>
+              </template>
               
               <span class="small muted label" style="margin-left:20px">排序：</span>
               <span class="tag" :class="{ accent: query.sort === '' }" @click="selectSort('')">综合</span>
@@ -66,8 +72,9 @@
               <div class="pbody">
                 <div class="pname">{{ p.name }}</div>
                 <div class="price-row">
-                  <span class="price"><span class="cur">¥</span>{{ p.price }}</span>
-                  <span v-if="p.originalPrice && p.originalPrice > p.price" class="del">¥{{ p.originalPrice }}</span>
+                  <span class="price"><span class="cur">¥</span>{{ getCurrentPrice(p) }}</span>
+                  <span v-if="discount < 1" class="del">¥{{ p.price }}</span>
+                  <span v-else-if="p.originalPrice && p.originalPrice > p.price" class="del">¥{{ p.originalPrice }}</span>
                 </div>
                 <div class="row between center small muted mt8">
                   <span>已售 {{ p.sales || 0 }}</span>
@@ -101,6 +108,7 @@
 <script>
 import { categoryTree } from "@/api/modules/home.js";
 import { searchProducts } from "@/api/modules/product.js";
+import { getStore } from "@/libs/storage.js";
 
 // Mock Data fallback
 const mockCategories = [
@@ -128,6 +136,7 @@ export default {
     return {
       categories: [],
       currentCategoryName: "",
+      userInfo: null,
       
       products: [],
       total: 0,
@@ -148,10 +157,24 @@ export default {
   computed: {
     totalPages() {
       return Math.ceil(this.total / this.query.size) || 1;
+    },
+    discount() {
+      if (!this.userInfo) return 1;
+      const level = this.userInfo.memberLevelId || 0;
+      if (level > 0) {
+        return Math.max(0.7, 1 - level * 0.05);
+      }
+      return 1;
     }
   },
   created() {
-    
+    const u = getStore("userInfo");
+    try {
+      this.userInfo = u ? JSON.parse(u) : null;
+    } catch (e) {
+      this.userInfo = null;
+    }
+
     // 初始化参数
     if (this.$route.query.categoryId) this.query.categoryId = Number(this.$route.query.categoryId) || this.$route.query.categoryId;
     if (this.$route.query.name) this.query.name = this.$route.query.name;
@@ -168,6 +191,9 @@ export default {
     }
   },
   methods: {
+    getCurrentPrice(p) {
+      return parseFloat((p.price * this.discount).toFixed(2));
+    },
     async loadCategories() {
       try {
         const res = await categoryTree();
@@ -228,6 +254,7 @@ export default {
     },
     selectCategory(id, name) {
       this.query.categoryId = id;
+      if (id !== '') this.query.type = ''; // 清除类型筛选，因为具体分类下不展示类型筛选
       this.currentCategoryName = id === '' ? '' : name;
       this.query.page = 1;
       this.doSearch();
@@ -281,6 +308,8 @@ export default {
 </script>
 
 <style scoped>
+.bc-link { color: inherit; text-decoration: none; cursor: pointer; transition: color 0.2s; }
+.bc-link:hover { color: #5b8def; }
 .products-page { background: #f4f5f7; min-height: 100vh; display: flex; flex-direction: column; }
 
 /* 布局 */
