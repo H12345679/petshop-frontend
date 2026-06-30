@@ -1,18 +1,6 @@
 <template>
   <div class="user-center">
-    <!-- 顶栏 -->
-    <header class="topbar">
-      <router-link to="/" class="logo"><span class="paw">🐾</span>宠物商城</router-link>
-      <div class="spacer"></div>
-      <div class="right">
-        <span>🛒 购物车</span>
-        <template v-if="userInfo">
-          <span class="link">👤 {{ userInfo.nickname || userInfo.username }}</span>
-          <span class="link" @click="handleLogout">退出</span>
-        </template>
-        <router-link v-else to="/login" class="link">登录 / 注册</router-link>
-      </div>
-    </header>
+    <AppHeader />
 
     <!-- 通知条 -->
     <div v-if="notification" :class="['notify', notification.type]">
@@ -166,6 +154,7 @@
 </template>
 
 <script>
+import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
 import UserProfile from "@/views/user/UserProfile.vue";
 import UserOrders from "@/views/user/UserOrders.vue";
@@ -182,6 +171,7 @@ import { getStore, setStore, removestore } from "@/libs/storage.js";
 export default {
   name: "UserCenter",
   components: { 
+    AppHeader,
     AppFooter,
     UserProfile,
     UserOrders,
@@ -293,17 +283,7 @@ export default {
 /* ========== 全局布局 ========== */
 .user-center { background: #f4f5f7; min-height: 100vh; display: flex; flex-direction: column; }
 
-.topbar {
-  display: flex; align-items: center; gap: 18px;
-  padding: 12px 24px; background: #fff; border-bottom: 1px solid #e6e8eb;
-  position: sticky; top: 0; z-index: 10;
-}
-.logo { font-weight: 700; font-size: 18px; color: #5b8def; text-decoration: none; white-space: nowrap; }
-.logo .paw { margin-right: 4px; }
-.spacer { flex: 1; }
-.right { display: flex; align-items: center; gap: 14px; font-size: 13px; color: #555; white-space: nowrap; }
-.link { color: #5b8def; cursor: pointer; text-decoration: none; }
-.link:hover { text-decoration: underline; }
+
 
 .notify {
   padding: 10px 24px; font-size: 13px; display: flex; align-items: center; justify-content: space-between;

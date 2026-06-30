@@ -111,7 +111,9 @@
             </div>
             <div class="pbody" style="padding: 4px; flex: 1; overflow: hidden;">
               <div class="small" style="margin-bottom: 4px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; line-height: 1.4;">{{ p.name }}</div>
-              <div class="price small">¥ {{ p.price }}</div>
+              <div class="price small">
+                ¥ {{ (p.price * discount).toFixed(2) }}
+              </div>
             </div>
           </div>
           <div v-if="!loading && otherProducts.length === 0" class="muted small text-center">暂无其他商品</div>

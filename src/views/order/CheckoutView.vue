@@ -1,5 +1,6 @@
 <template>
   <div id="checkout-page">
+    <AppHeader />
     <div class="checkout-wrap">
       <!-- 步骤条 -->
       <div class="steps">
@@ -164,11 +165,12 @@ import { addressList, addAddress } from "@/api/modules/address.js";
 import { myCoupons, couponList } from "@/api/modules/coupon.js";
 import { preSettle, createOrder } from "@/api/modules/order.js";
 import { regionData, codeToText } from "element-china-area-data";
+import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
 
 export default {
   name: "CheckoutView",
-  components: { AppFooter },
+  components: { AppHeader, AppFooter },
   data() {
     return {
       checkoutItems: [],
