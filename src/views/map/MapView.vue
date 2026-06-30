@@ -179,17 +179,18 @@
 </template>
 
 <script>
-import { AMAP_CONFIG, DEFAULT_LNG, DEFAULT_LAT, DEFAULT_CITY } from "@/config/env.js";
+import { DEFAULT_LNG, DEFAULT_LAT, DEFAULT_CITY } from "@/config/env.js";
 import { searchNearbyShops } from "@/api/modules/map.js";
+import { getMapConfig } from "@/api/modules/config.js";
 
 /** 动态插入高德地图脚本（避免重复插入） */
-function loadAMapScript() {
+function loadAMapScript(key, securityJsCode) {
   return new Promise((resolve, reject) => {
     if (window.AMap) return resolve();
-    window._AMapSecurityConfig = { securityJsCode: AMAP_CONFIG.securityJsCode };
+    window._AMapSecurityConfig = { securityJsCode: securityJsCode };
     const s = document.createElement("script");
     s.id = "amap-script";
-    s.src = `https://webapi.amap.com/maps?v=2.0&key=${AMAP_CONFIG.key}`;
+    s.src = `https://webapi.amap.com/maps?v=2.0&key=${key}`;
     s.onload = () => resolve();
     s.onerror = () => reject(new Error("AMap script load failed"));
     document.head.appendChild(s);
@@ -251,8 +252,11 @@ export default {
     /* ==================== 地图初始化 ==================== */
     async initMap() {
       try {
-        await loadAMapScript();
-      } catch {
+        const configRes = await getMapConfig();
+        const { key, securityJsCode } = configRes.data;
+        await loadAMapScript(key, securityJsCode);
+      } catch (err) {
+        console.error("加载高德地图配置失败:", err);
         this.$message && this.$message.error("地图加载失败，请刷新重试");
         return;
       }
