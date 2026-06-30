@@ -84,7 +84,7 @@ export default {
       userInfo: null,
       sections: [
         { key: "hot", title: "🔥 热卖", tag: "HOT", list: [], loading: true },
-        { key: "new", title: "🆕 新品上市", tag: "NEW", list: [], loading: true },
+        { key: "cf", title: "🛍️ 大家都在买", tag: "CF", list: [], loading: true },
         { key: "rec", title: "🌟 为你推荐", tag: "RECOMMEND", list: [], loading: true },
       ],
       banners: [
@@ -112,7 +112,7 @@ export default {
     // 拉数据（都是公开接口，免登录可看）
     this.loadCategories();
     this.loadSection(this.sections[0], "HOT");
-    this.loadSection(this.sections[1], "NEW");
+    this.loadSection(this.sections[1], "CF");
     this.loadSection(this.sections[2], "RECOMMEND");
   },
   methods: {
