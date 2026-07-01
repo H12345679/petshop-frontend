@@ -169,8 +169,8 @@ export default {
         const res = await categoryTree();
         this.categories = res.data || [];
       } catch (e) {
-        console.warn("加载分类失败，使用模拟数据");
-        this.categories = mockCategories;
+        console.warn("加载分类失败", e);
+        this.categories = [];
       }
     },
     async doSearch() {
@@ -197,26 +197,9 @@ export default {
           throw new Error("无数据或格式不匹配");
         }
       } catch (e) {
-        console.warn("商品搜索请求失败或未对接后端，启用模拟数据:", e.message);
-        // Mock filtering logic
-        let filtered = mockProducts.filter(p => {
-          if (this.query.name && !p.name.includes(this.query.name)) return false;
-          if (this.query.type !== "" && p.type && p.type !== this.query.type) return false;
-          if (this.query.minPrice != null && p.price < this.query.minPrice) return false;
-          if (this.query.maxPrice != null && p.price > this.query.maxPrice) return false;
-          // Note: mock data category filtering is simplified here
-          return true;
-        });
-        
-        // Mock sorting
-        if (this.query.sort === 'price_asc') filtered.sort((a,b) => a.price - b.price);
-        if (this.query.sort === 'price_desc') filtered.sort((a,b) => b.price - a.price);
-        if (this.query.sort === 'sales_desc') filtered.sort((a,b) => b.sales - a.sales);
-        
-        this.total = filtered.length;
-        // Paginate mock
-        const start = (this.query.page - 1) * this.query.size;
-        this.products = filtered.slice(start, start + this.query.size);
+        console.warn("商品搜索请求失败:", e.message);
+        this.products = [];
+        this.total = 0;
       } finally {
         this.loading = false;
         this.updateUrl();
