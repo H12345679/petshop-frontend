@@ -204,7 +204,7 @@ export default {
     },
     async receiveOrder(order) {
       await this.$confirm("确认收到商品？", "确认收货", { type: "warning" });
-      try { await receiveOrder(order.id); this.$message.success("收货成功"); this.loadOrders(); }
+      try { await receiveOrder(order.id); this.$message.success("收货成功"); await this.refreshBalance(); this.loadOrders(); }
       catch (e) { if (e !== 'cancel') this.$message.error(e.message || "操作失败"); }
     },
     openRefund(order) { this.$router.push(`/refund?orderId=${order.id}`); },

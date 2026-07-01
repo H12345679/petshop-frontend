@@ -242,6 +242,7 @@ export default {
       try {
         await receiveOrder(this.order.id);
         this.$message.success("收货成功");
+        await this.refreshBalance(); // 收货已赠积分，刷新用户信息让积分即时更新
         this.loadDetail();
       } catch (e) {
         if (e !== 'cancel') this.$message.error(e.message || "操作失败");
