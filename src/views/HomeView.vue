@@ -84,9 +84,9 @@ export default {
       categories: [],
       userInfo: null,
       sections: [
-        { key: "hot", title: "🔥 热卖", tag: "HOT", list: [], loading: true },
         { key: "cf", title: "🛍️ 大家都在买", tag: "CF", list: [], loading: true },
         { key: "rec", title: "🌟 为你推荐", tag: "RECOMMEND", list: [], loading: true },
+        { key: "hot", title: "🔥 热卖", tag: "HOT", list: [], loading: true },
       ],
       banners: [
         'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=800&q=80',
