@@ -72,8 +72,8 @@
               <div class="pbody">
                 <div class="pname">{{ p.name }}</div>
                 <div class="price-row">
-                  <span class="price"><span class="cur">¥</span>{{ getCurrentPrice(p) }}</span>
-                  <span v-if="discount < 1" class="del">¥{{ p.price }}</span>
+                  <span class="price"><span class="cur">¥</span>{{ Number(p.price).toFixed(2) }}</span>
+                  <span v-if="p.userDiscount < 1" class="del">¥{{ (p.price / p.userDiscount).toFixed(2) }}</span>
                   <span v-else-if="p.originalPrice && p.originalPrice > p.price" class="del">¥{{ p.originalPrice }}</span>
                 </div>
                 <div class="row between center small muted mt8">
@@ -110,25 +110,6 @@ import { categoryTree } from "@/api/modules/home.js";
 import { searchProducts } from "@/api/modules/product.js";
 import { getStore } from "@/libs/storage.js";
 
-// Mock Data fallback
-const mockCategories = [
-  { id: 1, name: '宠物', children: [{ id: 11, name: '猫咪' }, { id: 12, name: '狗狗' }, { id: 13, name: '水族小宠' }] },
-  { id: 2, name: '主粮', children: [{ id: 21, name: '猫粮' }, { id: 22, name: '狗粮' }] },
-  { id: 3, name: '玩具用品', children: [] },
-  { id: 4, name: '清洁洗护', children: [] }
-];
-const mockProducts = [
-  { id: 101, name: "英国短毛猫 蓝猫 纯种健康", price: 2500, originalPrice: 3000, sales: 88, shopName: "极客宠物南山店", mainImage: "", type: 1 },
-  { id: 102, name: "布偶猫 海双 蓝眼 公", price: 6800, sales: 12, shopName: "萌宠之家", mainImage: "", type: 1 },
-  { id: 103, name: "银渐层 美短 折耳可选", price: 3200, sales: 30, shopName: "猫舍直营", mainImage: "", type: 1 },
-  { id: 104, name: "橘猫 田园猫 活泼黏人", price: 399, sales: 56, shopName: "领养代售", mainImage: "", type: 1 },
-  { id: 105, name: "暹罗猫 重点色 蓝眼", price: 1500, sales: 8, shopName: "萌宠之家", mainImage: "", type: 1 },
-  { id: 106, name: "无毛猫 斯芬克斯", price: 8800, sales: 3, shopName: "高端猫舍", mainImage: "", type: 1 },
-  { id: 107, name: "缅因猫 巨型 大体", price: 9900, sales: 5, shopName: "高端猫舍", mainImage: "", type: 1 },
-  { id: 108, name: "奶牛猫 活体 已驱虫", price: 299, sales: 22, shopName: "领养代售", mainImage: "", type: 1 },
-  { id: 109, name: "全价猫粮 1.5kg", price: 89, sales: 1200, shopName: "宠物商城自营", mainImage: "", type: 2 },
-  { id: 110, name: "逗猫棒 羽毛材质", price: 9.9, sales: 500, shopName: "宠物商城自营", mainImage: "", type: 2 }
-];
 
 export default {
   name: "ProductsView",
@@ -157,13 +138,6 @@ export default {
   computed: {
     totalPages() {
       return Math.ceil(this.total / this.query.size) || 1;
-    },
-    discount() {
-      if (!this.userInfo) return 1;
-      const level = this.userInfo.memberLevelId || 0;
-      if (level === 2) return 0.95; // 银卡 95%
-      if (level >= 3) return 0.90;  // 金卡 90%
-      return 1; // 游客或普通会员(1) 100%
     }
   },
   created() {
@@ -190,9 +164,6 @@ export default {
     }
   },
   methods: {
-    getCurrentPrice(p) {
-      return parseFloat((p.price * this.discount).toFixed(2));
-    },
     async loadCategories() {
       try {
         const res = await categoryTree();
