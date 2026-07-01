@@ -307,167 +307,210 @@ export default {
 </script>
 
 <style scoped>
-/* ===== 遮罩层 ===== */
+/* ===== 遮罩层 (现代高阶磨砂玻璃背板) ===== */
 .map-picker-mask {
   position: fixed;
   z-index: 999999 !important;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: fadeIn .2s ease;
+  animation: fadeIn .3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* ===== 容器 ===== */
+/* ===== 容器 (流光圆角及立体悬浮阴影) ===== */
 .map-picker-container {
-  width: 720px;
+  width: 760px;
   max-width: 95vw;
-  height: 560px;
+  height: 600px;
   max-height: 90vh;
   background: #fff;
-  border-radius: 14px;
+  border-radius: 20px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
-  animation: scaleIn .25s ease;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.22), 0 1px 3px rgba(0, 0, 0, 0.05);
+  animation: scaleIn .35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  border: 1px solid rgba(255, 255, 255, 0.8);
 }
-@keyframes scaleIn { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes scaleIn { from { transform: scale(.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-/* ===== 头部 ===== */
+/* ===== 头部 (精致扁平化设计) ===== */
 .map-picker-header {
-  padding: 14px 20px;
-  border-bottom: 1px solid #eef0f5;
+  padding: 18px 24px;
+  border-bottom: 1px solid #f1f3f7;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #fafbfd;
+  background: linear-gradient(to bottom, #ffffff, #fcfdfe);
   flex-shrink: 0;
 }
 .map-picker-header h3 {
   margin: 0;
-  font-size: 16px;
-  color: #1a1a2e;
+  font-size: 17px;
+  color: #0f172a;
   font-weight: 700;
+  letter-spacing: -0.2px;
 }
 .close-btn {
-  font-size: 24px;
-  color: #aaa;
+  font-size: 20px;
+  color: #94a3b8;
   cursor: pointer;
   line-height: 1;
   width: 32px; height: 32px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: 8px;
-  transition: all .15s;
+  border-radius: 10px;
+  background: #f8fafc;
+  transition: all .25s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
-.close-btn:hover { color: #333; background: #f0f2f7; }
+.close-btn:hover {
+  color: #0f172a;
+  background: #f1f5f9;
+  transform: rotate(90deg) scale(1.05);
+}
 
-/* ===== 搜索框 ===== */
+/* ===== 搜索栏 (浮动搜索舱) ===== */
 .map-picker-search {
-  padding: 10px 16px 6px;
+  padding: 12px 24px 8px;
   position: relative;
   flex-shrink: 0;
   background: #fff;
+  z-index: 10;
 }
 .search-inner {
   display: flex;
   align-items: center;
-  background: #f5f7fa;
-  border: 1.5px solid #e8eaf0;
-  border-radius: 10px;
-  padding: 0 12px;
-  transition: all .2s;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0 14px;
+  transition: all .25s ease;
 }
 .search-inner:focus-within {
-  border-color: #5b8def;
+  border-color: #3b82f6;
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(91,141,239,.12);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12), 0 4px 12px rgba(59, 130, 246, 0.05);
 }
-.search-icon { font-size: 14px; flex-shrink: 0; }
+.search-icon { font-size: 14px; flex-shrink: 0; color: #64748b; }
 .search-input {
   flex: 1; border: none; outline: none; background: transparent;
-  padding: 10px 8px; font-size: 13px; color: #1a1a2e;
+  padding: 11px 10px; font-size: 14px; color: #0f172a;
+  font-weight: 500;
 }
-.search-input::placeholder { color: #aab0bf; }
+.search-input::placeholder { color: #94a3b8; }
 .search-clear {
-  cursor: pointer; color: #aab0bf; font-size: 13px;
-  padding: 2px 4px; border-radius: 50%; transition: color .15s;
+  cursor: pointer; color: #94a3b8; font-size: 12px;
+  padding: 3px; border-radius: 50%; transition: all .15s;
 }
-.search-clear:hover { color: #5b8def; }
+.search-clear:hover { color: #3b82f6; background: #eff6ff; }
 
-/* ===== 搜索建议 ===== */
+/* ===== 搜索智能下拉建议 ===== */
 .tips-dropdown {
   position: absolute;
-  top: calc(100% - 2px); left: 16px; right: 16px;
-  background: #fff; border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0,0,0,.12);
-  max-height: 200px; overflow-y: auto;
-  z-index: 300; border: 1px solid #eef0f5;
+  top: calc(100% - 2px); left: 24px; right: 24px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 14px;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+  max-height: 220px; overflow-y: auto;
+  z-index: 300; border: 1px solid #e2e8f0;
+  margin-top: 4px;
 }
 .tip-item {
-  display: flex; align-items: flex-start; gap: 8px;
-  padding: 9px 14px; cursor: pointer; transition: background .12s;
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 11px 16px; cursor: pointer; transition: all .15s ease;
 }
-.tip-item:hover { background: #f0f4ff; }
-.tip-icon { font-size: 13px; flex-shrink: 0; margin-top: 2px; }
+.tip-item:hover { background: #eff6ff; }
+.tip-icon { font-size: 14px; flex-shrink: 0; color: #3b82f6; margin-top: 1px; }
 .tip-text { display: flex; flex-direction: column; min-width: 0; }
 .tip-name {
-  font-size: 13px; font-weight: 600; color: #1a1a2e;
+  font-size: 13.5px; font-weight: 600; color: #0f172a;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .tip-addr {
-  font-size: 11px; color: #9ca0ad; margin-top: 1px;
+  font-size: 11.5px; color: #64748b; margin-top: 2px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
-/* ===== 地图区域 ===== */
+/* ===== 地图视窗 ===== */
 .map-picker-body {
   flex: 1; position: relative; min-height: 0;
+  border-top: 1px solid #f1f3f7;
+  border-bottom: 1px solid #f1f3f7;
 }
 .map-el {
   width: 100%; height: 100%;
 }
 .map-loading {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  background: #f5f7fa; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 12px;
-  color: #888; font-size: 13px;
+  background: #f8fafc; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px;
+  color: #64748b; font-size: 14px;
 }
 .map-loading-spinner {
-  width: 28px; height: 28px; border: 3px solid #e0e3ea;
-  border-top-color: #5b8def; border-radius: 50%;
-  animation: spin .7s linear infinite;
+  width: 32px; height: 32px; border: 3.5px solid #e2e8f0;
+  border-top-color: #3b82f6; border-radius: 50%;
+  animation: spin .8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ===== 底部确认栏 ===== */
 .map-picker-footer {
-  padding: 12px 20px;
-  border-top: 1px solid #eef0f5;
+  padding: 16px 24px;
   display: flex;
   align-items: center;
-  gap: 14px;
-  background: #fafbfd;
+  gap: 16px;
+  background: #ffffff;
   flex-shrink: 0;
 }
 .selected-info {
-  flex: 1; display: flex; align-items: center; gap: 8px;
+  flex: 1; display: flex; align-items: center; gap: 10px;
   min-width: 0;
+  background: #f8fafc;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
 }
-.selected-info.placeholder .selected-text { color: #aab0bf; }
-.selected-icon { font-size: 14px; flex-shrink: 0; }
+.selected-info.placeholder {
+  background: #f8fafc;
+  border-color: #f1f5f9;
+}
+.selected-info.placeholder .selected-text { color: #94a3b8; }
+.selected-icon { font-size: 15px; flex-shrink: 0; }
 .selected-text {
-  font-size: 13px; color: #333;
+  font-size: 13.5px; color: #1e293b;
+  font-weight: 600;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .confirm-btn {
-  padding: 9px 24px; border-radius: 8px; font-size: 13px; font-weight: 600;
-  border: none; background: #5b8def; color: #fff; cursor: pointer;
-  transition: all .15s; flex-shrink: 0;
+  padding: 11px 28px; border-radius: 12px; font-size: 14px; font-weight: 600;
+  border: none;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: #fff; cursor: pointer;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  transition: all .2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  flex-shrink: 0;
 }
-.confirm-btn:hover { background: #4a7de0; }
-.confirm-btn:disabled { background: #c5d5f5; cursor: not-allowed; }
+.confirm-btn:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+  background: linear-gradient(135deg, #60a5fa, #2563eb);
+}
+.confirm-btn:active {
+  transform: translateY(0.5px);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+}
+.confirm-btn:disabled {
+  background: #e2e8f0;
+  color: #94a3b8;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
 </style>
