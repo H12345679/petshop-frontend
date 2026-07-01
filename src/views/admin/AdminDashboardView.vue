@@ -27,6 +27,14 @@
       </div>
     </div>
 
+    <!-- 历史预聚合每日数据趋势（仅管理员可见） -->
+    <div class="chart-row" v-if="userInfo && userInfo.role === 'ADMIN'">
+      <div class="chart-card wide">
+        <h3>📅 历史每日数据统计 (定时任务提取)</h3>
+        <div ref="dailyAggChart" style="height:260px"></div>
+      </div>
+    </div>
+
     <div class="chart-row">
       <!-- 订单状态分布 -->
       <div class="chart-card">
@@ -40,16 +48,37 @@
       </div>
     </div>
 
-    <!-- 热销 Top10 -->
-    <div class="chart-card" style="margin-top:16px">
-      <h3>🏆 热门商品销量 Top {{ productLimit }}</h3>
-      <div ref="productChart" style="height:260px"></div>
+    <!-- 系统操作与日志分析（仅管理员可见） -->
+    <div class="chart-row" v-if="userInfo && userInfo.role === 'ADMIN'">
+      <div class="chart-card">
+        <h3>⚡ Top 10 系统操作分布</h3>
+        <div ref="logOpChart" style="height:220px"></div>
+      </div>
+      <div class="chart-card">
+        <h3>⏰ 24小时系统操作活跃时段</h3>
+        <div ref="logHourChart" style="height:220px"></div>
+      </div>
+    </div>
+
+    <!-- 商品与店铺销量排行 -->
+    <div class="chart-row" style="margin-top:16px">
+      <!-- 热销 Top10 -->
+      <div class="chart-card">
+        <h3>🏆 热门商品销量 Top {{ productLimit }}</h3>
+        <div ref="productChart" style="height:260px"></div>
+      </div>
+      <!-- 店铺销量排行 (仅管理员可见) -->
+      <div class="chart-card" v-if="userInfo && userInfo.role === 'ADMIN'">
+        <h3>🏪 店铺商品销量排行 Top 10</h3>
+        <div ref="shopRankChart" style="height:260px"></div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { kpi, salesTrend, orderStatus, productSales, memberLevel } from "@/api/modules/stats.js";
+import { kpi, salesTrend, orderStatus, productSales, memberLevel, dailyStats, logOps, shopRanking } from "@/api/modules/stats.js";
+import { getStore } from "@/libs/storage.js";
 import * as echarts from "echarts";
 
 export default {
@@ -60,7 +89,12 @@ export default {
       refreshing: false,
       productLimit: 10,
       kpiData: { todayRevenue: 0, todayOrders: 0, totalUsers: 0, activeProducts: 0 },
+      userInfo: null,
     };
+  },
+  created() {
+    const u = getStore("userInfo");
+    try { this.userInfo = u ? JSON.parse(u) : null; } catch (e) { this.userInfo = null; }
   },
   mounted() {
     this.$nextTick(() => {
@@ -91,12 +125,18 @@ export default {
     },
 
     async loadCharts() {
-      await Promise.all([
+      const promises = [
         this.loadSales(),
         this.loadOrderStatus(),
         this.loadMemberLevel(),
         this.loadProductSales(),
-      ]);
+      ];
+      if (this.userInfo && this.userInfo.role === 'ADMIN') {
+        promises.push(this.loadDailyAgg());
+        promises.push(this.loadLogStats());
+        promises.push(this.loadShopRanking());
+      }
+      await Promise.all(promises);
     },
 
     async loadSales() {
@@ -113,6 +153,34 @@ export default {
           series: [
             { name: "订单量", type: "line", data: d.orderCounts || [], smooth: true, color: "#5b8def", yAxisIndex: 0 },
             { name: "营业额(元)", type: "line", data: (d.revenues || []).map(Number), smooth: true, color: "#f5a623", yAxisIndex: 1 },
+          ],
+        });
+      } catch (e) { /* ignore */ }
+    },
+
+    async loadDailyAgg() {
+      try {
+        const res = await dailyStats(this.days);
+        const list = res.data || [];
+        const dates = list.map(i => i.date);
+        const revenues = list.map(i => Number(i.revenue));
+        const newUsers = list.map(i => Number(i.newUsers));
+        const opCounts = list.map(i => Number(i.operationCount));
+
+        const chart = echarts.getInstanceByDom(this.$refs.dailyAggChart) || echarts.init(this.$refs.dailyAggChart);
+        chart.setOption({
+          tooltip: { trigger: "axis" },
+          legend: { data: ["日营业额", "新增用户", "系统操作量"], bottom: 0 },
+          grid: { left: 60, right: 60, bottom: 40, top: 20 },
+          xAxis: { type: "category", data: dates, axisLabel: { fontSize: 11 } },
+          yAxis: [
+            { type: "value", name: "金额/人" },
+            { type: "value", name: "次数(日志)", position: "right" }
+          ],
+          series: [
+            { name: "日营业额", type: "line", data: revenues, smooth: true, color: "#6bc46b" },
+            { name: "新增用户", type: "bar", data: newUsers, color: "#f5a623" },
+            { name: "系统操作量", type: "line", data: opCounts, yAxisIndex: 1, smooth: true, color: "#5b8def" },
           ],
         });
       } catch (e) { /* ignore */ }
@@ -156,6 +224,39 @@ export default {
       } catch (e) { /* ignore */ }
     },
 
+    async loadLogStats() {
+      try {
+        const res = await logOps(this.days);
+        const d = res.data || {};
+        
+        // 1) Top 10 系统操作分布
+        const opList = d.topOperations || [];
+        const opNames = opList.map(i => i.operation);
+        const opCounts = opList.map(i => Number(i.count));
+        const opChart = echarts.getInstanceByDom(this.$refs.logOpChart) || echarts.init(this.$refs.logOpChart);
+        opChart.setOption({
+          tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+          grid: { left: 10, right: 30, top: 10, bottom: 20 },
+          xAxis: { type: "value" },
+          yAxis: { type: "category", data: opNames.reverse(), axisLabel: { fontSize: 10 } },
+          series: [{ type: "bar", data: opCounts.reverse(), color: "#e74c3c", label: { show: true, position: "right", fontSize: 10 } }],
+        });
+
+        // 2) 24小时系统操作活跃时段
+        const hourList = d.hourlyDistribution || [];
+        const hours = hourList.map(i => i.hour + "时");
+        const hourCounts = hourList.map(i => Number(i.count));
+        const hourChart = echarts.getInstanceByDom(this.$refs.logHourChart) || echarts.init(this.$refs.logHourChart);
+        hourChart.setOption({
+          tooltip: { trigger: "axis" },
+          grid: { left: 40, right: 20, top: 10, bottom: 20 },
+          xAxis: { type: "category", data: hours },
+          yAxis: { type: "value" },
+          series: [{ type: "line", data: hourCounts, smooth: true, areaStyle: { color: "rgba(231, 76, 60, 0.1)" }, color: "#e74c3c" }],
+        });
+      } catch (e) { /* ignore */ }
+    },
+
     async loadProductSales() {
       try {
         const res = await productSales(this.productLimit);
@@ -176,16 +277,44 @@ export default {
       } catch (e) { /* ignore */ }
     },
 
+    async loadShopRanking() {
+      try {
+        const res = await shopRanking(10);
+        const list = res.data || [];
+        const names = list.map(i => i.shopName);
+        const sales = list.map(i => Number(i.totalSales));
+        const chart = echarts.getInstanceByDom(this.$refs.shopRankChart) || echarts.init(this.$refs.shopRankChart);
+        chart.setOption({
+          tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+          grid: { left: 10, right: 60, top: 10, bottom: 20 },
+          xAxis: { type: "value" },
+          yAxis: { type: "category", data: names.reverse(), axisLabel: { fontSize: 11 } },
+          series: [{
+            type: "bar", data: sales.reverse(), color: "#6bc46b",
+            label: { show: true, position: "right", fontSize: 11 },
+          }],
+        });
+      } catch (e) { /* ignore */ }
+    },
+
     initCharts() {
       // Init all chart instances
-      ["salesChart", "orderChart", "memberChart", "productChart"].forEach(ref => {
+      const refs = ["salesChart", "orderChart", "memberChart", "productChart"];
+      if (this.userInfo && this.userInfo.role === 'ADMIN') {
+        refs.push("dailyAggChart", "logOpChart", "logHourChart", "shopRankChart");
+      }
+      refs.forEach(ref => {
         if (this.$refs[ref]) echarts.init(this.$refs[ref]);
       });
     },
   },
   beforeDestroy() {
     // Dispose charts
-    ["salesChart", "orderChart", "memberChart", "productChart"].forEach(ref => {
+    const refs = ["salesChart", "orderChart", "memberChart", "productChart"];
+    if (this.userInfo && this.userInfo.role === 'ADMIN') {
+      refs.push("dailyAggChart", "logOpChart", "logHourChart", "shopRankChart");
+    }
+    refs.forEach(ref => {
       const chart = this.$refs[ref] && echarts.getInstanceByDom(this.$refs[ref]);
       if (chart) chart.dispose();
     });

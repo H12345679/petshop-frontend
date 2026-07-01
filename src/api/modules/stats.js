@@ -28,3 +28,18 @@ export function productSales(limit = 10) {
 export function memberLevel() {
   return get("/stats/member-level");
 }
+
+/** 历史日度聚合统计数据 */
+export function dailyStats(days = 30) {
+  return get("/stats/daily", { days });
+}
+
+/** 操作日志实时提取分析统计 */
+export function logOps(days = 7) {
+  return get("/stats/log-ops", { days });
+}
+
+/** 店铺商品总销量排行 TopN */
+export function shopRanking(limit = 10) {
+  return get("/stats/shop-ranking", { limit });
+}

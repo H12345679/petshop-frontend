@@ -42,7 +42,7 @@
       </div>
 
       <!-- 新增/编辑弹窗 -->
-      <el-dialog :title="dialogTitle" :visible.sync="showDialog" width="500px">
+      <el-dialog :title="dialogTitle" :visible.sync="showDialog" width="520px">
         <el-form :model="form" label-width="80px" size="small">
           <el-form-item label="收货人" required>
             <el-input v-model="form.receiver" placeholder="请输入收货人姓名" />
@@ -51,15 +51,18 @@
             <el-input v-model="form.phone" placeholder="请输入手机号" maxlength="11" />
           </el-form-item>
           <el-form-item label="所在地区" required>
-            <el-cascader
-              v-model="regionCode"
-              :options="regionData"
-              :props="{ label: 'label', value: 'value', children: 'children' }"
-              placeholder="请选择省/市/区"
-              @change="handleRegionChange"
-              style="width: 100%"
-              clearable
-            />
+            <div style="display: flex; gap: 8px;">
+              <el-cascader
+                v-model="regionCode"
+                :options="regionData"
+                :props="{ label: 'label', value: 'value', children: 'children' }"
+                placeholder="请选择省/市/区"
+                @change="handleRegionChange"
+                style="flex: 1;"
+                clearable
+              />
+              <el-button type="primary" plain @click="mapPickerVisible = true" title="在地图上点选自动填充">📍 地图选点</el-button>
+            </div>
           </el-form-item>
           <el-form-item label="详细地址" required>
             <el-input v-model="form.detail" placeholder="街道、门牌号等" rows="2" type="textarea" />
@@ -75,6 +78,9 @@
           </el-button>
         </span>
       </el-dialog>
+
+      <!-- 地图选点弹窗 -->
+      <MapPicker :visible.sync="mapPickerVisible" @select="onMapSelect" />
     </div>
     <AppFooter />
   </div>
@@ -83,6 +89,7 @@
 <script>
 import { addressList, addAddress, updateAddress, deleteAddress, setDefaultAddress } from "@/api/modules/address.js";
 import { regionData, codeToText } from "element-china-area-data";
+import MapPicker from "@/components/MapPicker.vue";
 import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
 
@@ -93,12 +100,14 @@ const EMPTY_FORM = {
   city: "",
   district: "",
   detail: "",
+  longitude: null,
+  latitude: null,
   isDefault: false,
 };
 
 export default {
   name: "AddressManageView",
-  components: { AppHeader, AppFooter },
+  components: { MapPicker,AppHeader, AppFooter },
   data() {
     return {
       addresses: [],
@@ -110,6 +119,7 @@ export default {
       submitting: false,
       regionCode: [],
       regionData: regionData,
+      mapPickerVisible: false,
     };
   },
   computed: {
@@ -151,9 +161,11 @@ export default {
         city: addr.city,
         district: addr.district,
         detail: addr.detail,
+        longitude: addr.longitude || null,
+        latitude: addr.latitude || null,
         isDefault: addr.isDefault === 1,
       };
-      this.regionCode = [];
+      this.regionCode = this.matchRegionCode(addr.province, addr.city, addr.district);
       this.showDialog = true;
     },
 
@@ -166,6 +178,38 @@ export default {
         this.form.province = "";
         this.form.city = "";
         this.form.district = "";
+      }
+    },
+
+    matchRegionCode(province, city, district) {
+      if (!province) return [];
+      const codeArr = [];
+      const prov = this.regionData.find(p => p.label.includes(province) || province.includes(p.label));
+      if (prov) {
+        codeArr.push(prov.value);
+        if (prov.children && city) {
+          const c = prov.children.find(ci => ci.label.includes(city) || city.includes(ci.label));
+          if (c) {
+            codeArr.push(c.value);
+            if (c.children && district) {
+              const dist = c.children.find(d => d.label.includes(district) || district.includes(d.label));
+              if (dist) codeArr.push(dist.value);
+            }
+          }
+        }
+      }
+      return codeArr.length === 3 ? codeArr : [];
+    },
+
+    onMapSelect(data) {
+      if (data) {
+        this.form.province = data.province || "";
+        this.form.city = data.city || "";
+        this.form.district = data.district || "";
+        this.form.detail = data.detail || "";
+        this.form.longitude = data.lng || null;
+        this.form.latitude = data.lat || null;
+        this.regionCode = this.matchRegionCode(data.province, data.city, data.district);
       }
     },
 
@@ -184,6 +228,8 @@ export default {
           city: f.city,
           district: f.district,
           detail: f.detail,
+          longitude: f.longitude,
+          latitude: f.latitude,
           isDefault: f.isDefault ? 1 : 0,
         };
         if (this.editing) {

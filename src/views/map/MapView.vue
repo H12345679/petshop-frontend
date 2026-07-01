@@ -8,11 +8,10 @@
         <!-- 搜索框 -->
         <div class="search-box">
           <div class="search-inner">
-            <span class="search-icon">🔍</span>
             <input
               v-model="searchKeyword"
               class="search-input"
-              placeholder="🔍 输入地址以设置起始位置..."
+              placeholder="输入地址以设置起始位置..."
               @input="onSearchInput"
               @keyup.enter="triggerSearch"
               @blur="onSearchBlur"
@@ -179,17 +178,18 @@
 </template>
 
 <script>
-import { AMAP_CONFIG, DEFAULT_LNG, DEFAULT_LAT, DEFAULT_CITY } from "@/config/env.js";
+import { DEFAULT_LNG, DEFAULT_LAT, DEFAULT_CITY } from "@/config/env.js";
 import { searchNearbyShops } from "@/api/modules/map.js";
+import { getMapConfig } from "@/api/modules/config.js";
 
 /** 动态插入高德地图脚本（避免重复插入） */
-function loadAMapScript() {
+function loadAMapScript(key, securityJsCode) {
   return new Promise((resolve, reject) => {
     if (window.AMap) return resolve();
-    window._AMapSecurityConfig = { securityJsCode: AMAP_CONFIG.securityJsCode };
+    window._AMapSecurityConfig = { securityJsCode: securityJsCode };
     const s = document.createElement("script");
     s.id = "amap-script";
-    s.src = `https://webapi.amap.com/maps?v=2.0&key=${AMAP_CONFIG.key}`;
+    s.src = `https://webapi.amap.com/maps?v=2.0&key=${key}`;
     s.onload = () => resolve();
     s.onerror = () => reject(new Error("AMap script load failed"));
     document.head.appendChild(s);
@@ -251,8 +251,11 @@ export default {
     /* ==================== 地图初始化 ==================== */
     async initMap() {
       try {
-        await loadAMapScript();
-      } catch {
+        const configRes = await getMapConfig();
+        const { key, securityJsCode } = configRes.data;
+        await loadAMapScript(key, securityJsCode);
+      } catch (err) {
+        console.error("加载高德地图配置失败:", err);
         this.$message && this.$message.error("地图加载失败，请刷新重试");
         return;
       }
@@ -299,6 +302,7 @@ export default {
         getCityWhenFail: true,
       });
       geo.getCurrentPosition((status, result) => {
+        if (!this.map) return;
         this.locating = false;
         if (status === "complete" && result.position) {
           const { lng, lat } = result.position;
@@ -308,8 +312,11 @@ export default {
           // 初始模式：仅加载最近5家，不带半径限制（后端用 limit:5）
           this.fetchShops({ longitude: lng, latitude: lat, limit: 5 }, false);
         } else {
-          // 定位失败：使用默认城市中心，仍加载5家
+          // 定位失败：使用默认城市中心，同时初始化起点，确保距离切换正常工作
           this.locationFailed = true;
+          this.map.setZoomAndCenter(14, [DEFAULT_LNG, DEFAULT_LAT]);
+          this.setStartMarker(DEFAULT_LNG, DEFAULT_LAT, "默认位置（杭州）");
+          this.startPoint = { lng: DEFAULT_LNG, lat: DEFAULT_LAT };
           this.fetchShops(
             { longitude: DEFAULT_LNG, latitude: DEFAULT_LAT, limit: 5 },
             false
@@ -329,6 +336,7 @@ export default {
         getCityWhenFail: true,
       });
       geo.getCurrentPosition((status, result) => {
+        if (!this.map) return;
         this.locating = false;
         if (status === "complete" && result.position) {
           const { lng, lat } = result.position;
@@ -344,7 +352,15 @@ export default {
           }
         } else {
           this.locationFailed = true;
-          this.$message && this.$message.warning("定位失败，请手动搜索地址");
+          this.map.setZoomAndCenter(14, [DEFAULT_LNG, DEFAULT_LAT]);
+          this.setStartMarker(DEFAULT_LNG, DEFAULT_LAT, "默认位置（杭州）");
+          this.startPoint = { lng: DEFAULT_LNG, lat: DEFAULT_LAT };
+          if (this.searchMode) {
+            this.fetchShops({ longitude: DEFAULT_LNG, latitude: DEFAULT_LAT, radius: this.radius, limit: 50 }, true);
+          } else {
+            this.fetchShops({ longitude: DEFAULT_LNG, latitude: DEFAULT_LAT, limit: 5 }, false);
+          }
+          this.$message && this.$message.warning("自动定位失败，已切换至默认城市中心");
         }
       });
     },
@@ -357,6 +373,7 @@ export default {
       if (this._infoWindow) this.map && this.map.clearInfoWindow();
       try {
         const res = await searchNearbyShops(params);
+        if (!this.map) return;
         let list = res.data || [];
         // 如果是搜索/半径筛选模式，严格过滤掉距离大于当前搜索半径的门店
         if (isSearchMode && params.radius != null) {
@@ -430,6 +447,7 @@ export default {
       } else {
         const geocoder = new AMap.Geocoder({ city: DEFAULT_CITY });
         geocoder.getAddress([lng, lat], (status, result) => {
+          if (!this.map) return;
           if (status === "complete" && result.regeocode) {
             this.searchKeyword = result.regeocode.formattedAddress;
           }
@@ -458,6 +476,7 @@ export default {
 
         const geocoder = new AMap.Geocoder({ city: DEFAULT_CITY });
         geocoder.getAddress([newLng, newLat], (status, result) => {
+          if (!this.map) return;
           let newAddr = "自定义位置";
           if (status === "complete" && result.regeocode) {
             newAddr = result.regeocode.formattedAddress;
@@ -469,7 +488,9 @@ export default {
         });
       });
 
-      this.map.add(this._startMarker);
+      if (this.map) {
+        this.map.add(this._startMarker);
+      }
     },
 
     /* ==================== 点击标注 / 列表：弹出预览 ==================== */
@@ -531,6 +552,7 @@ export default {
       this._searchTimer = setTimeout(() => {
         if (!this._autoComplete) return;
         this._autoComplete.search(val, (status, result) => {
+          if (!this.map) return;
           if (status === "complete" && result.tips) {
             this.searchTips = result.tips.filter((t) => t.location && t.name);
           } else {
@@ -547,6 +569,7 @@ export default {
         const AMap = window.AMap;
         const geocoder = new AMap.Geocoder({ city: DEFAULT_CITY });
         geocoder.getLocation(this.searchKeyword, (status, result) => {
+          if (!this.map) return;
           if (status === "complete" && result.geocodes.length) {
             const location = result.geocodes[0].location;
             this.map.setZoomAndCenter(14, location);
@@ -569,6 +592,7 @@ export default {
       this.searchKeyword = tip.name;
       this.searchTips = [];
       if (tip.location) {
+        if (!this.map) return;
         const { lng, lat } = tip.location;
         this.setStartMarker(lng, lat);
         this.map.setZoomAndCenter(14, tip.location);
