@@ -1,11 +1,11 @@
-<template>
+﻿<template>
   <div class="ai-chat-float-wrapper">
     <!-- 悬浮按钮 -->
-    <div 
-      class="float-btn" 
-      v-show="!visible" 
+    <div
+      class="float-btn"
+      v-show="!visible"
       @click="visible = true"
-      title="常驻悬浮按钮">
+      title="智能养宠助手">
       <div class="icon">🐾</div>
     </div>
 
@@ -19,31 +19,39 @@
             <span class="action-btn" @click="visible = false" title="隐藏">－</span>
           </div>
         </div>
-        
+
         <div class="chat-body" ref="chatBody">
-          <!-- 消息列表 -->
-          <div 
-            v-for="(msg, index) in messages" 
+          <!-- 历史消息列表 -->
+          <div
+            v-for="(msg, index) in messages"
             :key="index"
             class="msg-row"
             :class="{ 'is-user': msg.role === 'user' }">
-            
             <div class="avatar" v-if="msg.role === 'ai'">AI</div>
             <div class="bubble">
-              <div v-html="formatText(msg.content)"></div>
+              <div v-html="formatText(msg.content)" @click="handleChatClick"></div>
             </div>
           </div>
-          
-          <div class="msg-row" v-if="loading">
+
+          <!-- 流式输出中的消息（打字机效果） -->
+          <div class="msg-row" v-if="currentAiMessage">
+            <div class="avatar">AI</div>
+            <div class="bubble">
+              <div v-html="formatText(currentAiMessage)" @click="handleChatClick"></div>
+            </div>
+          </div>
+
+          <!-- 等待第一个字节时显示"正在输入..." -->
+          <div class="msg-row" v-if="loading && !currentAiMessage">
             <div class="avatar">AI</div>
             <div class="bubble typing">正在输入...</div>
           </div>
         </div>
-        
+
         <div class="chat-footer">
-          <el-input 
-            v-model="inputVal" 
-            placeholder="发消息..." 
+          <el-input
+            v-model="inputVal"
+            placeholder="发消息..."
             @keyup.enter.native="handleSend"
             class="chat-input"
             size="small"
@@ -59,7 +67,8 @@
 </template>
 
 <script>
-import { aiChat, getAiHistory } from "@/api/modules/ai.js";
+import { getAiHistory } from "@/api/modules/ai.js";
+import { getStore } from "@/libs/storage.js";
 
 export default {
   name: "AiChatFloat",
@@ -71,7 +80,8 @@ export default {
         { role: 'ai', content: '您好，有养宠问题尽管问我~' }
       ],
       sessionId: "",
-      loading: false
+      loading: false,
+      currentAiMessage: ""
     };
   },
   created() {
@@ -85,14 +95,12 @@ export default {
         localStorage.setItem("ai_current_session", sid);
       }
       this.sessionId = sid;
-      // 尝试加载历史记录
       this.loadHistory();
     },
     async loadHistory() {
       try {
         const res = await getAiHistory({ sessionId: this.sessionId });
         if (res.data && res.data.length > 0) {
-          // 清空初始欢迎语，换成真实历史
           this.messages = [];
           res.data.forEach(item => {
             if (item.question) this.messages.push({ role: 'user', content: item.question });
@@ -101,33 +109,88 @@ export default {
           this.scrollToBottom();
         }
       } catch (e) {
-        // 如果后端报错（比如未登录），就忽略，作为新会话
+        // 未登录或网络异常时忽略
       }
     },
     formatText(text) {
       if (!text) return "";
-      return text.replace(/\n/g, '<br/>');
+      let html = text
+        .replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/(【[^】]+】)\s*[（(]\s*(\/product\/\d+)\s*[）)]/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/\*\*([^*<>]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br/>');
+      return html;
+    },
+    handleChatClick(e) {
+      const target = e.target;
+      if (target.classList.contains('ai-product-link')) {
+        const link = target.getAttribute('data-link');
+        if (link) {
+          this.visible = false;
+          this.$router.push(link);
+        }
+      }
     },
     async handleSend() {
       const text = this.inputVal.trim();
-      if (!text) return;
-      
+      if (!text || this.loading) return;
+
       this.messages.push({ role: 'user', content: text });
       this.inputVal = "";
       this.scrollToBottom();
-      
+
       this.loading = true;
+      this.currentAiMessage = "";
+
       try {
-        const res = await aiChat({
-          sessionId: this.sessionId,
-          question: text
+        const token = getStore("token") || "";
+        const response = await fetch('http://localhost:8088/api/ai/chat/stream', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'text/event-stream',
+            ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+          },
+          body: JSON.stringify({
+            sessionId: this.sessionId,
+            question: text
+          })
         });
-        if (res.data && res.data.answer) {
-          this.messages.push({ role: 'ai', content: res.data.answer });
-        } else {
-          this.messages.push({ role: 'ai', content: '抱歉，我没有理解您的问题。' });
+
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+          for (let line of lines) {
+            if (line.startsWith('data:')) {
+              const jsonStr = line.substring(5).trim();
+              if (!jsonStr) continue;
+              try {
+                const obj = JSON.parse(jsonStr);
+                if (obj.text) {
+                  this.currentAiMessage += obj.text;
+                  this.scrollToBottom();
+                }
+              } catch (e) { /* ignore */ }
+            }
+          }
+        }
+
+        if (this.currentAiMessage) {
+          this.messages.push({ role: 'ai', content: this.currentAiMessage });
+          this.currentAiMessage = "";
         }
       } catch (e) {
+        this.currentAiMessage = "";
         this.messages.push({ role: 'ai', content: '网络异常，请稍后再试。' });
       } finally {
         this.loading = false;
@@ -137,9 +200,7 @@ export default {
     scrollToBottom() {
       this.$nextTick(() => {
         const box = this.$refs.chatBody;
-        if (box) {
-          box.scrollTop = box.scrollHeight;
-        }
+        if (box) box.scrollTop = box.scrollHeight;
       });
     },
     goToFullPage() {
@@ -163,27 +224,28 @@ export default {
 .float-btn {
   width: 56px;
   height: 56px;
-  background: #5b8def;
+  background: linear-gradient(135deg, #5b8def, #7a6fdf);
   border-radius: 50%;
-  box-shadow: 0 4px 12px rgba(91, 141, 239, 0.4);
+  box-shadow: 0 4px 16px rgba(91, 141, 239, 0.45);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 24px;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 .float-btn:hover {
-  transform: scale(1.05);
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(91, 141, 239, 0.55);
 }
 
 .chat-window {
-  width: 320px;
-  height: 480px;
+  width: 340px;
+  height: 500px;
   background: #f7f8fa;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -193,29 +255,20 @@ export default {
 }
 
 .chat-header {
-  height: 48px;
-  background: #5b8def;
+  height: 50px;
+  background: linear-gradient(135deg, #5b8def, #7a6fdf);
   color: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
 }
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.action-btn {
-  cursor: pointer;
-  font-size: 16px;
-  opacity: 0.8;
-  transition: opacity 0.2s;
-}
-.action-btn:hover {
-  opacity: 1;
-}
+.header-actions { display: flex; align-items: center; gap: 12px; }
+.action-btn { cursor: pointer; font-size: 16px; opacity: 0.8; transition: opacity 0.2s; }
+.action-btn:hover { opacity: 1; }
 
 .chat-body {
   flex: 1;
@@ -224,68 +277,37 @@ export default {
   background: #f7f8fa;
 }
 
-.msg-row {
-  display: flex;
-  margin-bottom: 16px;
-  align-items: flex-start;
-}
-.msg-row.is-user {
-  flex-direction: row-reverse;
-}
+.msg-row { display: flex; margin-bottom: 14px; align-items: flex-start; }
+.msg-row.is-user { flex-direction: row-reverse; }
 
 .avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #dbe4f0;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, #dbe4f0, #c8d5ee);
   color: #5b8def;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: bold;
-  flex-shrink: 0;
-  margin: 0 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: bold; flex-shrink: 0; margin: 0 8px;
 }
-.is-user .avatar {
-  display: none; /* 用户通常不显示头像或放右边 */
-}
+.is-user .avatar { display: none; }
 
 .bubble {
-  max-width: 70%;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 13px;
-  line-height: 1.5;
-  word-break: break-all;
+  max-width: 78%; padding: 10px 14px; border-radius: 12px;
+  font-size: 13px; line-height: 1.55; word-break: break-word;
 }
 .msg-row:not(.is-user) .bubble {
-  background: #e4e7ed;
-  color: #333;
-  border-top-left-radius: 2px;
+  background: #ffffff; color: #333; border-top-left-radius: 2px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
 .msg-row.is-user .bubble {
-  background: #5b8def;
-  color: #fff;
-  border-top-right-radius: 2px;
+  background: linear-gradient(135deg, #5b8def, #7a6fdf);
+  color: #fff; border-top-right-radius: 2px;
 }
-.bubble.typing {
-  color: #999;
-  font-style: italic;
-}
+.bubble.typing { color: #999; font-style: italic; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
 
 .chat-footer {
-  padding: 12px;
-  background: #fff;
-  border-top: 1px solid #ebeef5;
+  padding: 12px; background: #fff;
+  border-top: 1px solid #ebeef5; flex-shrink: 0;
 }
 
-/* 动画 */
-.fade-up-enter-active, .fade-up-leave-active {
-  transition: all 0.3s;
-}
-.fade-up-enter, .fade-up-leave-to {
-  opacity: 0;
-  transform: translateY(20px) scale(0.95);
-}
+.fade-up-enter-active, .fade-up-leave-active { transition: all 0.25s cubic-bezier(0.4,0,0.2,1); }
+.fade-up-enter, .fade-up-leave-to { opacity: 0; transform: translateY(16px) scale(0.96); }
 </style>
