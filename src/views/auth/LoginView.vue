@@ -6,8 +6,8 @@
       <div class="spacer"></div>
       <div class="right">
         <router-link to="/">首页</router-link>
-        <span>商品</span>
-        <span>找门店</span>
+        <router-link to="/products">商品</router-link>
+        <router-link to="/shops">找门店</router-link>
       </div>
     </div>
 

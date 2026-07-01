@@ -190,6 +190,12 @@ const routes = [
         meta: { title: "运营 / 消息推送" },
       },
       {
+        path: "my-messages",
+        name: "AdminMyMessages",
+        component: () => import("../views/admin/AdminMyMessagesView.vue"),
+        meta: { title: "运营 / 我的消息" },
+      },
+      {
         path: 'products',
         name: 'admin-products',
         component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminProductsView.vue'),

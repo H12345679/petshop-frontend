@@ -167,9 +167,9 @@
                 </div>
               </div>
               <div class="field col flex1">
-                <label>库存（宠物填1）</label>
+                <label>库存（宠物锁定为1）</label>
                 <div class="input-wrap">
-                  <input type="number" v-model.number="formData.stock" placeholder="1" />
+                  <input type="number" v-model.number="formData.stock" placeholder="1" :disabled="formData.type === 1" />
                 </div>
               </div>
             </div>
@@ -284,7 +284,7 @@
 </template>
 
 <script>
-import { searchProducts, createProduct, updateProduct, deleteProduct, uploadImage } from "@/api/modules/product.js";
+import { searchProducts, createProduct, updateProduct, deleteProduct, uploadImage, getProductDetail } from "@/api/modules/product.js";
 import { searchShops } from "@/api/modules/shop.js";
 import { categoryTree } from "@/api/modules/home.js";
 import { getStore } from "@/libs/storage.js";
@@ -338,6 +338,13 @@ export default {
   computed: {
     totalPages() {
       return Math.ceil(this.total / this.query.size) || 1;
+    }
+  },
+  watch: {
+    'formData.type'(newVal) {
+      if (newVal === 1) {
+        this.formData.stock = 1;
+      }
     }
   },
   async created() {
@@ -462,31 +469,44 @@ export default {
       };
       this.modalVisible = true;
     },
-    openEditModal(p) {
+    async openEditModal(p) {
       this.isEdit = true;
       this.formErrors = {};
-      let imgList = [];
-      try {
-        if (p.images) imgList = JSON.parse(p.images);
-      } catch (e) {
-        console.warn("解析图册失败", e);
-      }
       
-      this.formData = {
-        id: p.id,
-        shopId: p.shopId,
-        categoryId: p.categoryId,
-        name: p.name,
-        type: p.type,
-        price: p.price,
-        originalPrice: p.originalPrice,
-        stock: p.stock,
-        mainImage: p.mainImage || "",
-        imagesList: imgList,
-        description: p.description || "",
-        skus: p.skus ? JSON.parse(JSON.stringify(p.skus)) : []
-      };
-      this.modalVisible = true;
+      // 从 API 获取完整商品详情（包含 SKU 列表）
+      try {
+        const res = await getProductDetail(p.id);
+        const detail = res.data;
+        let imgList = [];
+        try {
+          if (detail.images) imgList = JSON.parse(detail.images);
+        } catch (e) {
+          console.warn("解析图册失败", e);
+        }
+        
+        this.formData = {
+          id: detail.id,
+          shopId: detail.shopId,
+          categoryId: detail.categoryId,
+          name: detail.name,
+          type: detail.type,
+          price: detail.originalPrice || detail.price,
+          originalPrice: detail.originalPrice,
+          stock: detail.stock,
+          mainImage: detail.mainImage || "",
+          imagesList: imgList,
+          description: detail.description || "",
+          skus: detail.skus ? detail.skus.map(s => ({
+            specName: s.specName || "",
+            price: s.price,
+            stock: s.stock,
+            image: s.image || ""
+          })) : []
+        };
+        this.modalVisible = true;
+      } catch (e) {
+        alert("获取商品详情失败：" + (e.message || e));
+      }
     },
     addSku() {
       this.formData.skus.push({ specName: "", price: this.formData.price || 0, stock: 1, image: "" });
