@@ -244,6 +244,25 @@ export default {
       window.addEventListener("resize", this.handleResize);
     });
   },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.handleResize);
+    if (this.salesChart) {
+      this.salesChart.dispose();
+      this.salesChart = null;
+    }
+    if (this.statusChart) {
+      this.statusChart.dispose();
+      this.statusChart = null;
+    }
+    if (this.levelChart) {
+      this.levelChart.dispose();
+      this.levelChart = null;
+    }
+    if (this.productChart) {
+      this.productChart.dispose();
+      this.productChart = null;
+    }
+  },
   methods: {
     formatCurrency(v) {
       const num = Number(v || 0);
