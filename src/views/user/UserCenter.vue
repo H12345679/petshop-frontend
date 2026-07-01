@@ -165,7 +165,7 @@ import UserMembership from "@/views/user/UserMembership.vue";
 import UserMessages from "@/views/user/UserMessages.vue";
 import UserPassword from "@/views/user/UserPassword.vue";
 
-import { getUserInfo, getMembershipLevels } from "@/api/modules/user.js";
+import { getUserInfo, getMembershipLevels, getFavorites } from "@/api/modules/user.js";
 import { getStore, setStore, removestore } from "@/libs/storage.js";
 
 export default {
@@ -229,6 +229,7 @@ export default {
     this.restoreLocal();
     this.loadUserInfo();
     this.loadMembershipLevels();
+    this.loadFavoriteCount();
   },
   methods: {
     restoreLocal() {
@@ -246,6 +247,14 @@ export default {
       try {
         const res = await getMembershipLevels();
         this.membershipLevels = res.data || [];
+      } catch (e) { /* ignore */ }
+    },
+    async loadFavoriteCount() {
+      try {
+        const res = await getFavorites({ current: 1, size: 1 });
+        if (res && res.data && res.data.total !== undefined) {
+          this.favoriteTotal = res.data.total;
+        }
       } catch (e) { /* ignore */ }
     },
 
