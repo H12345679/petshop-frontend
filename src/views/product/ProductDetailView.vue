@@ -53,12 +53,12 @@
           <div class="price-box">
             <div class="row center gap8">
               <span class="muted small">价格</span>
-              <span class="price"><span class="cur">¥</span>{{ currentPrice }}</span>
-              <span class="del" v-if="discount < 1">原价 ¥{{ basePrice.toFixed(2) }}</span>
+              <span class="price"><span class="cur">¥</span>{{ Number(currentPrice).toFixed(2) }}</span>
+              <span class="del" v-if="userDiscount < 1">原价 ¥{{ (currentPrice / userDiscount).toFixed(2) }}</span>
               <span class="del" v-else-if="product.originalPrice && product.originalPrice > currentPrice">原价 ¥{{ product.originalPrice }}</span>
               
-              <span class="tag warn" v-if="userInfo && userInfo.memberLevelId > 0">
-                尊贵会员 <span class="anno" v-if="discount < 1">已享 {{ discount * 10 }} 折</span>
+              <span class="tag warn" v-if="userDiscount < 1">
+                {{ product.userLevelName || '会员' }} <span class="anno">享 {{ userDiscount * 10 }} 折</span>
               </span>
             </div>
             <div class="row gap8 small muted mt8">
@@ -112,7 +112,7 @@
             <div class="pbody" style="padding: 4px; flex: 1; overflow: hidden;">
               <div class="small" style="margin-bottom: 4px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; line-height: 1.4;">{{ p.name }}</div>
               <div class="price small">
-                ¥ {{ (p.price * discount).toFixed(2) }}
+                ¥ {{ p.price.toFixed(2) }}
               </div>
             </div>
           </div>
@@ -210,23 +210,15 @@ export default {
     }
   },
   computed: {
-    discount() {
-      if (!this.userInfo) return 1;
-      const level = this.userInfo.memberLevelId || 0;
-      if (level === 2) return 0.95; // 银卡 95%
-      if (level >= 3) return 0.90;  // 金卡 90%
-      return 1; // 游客或普通会员(1) 100%
-    },
-    basePrice() {
-      if (!this.product) return 0;
-      let bp = this.product.price || 0;
-      if (this.currentSku) {
-        bp = this.currentSku.price;
-      }
-      return bp;
+    userDiscount() {
+      if (this.currentSku && this.currentSku.userDiscount) return this.currentSku.userDiscount;
+      if (this.product && this.product.userDiscount) return this.product.userDiscount;
+      return 1;
     },
     currentPrice() {
-      return (this.basePrice * this.discount).toFixed(2);
+      if (!this.product) return 0;
+      if (this.currentSku) return this.currentSku.price;
+      return this.product.price || 0;
     },
     currentStock() {
       if (this.currentSku) {

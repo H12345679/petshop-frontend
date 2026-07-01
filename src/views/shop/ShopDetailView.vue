@@ -45,7 +45,7 @@
             </div>
             <div class="pbody">
               <div class="pname">{{ p.name }}</div>
-              <div class="price">¥ {{ getCurrentPrice(p) }} <span v-if="discount < 1" style="text-decoration: line-through; font-size: 12px; color: #999; margin-left: 4px; font-weight: normal;">¥{{ p.price }}</span></div>
+              <div class="price">¥ {{ Number(p.price).toFixed(2) }} <span v-if="p.userDiscount < 1" style="text-decoration: line-through; font-size: 12px; color: #999; margin-left: 4px; font-weight: normal;">¥{{ (p.price / p.userDiscount).toFixed(2) }}</span></div>
               <div class="small muted mt8">总销量 {{ p.sales || 0 }}</div>
             </div>
           </div>
@@ -120,13 +120,6 @@ export default {
     };
   },
   computed: {
-    discount() {
-      if (!this.userInfo) return 1;
-      const level = this.userInfo.memberLevelId || 0;
-      if (level === 2) return 0.95;
-      if (level >= 3) return 0.90;
-      return 1;
-    },
     totalPages() {
       return Math.ceil(this.total / this.query.size) || 1;
     }
@@ -138,9 +131,6 @@ export default {
     this.fetchShopData();
   },
   methods: {
-    getCurrentPrice(p) {
-      return parseFloat((p.price * this.discount).toFixed(2));
-    },
     async fetchShopData() {
       const id = this.shopId;
       if (!id) return;

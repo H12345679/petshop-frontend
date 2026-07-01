@@ -54,8 +54,8 @@
             <div class="pbody">
               <div class="pname">{{ p.name }}</div>
               <div class="price-row">
-                <span class="price"><span class="cur">¥</span>{{ getCurrentPrice(p) }}</span>
-                <span v-if="discount < 1" class="del">¥{{ p.price }}</span>
+                <span class="price"><span class="cur">¥</span>{{ Number(p.price).toFixed(2) }}</span>
+                <span v-if="p.userDiscount < 1" class="del">¥{{ (p.price / p.userDiscount).toFixed(2) }}</span>
                 <span v-else-if="p.originalPrice && p.originalPrice > p.price" class="del">¥{{ p.originalPrice }}</span>
               </div>
               <div class="small muted sales">已售 {{ p.sales || 0 }} 件</div>
@@ -98,13 +98,6 @@ export default {
     };
   },
   computed: {
-    discount() {
-      if (!this.userInfo) return 1;
-      const level = this.userInfo.memberLevelId || 0;
-      if (level === 2) return 0.95; // 银卡 95%
-      if (level >= 3) return 0.90;  // 金卡 90%
-      return 1; // 游客或普通会员(1) 100%
-    }
   },
   created() {
     // 读本地登录态
@@ -138,9 +131,7 @@ export default {
         this.categories = [];
       }
     },
-    getCurrentPrice(p) {
-      return parseFloat((p.price * this.discount).toFixed(2));
-    },
+
     async loadSection(sec, strategy) {
       try {
         const res = await homeProducts(strategy, 6);
