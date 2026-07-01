@@ -217,7 +217,13 @@ export default {
     async initData() {
       this.loading = true;
       try {
-        const [addrRes, myRes, allRes] = await Promise.all([addressList(), myCoupons(0), couponList()]);
+        // 三个加载并行发起，但各自兜底：任一失败不再拖垮其余、也不再吞掉后端真错
+        // （历史教训：address 表缺列 500 曾让整页金额停在 ¥0.00）
+        const [addrRes, myRes, allRes] = await Promise.all([
+          addressList().catch(e => { this.$message.error("收货地址加载失败：" + (e.message || "未知错误")); return { data: [] }; }),
+          myCoupons(0).catch(e => { this.$message.warning("优惠券加载失败：" + (e.message || "未知错误")); return { data: [] }; }),
+          couponList().catch(() => ({ data: [] })),
+        ]);
         this.addresses = addrRes.data || [];
         const allMap = {};
         (allRes.data || []).forEach(c => { allMap[c.id] = c; });
@@ -227,9 +233,9 @@ export default {
         });
         const def = this.addresses.find(a => a.isDefault === 1);
         this.selectedAddressId = def ? def.id : (this.addresses[0] || {}).id;
-        this.preSettleCalc();
-      } catch (e) { this.$message.error("加载失败：" + e.message); }
-      finally { this.loading = false; }
+        // 金额面板独立于地址/券的成败，始终计算
+        await this.preSettleCalc();
+      } finally { this.loading = false; }
     },
     couponUsable(c) { return Number(c.threshold || 0) <= (this.settleData.totalAmount || 0); },
     async preSettleCalc() {
@@ -237,7 +243,10 @@ export default {
         const items = this.checkoutItems.map(i => ({ cartId: i.cartId, productId: i.productId, skuId: i.skuId || 0, quantity: i.quantity }));
         const res = await preSettle({ items, couponId: this.selectedCouponId || 0, addressId: this.selectedAddressId || 0 });
         this.settleData = res.data || {};
-      } catch (e) { /* ignore */ }
+      } catch (e) {
+        // 不再静默吞掉：算不出金额时暴露后端真实原因，避免只看到 ¥0.00 无从排查
+        this.$message.error("金额试算失败：" + (e.message || "请稍后重试"));
+      }
     },
     selectCoupon(coupon) {
       this.selectedCouponId = this.selectedCouponId === coupon.id ? null : coupon.id;
