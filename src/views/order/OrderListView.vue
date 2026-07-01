@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import { myOrders, payOrder, cancelOrder, receiveOrder } from "@/api/modules/order.js";
+import { myOrders, payOrder, cancelOrder, receiveOrder, deleteOrder } from "@/api/modules/order.js";
 import { getUserInfo } from "@/api/modules/user.js";
 import { setStore } from "@/libs/storage.js";
 import AppHeader from "@/components/AppHeader.vue";
@@ -209,10 +209,17 @@ export default {
     },
     openRefund(order) { this.$router.push(`/refund?orderId=${order.id}`); },
     goReview(order) { this.$router.push(`/review?orderId=${order.id}`); },
-    deleteOrderConfirm(order) {
-      this.$confirm("确定删除该订单？", "删除", { type: "warning" }).then(() => {
-        this.$message.info("删除功能需后端支持");
-      }).catch(() => {});
+    async deleteOrderConfirm(order) {
+      try {
+        await this.$confirm("确定删除该订单？删除后无法恢复。", "删除订单", {
+          confirmButtonText: "删除", cancelButtonText: "取消", type: "warning",
+        });
+        await deleteOrder(order.id);
+        this.$message.success("订单已删除");
+        this.loadOrders();
+      } catch (e) {
+        if (e !== 'cancel') this.$message.error(e.message || "删除失败");
+      }
     },
     statusTagClass(s) {
       const m = { 0:'warn', 1:'accent', 2:'accent', 3:'ok', 4:'', '-1':'cancel', '-2':'warn', '-3':'ok', '-4':'ok' };

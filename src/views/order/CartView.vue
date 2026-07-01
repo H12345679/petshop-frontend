@@ -269,12 +269,14 @@ export default {
         return;
       }
       const checkoutItems = this.selectedItems.map((i) => ({
+        cartId: i.id,
         productId: i.productId,
         skuId: i.skuId || 0,
         quantity: i.quantity,
         productName: i.productName,
         productImage: i.productImage,
         specName: i.specName,
+        shopName: i.shopName || "",
         price: i.price,
       }));
       localStorage.setItem("CHECKOUT_ITEMS", JSON.stringify(checkoutItems));

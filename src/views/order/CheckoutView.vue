@@ -36,37 +36,38 @@
             </div>
           </div>
 
-          <!-- 商品清单（按店拆单） -->
-          <div class="card">
-            <h3>商品清单 <span class="small muted">（跨店将自动拆为多张订单）</span></h3>
-            <div v-for="(shop, si) in shopGroups" :key="si" class="shop-group">
-              <div class="shop-name">🏬 {{ shop.shopName || '店铺' }}</div>
-              <table class="tbl">
-                <thead>
-                  <tr>
-                    <th>商品</th>
-                    <th>规格</th>
-                    <th style="width:90px">单价</th>
-                    <th style="width:60px">数量</th>
-                    <th style="width:90px">小计</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="item in shop.items" :key="item.productId">
-                    <td>
-                      <div class="prod-cell">
-                        <div class="prod-img"><img :src="item.productImage || '/logo.png'" /></div>
-                        {{ item.productName }}
-                      </div>
-                    </td>
-                    <td class="small muted">{{ item.specName || '—' }}</td>
-                    <td class="price">¥{{ (item.price || 0).toFixed(2) }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td class="price">¥{{ ((item.price || 0) * item.quantity).toFixed(2) }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          <!-- 商品清单（按店拆单，每店一个卡片 + table） -->
+          <div
+            v-for="(shop, si) in shopGroups"
+            :key="si"
+            class="card"
+          >
+            <h3>商品明细　<span class="small muted">{{ shop.shopName || '店铺' }}</span></h3>
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>商品</th>
+                  <th>规格</th>
+                  <th style="width:90px">单价</th>
+                  <th style="width:60px">数量</th>
+                  <th style="width:90px">小计</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in shop.items" :key="(item.cartId || item.productId) + '_' + (item.skuId || 0)">
+                  <td>
+                    <div class="prod-cell">
+                      <div class="prod-img"><img :src="item.productImage || '/logo.png'" :alt="item.productName" /></div>
+                      {{ item.productName }}
+                    </div>
+                  </td>
+                  <td class="small muted">{{ item.specName || '—' }}</td>
+                  <td class="price">¥{{ (item.price || 0).toFixed(2) }}</td>
+                  <td>{{ item.quantity }}</td>
+                  <td class="price">¥{{ ((item.price || 0) * item.quantity).toFixed(2) }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           <!-- 优惠券 -->
@@ -233,7 +234,7 @@ export default {
     couponUsable(c) { return Number(c.threshold || 0) <= (this.settleData.totalAmount || 0); },
     async preSettleCalc() {
       try {
-        const items = this.checkoutItems.map(i => ({ productId: i.productId, skuId: i.skuId || 0, quantity: i.quantity }));
+        const items = this.checkoutItems.map(i => ({ cartId: i.cartId, productId: i.productId, skuId: i.skuId || 0, quantity: i.quantity }));
         const res = await preSettle({ items, couponId: this.selectedCouponId || 0, addressId: this.selectedAddressId || 0 });
         this.settleData = res.data || {};
       } catch (e) { /* ignore */ }
@@ -269,23 +270,25 @@ export default {
       this.submitting = true;
       try {
         const requestId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c==='x'?r:(r&0x3|0x8)).toString(16); });
-        const items = this.checkoutItems.map(i => ({ productId: i.productId, skuId: i.skuId || 0, quantity: i.quantity }));
+        const items = this.checkoutItems.map(i => ({ cartId: i.cartId, productId: i.productId, skuId: i.skuId || 0, quantity: i.quantity }));
         const res = await createOrder({ requestId, couponId: this.selectedCouponId || 0, addressId: this.selectedAddressId, items, remark: this.remark });
         const d = res.data || {};
         localStorage.removeItem("CHECKOUT_ITEMS");
         const ids = d.orderIds || []; const nos = d.orderNos || [];
         if (ids.length === 0) throw new Error("订单创建失败：未返回订单ID");
-        // 先刷新余额（下单可能占用优惠券、影响余额）
         try {
           const { getUserInfo } = await import("@/api/modules/user.js");
           const { setStore } = await import("@/libs/storage.js");
           const userRes = await getUserInfo();
           if (userRes && userRes.data) setStore("userInfo", JSON.stringify(userRes.data));
         } catch (_) { /* ignore */ }
-        const orderIdStr = String(ids[0]);
+        localStorage.setItem("PAYMENT_ORDER_IDS", JSON.stringify(ids));
         this.$message.success("订单创建成功！");
-        // 直接导航到支付页，不再使用 alert 弹窗
-        this.$router.push(`/order/${orderIdStr}`);
+        if (ids.length === 1) {
+          this.$router.push(`/order/${ids[0]}`);
+        } else {
+          this.$router.push("/payment");
+        }
       } catch (e) { this.$message.error(e.message || "下单失败"); }
       finally { this.submitting = false; }
     },
@@ -328,13 +331,12 @@ export default {
 .addr-add { min-width: 90px; height: 70px; border: 1px dashed #cfd4da; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #888; font-size: 12px; cursor: pointer; }
 .addr-add:hover { border-color: #5b8def; color: #5b8def; }
 
-/* 商品 */
-.shop-group { margin-bottom: 14px; }
-.shop-name { font-size: 12px; color: #888; margin-bottom: 8px; }
+/* 商品表格 */
 .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
-.tbl th { background: #f7f8fa; text-align: left; padding: 8px; border-bottom: 1px solid #cfd4da; color: #555; font-weight: 600; }
-.tbl td { padding: 8px; border-bottom: 1px solid #eef0f3; color: #555; vertical-align: middle; }
+.tbl th { background: #f7f8fa; text-align: left; padding: 10px; border-bottom: 1px solid #cfd4da; color: #555; font-weight: 600; white-space: nowrap; }
+.tbl td { padding: 10px; border-bottom: 1px solid #eef0f3; color: #555; vertical-align: middle; }
 .tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: #fafbfc; }
 .prod-cell { display: flex; align-items: center; gap: 8px; }
 .prod-img { width: 44px; height: 44px; border-radius: 6px; overflow: hidden; background: #f5f5f5; flex-shrink: 0; }
 .prod-img img { width: 100%; height: 100%; object-fit: cover; }
