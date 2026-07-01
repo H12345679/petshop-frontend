@@ -65,7 +65,7 @@
 
               <!-- 单价 -->
               <td>
-                <span v-if="item.valid" class="price">¥{{ (item.price || 0).toFixed(2) }}</span>
+                <span v-if="item.valid" class="price">¥{{ unitPrice(item).toFixed(2) }}</span>
                 <span v-else class="muted">--</span>
               </td>
 
@@ -81,7 +81,7 @@
 
               <!-- 小计 -->
               <td>
-                <span v-if="item.valid" class="price">¥{{ ((item.price || 0) * item.quantity).toFixed(2) }}</span>
+                <span v-if="item.valid" class="price">¥{{ (unitPrice(item) * item.quantity).toFixed(2) }}</span>
                 <span v-else class="muted">--</span>
               </td>
 
@@ -143,7 +143,7 @@ export default {
       return this.selectedItems.length;
     },
     totalPrice() {
-      return this.selectedItems.reduce((sum, i) => sum + (i.price || 0) * i.quantity, 0);
+      return this.selectedItems.reduce((sum, i) => sum + this.unitPrice(i) * i.quantity, 0);
     },
     allSelected: {
       get() {
@@ -159,6 +159,11 @@ export default {
     this.loadCart();
   },
   methods: {
+    // 购物车展示会员折后价（memberPrice）；结算时仍按原价(i.price)传递，保证结算/订单口径一致
+    unitPrice(item) {
+      const p = item.memberPrice != null ? item.memberPrice : item.price;
+      return Number(p || 0);
+    },
     async loadCart() {
       this.loading = true;
       try {
