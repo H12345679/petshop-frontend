@@ -96,6 +96,8 @@ const EMPTY_FORM = {
   city: "",
   district: "",
   detail: "",
+  longitude: null,
+  latitude: null,
   isDefault: false,
 };
 
@@ -155,6 +157,8 @@ export default {
         city: addr.city,
         district: addr.district,
         detail: addr.detail,
+        longitude: addr.longitude || null,
+        latitude: addr.latitude || null,
         isDefault: addr.isDefault === 1,
       };
       this.regionCode = this.matchRegionCode(addr.province, addr.city, addr.district);
@@ -199,6 +203,8 @@ export default {
         this.form.city = data.city || "";
         this.form.district = data.district || "";
         this.form.detail = data.detail || "";
+        this.form.longitude = data.lng || null;
+        this.form.latitude = data.lat || null;
         this.regionCode = this.matchRegionCode(data.province, data.city, data.district);
       }
     },
@@ -218,6 +224,8 @@ export default {
           city: f.city,
           district: f.district,
           detail: f.detail,
+          longitude: f.longitude,
+          latitude: f.latitude,
           isDefault: f.isDefault ? 1 : 0,
         };
         if (this.editing) {
