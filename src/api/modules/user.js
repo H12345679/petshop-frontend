@@ -1,4 +1,4 @@
-import { get, postJson, put, del } from "../axios.js";
+import { get, postJson, put, del, upload } from "../axios.js";
 
 /**
  * 用户信息 & 收货地址 & 会员等级接口
@@ -18,6 +18,11 @@ export const getMe = getUserInfo;
 /** 修改当前用户信息：PUT /api/users/me */
 export function updateUserInfo(data) {
   return put("/users/me", data);
+}
+
+/** 上传头像图片：POST /api/files/avatar */
+export function uploadAvatar(formData) {
+  return upload("/files/avatar", formData);
 }
 
 /** 修改密码：PUT /api/users/me/password */
@@ -140,4 +145,21 @@ export function getManageMessages(params) {
 /** 充值：POST /api/users/recharge */
 export function recharge(amount) {
   return postJson("/users/recharge", { amount });
+}
+
+// ==================== 后台用户管理（ADMIN） ====================
+
+/** 用户管理列表：GET /api/users/manage */
+export function getUserManageList(params) {
+  return get("/users/manage", params);
+}
+
+/** 启用/禁用用户：PUT /api/users/{id}/status */
+export function updateUserStatus(id, status) {
+  return put(`/users/${id}/status`, { status });
+}
+
+/** 变更用户角色：PUT /api/users/{id}/role */
+export function updateUserRole(id, role) {
+  return put(`/users/${id}/role`, { role });
 }

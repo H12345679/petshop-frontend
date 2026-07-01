@@ -5,13 +5,11 @@
       <h3>个人资料</h3>
       <div class="profile-layout">
         <div class="profile-avatar-col">
-          <div class="avatar-big">
+          <div class="avatar-big" @click="$refs.avatarInput.click()" title="点击更换头像" style="cursor: pointer; position: relative;">
             <img v-if="profileForm.avatar" :src="profileForm.avatar" class="avatar-img" />
             <span v-else class="avatar-txt big">{{ (userInfo.nickname || userInfo.username || '我')[0] }}</span>
-          </div>
-          <div class="field mt8">
-            <label>头像URL</label>
-            <input class="input" v-model.trim="profileForm.avatar" placeholder="输入头像图片地址" />
+            <div class="avatar-overlay">更换头像</div>
+            <input type="file" ref="avatarInput" accept="image/*" style="display:none" @change="handleAvatarChange" />
           </div>
         </div>
         <div class="profile-fields">
@@ -52,33 +50,11 @@
         </div>
       </div>
     </div>
-
-    <!-- 修改密码 -->
-    <div class="panel mt16">
-      <h3>账号安全 · 修改密码</h3>
-      <div class="form-narrow">
-        <div class="field">
-          <label>当前密码 <span class="req">*</span></label>
-          <input class="input" v-model="passwordForm.oldPassword" type="password" placeholder="输入当前密码" />
-        </div>
-        <div class="field">
-          <label>新密码 <span class="req">*</span></label>
-          <input class="input" v-model="passwordForm.newPassword" type="password" placeholder="至少 6 位" />
-        </div>
-        <div class="field">
-          <label>确认新密码 <span class="req">*</span></label>
-          <input class="input" v-model="passwordForm.confirmPassword" type="password" placeholder="再次输入新密码" />
-        </div>
-        <button class="btn primary" :disabled="savingPassword" @click="savePassword">
-          {{ savingPassword ? '保存中…' : '保存新密码' }}
-        </button>
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
-import { updateUserInfo, changePassword } from "@/api/modules/user.js";
+import { updateUserInfo, uploadAvatar } from "@/api/modules/user.js";
 import { setStore } from "@/libs/storage.js";
 
 export default {
@@ -93,9 +69,6 @@ export default {
     return {
       profileForm: { nickname: "", avatar: "", phone: "", email: "", gender: 0 },
       savingProfile: false,
-
-      passwordForm: { oldPassword: "", newPassword: "", confirmPassword: "" },
-      savingPassword: false,
     };
   },
   watch: {
@@ -115,6 +88,26 @@ export default {
       this.profileForm.phone = this.userInfo.phone || "";
       this.profileForm.email = this.userInfo.email || "";
       this.profileForm.gender = this.userInfo.gender != null ? this.userInfo.gender : 0;
+    },
+    async handleAvatarChange(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const formData = new FormData();
+      formData.append("file", file);
+      
+      try {
+        const res = await uploadAvatar(formData);
+        this.profileForm.avatar = res.data.url;
+        
+        // 头像传完后直接触发保存，更新全局 userInfo，避免用户忘记点保存按钮
+        await this.saveProfile();
+        
+      } catch (err) {
+        this.$emit('notify', "error", "上传头像失败");
+      } finally {
+        e.target.value = ''; // 清空 input 保证下次同名文件仍能触发 change
+      }
     },
     async saveProfile() {
       if (!this.profileForm.nickname.trim()) return this.$emit('notify', "error", "昵称不能为空");
@@ -141,24 +134,6 @@ export default {
         this.savingProfile = false;
       }
     },
-    async savePassword() {
-      const { oldPassword, newPassword, confirmPassword } = this.passwordForm;
-      if (!oldPassword) return this.$emit('notify', "error", "请输入当前密码");
-      if (!newPassword || newPassword.length < 6) return this.$emit('notify', "error", "新密码至少 6 位");
-      if (newPassword !== confirmPassword) return this.$emit('notify', "error", "两次输入的新密码不一致");
-      
-      this.savingPassword = true;
-      try {
-        await changePassword({ oldPassword, newPassword });
-        this.$emit('notify', "success", "密码修改成功，请重新登录");
-        this.passwordForm = { oldPassword: "", newPassword: "", confirmPassword: "" };
-        setTimeout(() => this.$emit('logout'), 1500);
-      } catch (e) {
-        this.$emit('notify', "error", e.message || "密码修改失败");
-      } finally {
-        this.savingPassword = false;
-      }
-    }
   }
 };
 </script>
@@ -201,7 +176,14 @@ select.input { cursor: pointer; }
 .avatar-big {
   width: 100px; height: 100px; border-radius: 50%; background: #e3e6ec; color: #999;
   display: flex; align-items: center; justify-content: center; margin: 0 auto;
-  overflow: hidden; border: 2px solid #e6e8eb;
+  overflow: hidden; border: 2px solid #e6e8eb; position: relative;
+}
+.avatar-big:hover .avatar-overlay { opacity: 1; }
+.avatar-overlay {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5); color: #fff; display: flex;
+  align-items: center; justify-content: center; font-size: 13px;
+  opacity: 0; transition: opacity 0.2s; pointer-events: none;
 }
 .avatar-big .avatar-txt.big { font-size: 32px; }
 .avatar-big .avatar-img { width: 100%; height: 100%; object-fit: cover; }

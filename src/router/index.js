@@ -15,7 +15,7 @@ const routes = [
     path: "/videos",
     name: "videos",
     component: () =>
-      import(/* webpackChunkName: "video" */ "../views/VideoListView.vue"),
+      import(/* webpackChunkName: "video" */ "../views/video/VideoListView.vue"),
   },
   {
     path: "/video/:id",
@@ -119,6 +119,13 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: "/payment",
+    name: "payment",
+    component: () =>
+      import(/* webpackChunkName: "order" */ "../views/order/PaymentView.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
     path: "/orders",
     name: "orders",
     component: () =>
@@ -130,6 +137,20 @@ const routes = [
     name: "order-detail",
     component: () =>
       import(/* webpackChunkName: "order" */ "../views/order/OrderDetailView.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/refund",
+    name: "refund",
+    component: () =>
+      import(/* webpackChunkName: "order" */ "../views/order/RefundView.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/review",
+    name: "review",
+    component: () =>
+      import(/* webpackChunkName: "order" */ "../views/order/ReviewView.vue"),
     meta: { requiresAuth: true },
   },
   {
@@ -176,6 +197,12 @@ const routes = [
         meta: { title: "运营 / 消息推送" },
       },
       {
+        path: "my-messages",
+        name: "AdminMyMessages",
+        component: () => import("../views/admin/AdminMyMessagesView.vue"),
+        meta: { title: "运营 / 我的消息" },
+      },
+      {
         path: 'products',
         name: 'admin-products',
         component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminProductsView.vue'),
@@ -185,7 +212,7 @@ const routes = [
         path: 'logs',
         name: 'AdminLogs',
         component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminLogsView.vue'),
-        meta: { title: '后台管理 - 日志审核' }
+        meta: { title: '后台管理 - 日志审核', requiresSuperAdmin: true }
       },
       {
         path: "orders",
@@ -197,13 +224,13 @@ const routes = [
         meta: { title: "订单 / 订单管理" },
       },
       {
-        path: "products",
-        name: "admin-products",
+        path: "refunds",
+        name: "admin-refunds",
         component: () =>
           import(
-            /* webpackChunkName: "admin" */ "../views/admin/AdminProductsView.vue"
+            /* webpackChunkName: "admin" */ "../views/admin/AdminRefundsView.vue"
           ),
-        meta: { title: "商品 / 商品管理" },
+        meta: { title: "退单 / 退单审核" },
       },
       {
         path: "reviews",
@@ -224,14 +251,11 @@ const routes = [
         meta: { title: "优惠券 / 优惠券管理" },
       },
       {
-        path: "messages",
-        name: "admin-messages",
-        component: () =>
-          import(
-            /* webpackChunkName: "admin" */ "../views/admin/AdminMessagesView.vue"
-          ),
-        meta: { title: "消息 / 消息推送" },
-      },
+        path: 'users',
+        name: 'AdminUsers',
+        component: () => import(/* webpackChunkName: "admin" */ '../views/admin/AdminManage.vue'),
+        meta: { title: '用户 / 用户与会员管理' }
+      }
     ],
   },
 ];
@@ -267,6 +291,14 @@ router.beforeEach((to, from, next) => {
     ) {
       alert("越权访问：仅限管理员或商家访问后台");
       return next("/");
+    }
+  }
+
+  // 检查是否需要超级管理员权限
+  if (to.matched.some((r) => r.meta && r.meta.requiresSuperAdmin)) {
+    if (!userInfo || userInfo.role !== "ADMIN") {
+      alert("越权访问，仅系统管理员可查看该页面");
+      return next("/admin");
     }
   }
 

@@ -3,7 +3,11 @@
     <AppHeader />
 
     <div class="container">
-      <div class="breadcrumb small muted mb12">首页 / 全部商品{{ currentCategoryName ? ' / ' + currentCategoryName : '' }}</div>
+      <div class="breadcrumb small muted mb12">
+        <router-link to="/" class="bc-link">首页</router-link> / 
+        <a href="/products" class="bc-link">全部商品</a>
+        <span v-if="currentCategoryName"> / {{ currentCategoryName }}</span>
+      </div>
       
       <div class="row layout-body">
         <!-- 左侧分类树 -->
@@ -30,10 +34,12 @@
           <!-- 筛选条 -->
           <div class="filter-card card">
             <div class="filter-row wrap gap8">
-              <span class="small muted label">类型：</span>
-              <span class="tag" :class="{ accent: query.type === '' }" @click="selectType('')">全部</span>
-              <span class="tag" :class="{ accent: query.type === 1 }" @click="selectType(1)">宠物</span>
-              <span class="tag" :class="{ accent: query.type === 2 }" @click="selectType(2)">周边商品</span>
+              <template v-if="!query.categoryId">
+                <span class="small muted label">类型：</span>
+                <span class="tag" :class="{ accent: query.type === '' }" @click="selectType('')">全部</span>
+                <span class="tag" :class="{ accent: query.type === 1 }" @click="selectType(1)">宠物</span>
+                <span class="tag" :class="{ accent: query.type === 2 }" @click="selectType(2)">周边商品</span>
+              </template>
               
               <span class="small muted label" style="margin-left:20px">排序：</span>
               <span class="tag" :class="{ accent: query.sort === '' }" @click="selectSort('')">综合</span>
@@ -66,8 +72,9 @@
               <div class="pbody">
                 <div class="pname">{{ p.name }}</div>
                 <div class="price-row">
-                  <span class="price"><span class="cur">¥</span>{{ p.price }}</span>
-                  <span v-if="p.originalPrice && p.originalPrice > p.price" class="del">¥{{ p.originalPrice }}</span>
+                  <span class="price"><span class="cur">¥</span>{{ Number(p.price).toFixed(2) }}</span>
+                  <span v-if="p.userDiscount < 1" class="del">¥{{ (p.price / p.userDiscount).toFixed(2) }}</span>
+                  <span v-else-if="p.originalPrice && p.originalPrice > p.price" class="del">¥{{ p.originalPrice }}</span>
                 </div>
                 <div class="row between center small muted mt8">
                   <span>已售 {{ p.sales || 0 }}</span>
@@ -101,26 +108,8 @@
 <script>
 import { categoryTree } from "@/api/modules/home.js";
 import { searchProducts } from "@/api/modules/product.js";
+import { getStore } from "@/libs/storage.js";
 
-// Mock Data fallback
-const mockCategories = [
-  { id: 1, name: '宠物', children: [{ id: 11, name: '猫咪' }, { id: 12, name: '狗狗' }, { id: 13, name: '水族小宠' }] },
-  { id: 2, name: '主粮', children: [{ id: 21, name: '猫粮' }, { id: 22, name: '狗粮' }] },
-  { id: 3, name: '玩具用品', children: [] },
-  { id: 4, name: '清洁洗护', children: [] }
-];
-const mockProducts = [
-  { id: 101, name: "英国短毛猫 蓝猫 纯种健康", price: 2500, originalPrice: 3000, sales: 88, shopName: "极客宠物南山店", mainImage: "", type: 1 },
-  { id: 102, name: "布偶猫 海双 蓝眼 公", price: 6800, sales: 12, shopName: "萌宠之家", mainImage: "", type: 1 },
-  { id: 103, name: "银渐层 美短 折耳可选", price: 3200, sales: 30, shopName: "猫舍直营", mainImage: "", type: 1 },
-  { id: 104, name: "橘猫 田园猫 活泼黏人", price: 399, sales: 56, shopName: "领养代售", mainImage: "", type: 1 },
-  { id: 105, name: "暹罗猫 重点色 蓝眼", price: 1500, sales: 8, shopName: "萌宠之家", mainImage: "", type: 1 },
-  { id: 106, name: "无毛猫 斯芬克斯", price: 8800, sales: 3, shopName: "高端猫舍", mainImage: "", type: 1 },
-  { id: 107, name: "缅因猫 巨型 大体", price: 9900, sales: 5, shopName: "高端猫舍", mainImage: "", type: 1 },
-  { id: 108, name: "奶牛猫 活体 已驱虫", price: 299, sales: 22, shopName: "领养代售", mainImage: "", type: 1 },
-  { id: 109, name: "全价猫粮 1.5kg", price: 89, sales: 1200, shopName: "宠物商城自营", mainImage: "", type: 2 },
-  { id: 110, name: "逗猫棒 羽毛材质", price: 9.9, sales: 500, shopName: "宠物商城自营", mainImage: "", type: 2 }
-];
 
 export default {
   name: "ProductsView",
@@ -128,6 +117,7 @@ export default {
     return {
       categories: [],
       currentCategoryName: "",
+      userInfo: null,
       
       products: [],
       total: 0,
@@ -141,7 +131,7 @@ export default {
         minPrice: null,
         maxPrice: null,
         page: 1,
-        size: 8
+        size: 10
       }
     };
   },
@@ -151,7 +141,13 @@ export default {
     }
   },
   created() {
-    
+    const u = getStore("userInfo");
+    try {
+      this.userInfo = u ? JSON.parse(u) : null;
+    } catch (e) {
+      this.userInfo = null;
+    }
+
     // 初始化参数
     if (this.$route.query.categoryId) this.query.categoryId = Number(this.$route.query.categoryId) || this.$route.query.categoryId;
     if (this.$route.query.name) this.query.name = this.$route.query.name;
@@ -173,8 +169,8 @@ export default {
         const res = await categoryTree();
         this.categories = res.data || [];
       } catch (e) {
-        console.warn("加载分类失败，使用模拟数据");
-        this.categories = mockCategories;
+        console.warn("加载分类失败", e);
+        this.categories = [];
       }
     },
     async doSearch() {
@@ -201,26 +197,9 @@ export default {
           throw new Error("无数据或格式不匹配");
         }
       } catch (e) {
-        console.warn("商品搜索请求失败或未对接后端，启用模拟数据:", e.message);
-        // Mock filtering logic
-        let filtered = mockProducts.filter(p => {
-          if (this.query.name && !p.name.includes(this.query.name)) return false;
-          if (this.query.type !== "" && p.type && p.type !== this.query.type) return false;
-          if (this.query.minPrice != null && p.price < this.query.minPrice) return false;
-          if (this.query.maxPrice != null && p.price > this.query.maxPrice) return false;
-          // Note: mock data category filtering is simplified here
-          return true;
-        });
-        
-        // Mock sorting
-        if (this.query.sort === 'price_asc') filtered.sort((a,b) => a.price - b.price);
-        if (this.query.sort === 'price_desc') filtered.sort((a,b) => b.price - a.price);
-        if (this.query.sort === 'sales_desc') filtered.sort((a,b) => b.sales - a.sales);
-        
-        this.total = filtered.length;
-        // Paginate mock
-        const start = (this.query.page - 1) * this.query.size;
-        this.products = filtered.slice(start, start + this.query.size);
+        console.warn("商品搜索请求失败:", e.message);
+        this.products = [];
+        this.total = 0;
       } finally {
         this.loading = false;
         this.updateUrl();
@@ -228,6 +207,7 @@ export default {
     },
     selectCategory(id, name) {
       this.query.categoryId = id;
+      if (id !== '') this.query.type = ''; // 清除类型筛选，因为具体分类下不展示类型筛选
       this.currentCategoryName = id === '' ? '' : name;
       this.query.page = 1;
       this.doSearch();
@@ -281,6 +261,8 @@ export default {
 </script>
 
 <style scoped>
+.bc-link { color: inherit; text-decoration: none; cursor: pointer; transition: color 0.2s; }
+.bc-link:hover { color: #5b8def; }
 .products-page { background: #f4f5f7; min-height: 100vh; display: flex; flex-direction: column; }
 
 /* 布局 */

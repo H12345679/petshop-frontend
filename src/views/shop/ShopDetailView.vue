@@ -45,7 +45,7 @@
             </div>
             <div class="pbody">
               <div class="pname">{{ p.name }}</div>
-              <div class="price">¥ {{ p.price }}</div>
+              <div class="price">¥ {{ Number(p.price).toFixed(2) }} <span v-if="p.userDiscount < 1" style="text-decoration: line-through; font-size: 12px; color: #999; margin-left: 4px; font-weight: normal;">¥{{ (p.price / p.userDiscount).toFixed(2) }}</span></div>
               <div class="small muted mt8">总销量 {{ p.sales || 0 }}</div>
             </div>
           </div>
@@ -95,11 +95,13 @@
 <script>
 import { getShopDetail } from "@/api/modules/shop.js";
 import { searchProducts } from "@/api/modules/product.js";
+import { getStore } from "@/libs/storage.js";
 
 export default {
   name: "ShopDetailView",
   data() {
     return {
+      userInfo: null,
       shopId: null,
       loading: true,
       shop: null,
@@ -123,6 +125,8 @@ export default {
     }
   },
   created() {
+    const u = getStore("userInfo");
+    try { this.userInfo = u ? JSON.parse(u) : null; } catch(e) { this.userInfo = null; }
     this.shopId = this.$route.params.id;
     this.fetchShopData();
   },

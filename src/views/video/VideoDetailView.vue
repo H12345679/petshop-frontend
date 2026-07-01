@@ -40,10 +40,10 @@
                 <el-image :src="video.productMainImage || ''" class="product-img" fit="cover">
                   <div slot="error" class="image-slot">暂无图片</div>
                 </el-image>
-                <div class="product-info">
-                   <div class="product-name">{{ video.productName }}</div>
-                   <div class="product-price">￥{{ video.productPrice }}</div>
-                </div>
+                 <div class="product-info">
+                    <div class="product-name">{{ video.productName }}</div>
+                    <div class="product-price">￥{{ Number(video.productPrice || 0).toFixed(2) }}</div>
+                 </div>
                 <div class="product-action">
                    <el-button size="medium" @click="goToProduct(video.productId)">查看详情</el-button>
                    <el-button size="medium" type="primary">立即购买</el-button>
@@ -93,6 +93,8 @@ export default {
       video: null,
       recommendList: []
     };
+  },
+  computed: {
   },
   watch: {
     '$route.params.id': {

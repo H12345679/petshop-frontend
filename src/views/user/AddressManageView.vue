@@ -1,5 +1,6 @@
 <template>
   <div id="address-manage-page">
+    <AppHeader />
     <div class="addr-container">
       <div class="page-top">
         <h1 class="page-title">📍 收货地址</h1>
@@ -81,6 +82,7 @@
       <!-- 地图选点弹窗 -->
       <MapPicker :visible.sync="mapPickerVisible" @select="onMapSelect" />
     </div>
+    <AppFooter />
   </div>
 </template>
 
@@ -88,6 +90,8 @@
 import { addressList, addAddress, updateAddress, deleteAddress, setDefaultAddress } from "@/api/modules/address.js";
 import { regionData, codeToText } from "element-china-area-data";
 import MapPicker from "@/components/MapPicker.vue";
+import AppHeader from "@/components/AppHeader.vue";
+import AppFooter from "@/components/AppFooter.vue";
 
 const EMPTY_FORM = {
   receiver: "",
@@ -103,7 +107,7 @@ const EMPTY_FORM = {
 
 export default {
   name: "AddressManageView",
-  components: { MapPicker },
+  components: { MapPicker,AppHeader, AppFooter },
   data() {
     return {
       addresses: [],
@@ -274,7 +278,11 @@ export default {
 </script>
 
 <style scoped>
-.addr-container { max-width: 800px; margin: 0 auto; padding: 24px 20px 60px; }
+#address-manage-page {
+  display: flex; flex-direction: column; min-height: 100vh;
+  background: #f4f5f7;
+}
+.addr-container { max-width: 800px; width: 100%; margin: 0 auto; padding: 24px 20px 60px; flex: 1; }
 .page-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
 .page-title { font-size: 24px; font-weight: 700; color: #2c3e50; margin: 0; }
 

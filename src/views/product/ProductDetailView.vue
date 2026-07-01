@@ -3,23 +3,44 @@
     <AppHeader />
 
     <div class="container" v-if="product">
-      <div class="breadcrumb small muted mb12">首页 / {{ product.type === 1 ? '宠物' : '周边商品' }} / {{ product.name }}</div>
+      <div class="breadcrumb small muted mb12">
+        <router-link to="/" class="bc-link">首页</router-link> / 
+        <a :href="'/products?type=' + product.type" class="bc-link">{{ product.type === 1 ? '活体' : '周边商品' }}</a> / 
+        {{ product.name }}
+      </div>
 
       <!-- 上半：图册 + 信息 -->
       <div class="row mb16">
         <!-- 左图册 -->
         <div style="width: 380px; flex-shrink: 0;">
-          <div class="img main-img" :style="{ backgroundImage: 'url(' + activeImage + ')' }">
-            <span v-if="!activeImage" style="color: #ccc;">商品主图</span>
+          <div class="img main-img">
+            <video v-if="activeMedia && activeMedia.type === 'video'" 
+                   :src="activeMedia.url" 
+                   controls autoplay muted
+                   style="width:100%; height:100%; object-fit:contain; background:#000; display:block;">
+            </video>
+            <div v-else-if="activeMedia" 
+                 style="width:100%; height:100%; background-size:cover; background-position:center; background-repeat:no-repeat;" 
+                 :style="{ backgroundImage: 'url(' + activeMedia.url + ')' }">
+            </div>
+            <span v-else style="color: #ccc;">商品主图</span>
           </div>
           <div class="row mt8 gap8 img-list">
             <div class="img thumb-img" 
-                 v-for="(img, idx) in imageList" 
+                 v-for="(media, idx) in mediaList" 
                  :key="idx"
-                 :class="{ active: activeImage === img }"
-                 :style="{ backgroundImage: 'url(' + img + ')' }"
-                 @click="activeImage = img">
-                 <span v-if="!img">缩</span>
+                 :class="{ active: activeMedia === media }"
+                 @click="activeMedia = media"
+                 style="position:relative; overflow:hidden;">
+                 
+                 <video v-if="media.type === 'video'" 
+                        :src="media.url" 
+                        style="width:100%; height:100%; object-fit:cover; display:block; pointer-events:none;"></video>
+                 <div v-else 
+                      style="width:100%; height:100%; background-size:cover; background-position:center;" 
+                      :style="{ backgroundImage: 'url(' + media.url + ')' }"></div>
+                 
+                 <div v-if="media.type === 'video'" class="play-icon">▶</div>
             </div>
           </div>
         </div>
@@ -32,11 +53,12 @@
           <div class="price-box">
             <div class="row center gap8">
               <span class="muted small">价格</span>
-              <span class="price"><span class="cur">¥</span>{{ currentPrice }}</span>
-              <span class="del" v-if="product.originalPrice && product.originalPrice > currentPrice">原价 ¥{{ product.originalPrice }}</span>
+              <span class="price"><span class="cur">¥</span>{{ Number(currentPrice).toFixed(2) }}</span>
+              <span class="del" v-if="userDiscount < 1">原价 ¥{{ (currentPrice / userDiscount).toFixed(2) }}</span>
+              <span class="del" v-else-if="product.originalPrice && product.originalPrice > currentPrice">原价 ¥{{ product.originalPrice }}</span>
               
-              <span class="tag warn" v-if="userInfo && userInfo.memberLevelId > 0">
-                尊贵会员 <span class="anno" v-if="discount < 1">已享 {{ discount * 10 }} 折</span>
+              <span class="tag warn" v-if="userDiscount < 1">
+                {{ product.userLevelName || '会员' }} <span class="anno">享 {{ userDiscount * 10 }} 折</span>
               </span>
             </div>
             <div class="row gap8 small muted mt8">
@@ -55,7 +77,7 @@
                     :key="sku.id"
                     :class="{ accent: currentSku && currentSku.id === sku.id, disabled: sku.stock <= 0 }"
                     @click="selectSku(sku)">
-                {{ sku.skuName }}
+                {{ sku.specName }}
               </span>
             </div>
           </div>
@@ -89,7 +111,9 @@
             </div>
             <div class="pbody" style="padding: 4px; flex: 1; overflow: hidden;">
               <div class="small" style="margin-bottom: 4px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; line-height: 1.4;">{{ p.name }}</div>
-              <div class="price small">¥ {{ p.price }}</div>
+              <div class="price small">
+                ¥ {{ p.price.toFixed(2) }}
+              </div>
             </div>
           </div>
           <div v-if="!loading && otherProducts.length === 0" class="muted small text-center">暂无其他商品</div>
@@ -154,6 +178,7 @@
 
 <script>
 import { getProductDetail, addToCart, addFavorite, removeFavorite, checkFavorite, searchProducts, getProductReviews } from "@/api/modules/product.js";
+import { getVideoList } from "@/api/modules/video.js";
 import { getStore } from "@/libs/storage.js";
 
 export default {
@@ -165,8 +190,8 @@ export default {
       userInfo: null,
       isFavorite: false,
       
-      imageList: [],
-      activeImage: "",
+      mediaList: [],
+      activeMedia: null,
       
       currentSku: null,
       quantity: 1,
@@ -185,21 +210,15 @@ export default {
     }
   },
   computed: {
-    discount() {
-      if (!this.userInfo) return 1;
-      // 简单模拟：memberLevelId 1 = 9.5折, 2 = 9折, 3 = 8.5折...
-      const level = this.userInfo.memberLevelId || 0;
-      if (level > 0) {
-        return Math.max(0.7, 1 - level * 0.05);
-      }
+    userDiscount() {
+      if (this.currentSku && this.currentSku.userDiscount) return this.currentSku.userDiscount;
+      if (this.product && this.product.userDiscount) return this.product.userDiscount;
       return 1;
     },
     currentPrice() {
-      let basePrice = this.product.price || 0;
-      if (this.currentSku) {
-        basePrice = this.currentSku.price;
-      }
-      return (basePrice * this.discount).toFixed(2);
+      if (!this.product) return 0;
+      if (this.currentSku) return this.currentSku.price;
+      return this.product.price || 0;
     },
     currentStock() {
       if (this.currentSku) {
@@ -227,6 +246,7 @@ export default {
           this.initData();
           this.loadReviews();
           this.checkFavStatus();
+          this.loadVideos();
         }
       } catch (e) {
         console.error("获取商品详情失败", e);
@@ -236,35 +256,44 @@ export default {
       }
     },
     initData() {
-      // 解析图片
-      this.imageList = [];
+      // 解析媒体列表
+      let mList = [];
       if (this.product.mainImage) {
-        this.imageList.push(this.product.mainImage);
+        mList.push({ type: 'image', url: this.product.mainImage });
       }
       if (this.product.images) {
         try {
           const imgs = JSON.parse(this.product.images);
           if (Array.isArray(imgs)) {
             imgs.forEach(img => {
-              if (img && !this.imageList.includes(img)) this.imageList.push(img);
+              if (img && !mList.find(m => m.url === img)) mList.push({ type: 'image', url: img });
             });
           }
         } catch (e) { /* ignore */ }
       }
-      this.activeImage = this.imageList[0] || "";
+      if (this.product.skus && this.product.skus.length > 0) {
+        this.product.skus.forEach(sku => {
+          if (sku.image && !mList.find(m => m.url === sku.image)) {
+            mList.push({ type: 'image', url: sku.image });
+          }
+        });
+      }
+      this.mediaList = mList;
+      if (this.mediaList.length > 0) {
+        this.activeMedia = this.mediaList[0];
+      } else {
+        this.activeMedia = null;
+      }
+      
+      this.currentSku = null;
       
       // 初始化 SKU
-      if (this.product.skus && this.product.skus.length > 0) {
-        // 默认选中第一个有库存的
-        this.currentSku = this.product.skus.find(s => s.stock > 0) || this.product.skus[0];
-      }
+      // 按照需求，刚进入商品时不要默认选中规格，保持为空
+      this.currentSku = null;
       
       // 初始化数量
       this.quantity = 1;
       if (this.currentStock === 0) this.quantity = 0;
-      
-      // 加载收藏状态
-      this.checkFavState();
       
       // 加载本店其他商品
       this.fetchOtherProducts();
@@ -290,6 +319,18 @@ export default {
       if (this.quantity === 0 && sku.stock > 0) {
         this.quantity = 1;
       }
+      
+      if (sku.image) {
+        const found = this.mediaList.find(m => m.url === sku.image);
+        if (found) {
+          this.activeMedia = found;
+        }
+      } else {
+        // 如果当前选中的规格没有专属图片，则切回商品的主图（即第一张图）
+        if (this.mediaList.length > 0) {
+          this.activeMedia = this.mediaList[0];
+        }
+      }
     },
     decQty() {
       if (this.quantity > 1) this.quantity--;
@@ -303,6 +344,11 @@ export default {
         return;
       }
       if (this.currentStock === 0) return;
+      
+      if (this.product.skus && this.product.skus.length > 0 && !this.currentSku) {
+        alert("请先选择商品规格！");
+        return;
+      }
       
       const payload = {
         productId: this.product.id,
@@ -323,7 +369,24 @@ export default {
         return;
       }
       if (this.currentStock === 0) return;
-      alert("结算页面暂未开放，敬请期待！");
+      
+      if (this.product.skus && this.product.skus.length > 0 && !this.currentSku) {
+        alert("请先选择商品规格！");
+        return;
+      }
+      
+      const checkoutItems = [{
+        productId: this.product.id,
+        skuId: this.currentSku ? this.currentSku.id : 0,
+        quantity: this.quantity,
+        productName: this.product.name,
+        productImage: this.product.mainImage,
+        specName: this.currentSku ? this.currentSku.skuName : "",
+        price: Number(this.currentPrice),
+      }];
+      
+      localStorage.setItem("CHECKOUT_ITEMS", JSON.stringify(checkoutItems));
+      this.$router.push("/checkout");
     },
     async checkFavStatus() {
       if (!this.userInfo || !this.product) return;
@@ -363,6 +426,22 @@ export default {
         console.error("加载评价失败", e);
       }
     },
+    async loadVideos() {
+      if (!this.product) return;
+      try {
+        const res = await getVideoList({ productId: this.product.id, status: 1 });
+        const videos = res.data?.records || [];
+        if (videos.length > 0) {
+          const vList = videos.map(v => ({ type: 'video', url: v.url, title: v.title }));
+          this.mediaList = [...vList, ...this.mediaList];
+          if (this.mediaList.length > 0) {
+            this.activeMedia = this.mediaList[0];
+          }
+        }
+      } catch (e) {
+        console.error("加载视频失败", e);
+      }
+    },
     switchReviews() {
       this.activeTab = 'reviews';
       if (this.reviews.length === 0 && this.product) {
@@ -378,6 +457,9 @@ export default {
 </script>
 
 <style scoped>
+.play-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.6); color: #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 14px; pointer-events: none; }
+.bc-link { color: inherit; text-decoration: none; cursor: pointer; transition: color 0.2s; }
+.bc-link:hover { color: #5b8def; }
 .product-detail-page { background: #f4f5f7; min-height: 100vh; display: flex; flex-direction: column; }
 
 /* 布局 */

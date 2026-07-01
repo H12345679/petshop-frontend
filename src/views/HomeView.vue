@@ -54,8 +54,9 @@
             <div class="pbody">
               <div class="pname">{{ p.name }}</div>
               <div class="price-row">
-                <span class="price"><span class="cur">¥</span>{{ p.price }}</span>
-                <span v-if="p.originalPrice && p.originalPrice > p.price" class="del">¥{{ p.originalPrice }}</span>
+                <span class="price"><span class="cur">¥</span>{{ Number(p.price).toFixed(2) }}</span>
+                <span v-if="p.userDiscount < 1" class="del">¥{{ (p.price / p.userDiscount).toFixed(2) }}</span>
+                <span v-else-if="p.originalPrice && p.originalPrice > p.price" class="del">¥{{ p.originalPrice }}</span>
               </div>
               <div class="small muted sales">已售 {{ p.sales || 0 }} 件</div>
             </div>
@@ -73,7 +74,8 @@
 
 <script>
 import { homeProducts, categoryTree } from "@/api/modules/home.js";
-import { getStore, removestore } from "@/libs/storage.js";
+import { getUserInfo } from "@/api/modules/user.js";
+import { getStore, setStore, removestore } from "@/libs/storage.js";
 
 export default {
   name: "HomeView",
@@ -83,7 +85,7 @@ export default {
       userInfo: null,
       sections: [
         { key: "hot", title: "🔥 热卖", tag: "HOT", list: [], loading: true },
-        { key: "new", title: "🆕 新品上市", tag: "NEW", list: [], loading: true },
+        { key: "cf", title: "🛍️ 大家都在买", tag: "CF", list: [], loading: true },
         { key: "rec", title: "🌟 为你推荐", tag: "RECOMMEND", list: [], loading: true },
       ],
       banners: [
@@ -95,17 +97,32 @@ export default {
       ],
     };
   },
+  computed: {
+  },
   created() {
     // 读本地登录态
     const u = getStore("userInfo");
     try { this.userInfo = u ? JSON.parse(u) : null; } catch (e) { this.userInfo = null; }
+    // 从 API 刷新最新用户信息（余额同步）
+    if (this.userInfo) {
+      this.refreshUserInfo();
+    }
     // 拉数据（都是公开接口，免登录可看）
     this.loadCategories();
     this.loadSection(this.sections[0], "HOT");
-    this.loadSection(this.sections[1], "NEW");
+    this.loadSection(this.sections[1], "CF");
     this.loadSection(this.sections[2], "RECOMMEND");
   },
   methods: {
+    async refreshUserInfo() {
+      try {
+        const res = await getUserInfo();
+        if (res && res.data) {
+          this.userInfo = res.data;
+          setStore("userInfo", JSON.stringify(res.data));
+        }
+      } catch (e) { /* 使用本地缓存兜底 */ }
+    },
     async loadCategories() {
       try {
         const res = await categoryTree();
@@ -114,6 +131,7 @@ export default {
         this.categories = [];
       }
     },
+
     async loadSection(sec, strategy) {
       try {
         const res = await homeProducts(strategy, 6);

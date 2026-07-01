@@ -1,18 +1,6 @@
 <template>
   <div class="user-center">
-    <!-- 顶栏 -->
-    <header class="topbar">
-      <router-link to="/" class="logo"><span class="paw">🐾</span>宠物商城</router-link>
-      <div class="spacer"></div>
-      <div class="right">
-        <span>🛒 购物车</span>
-        <template v-if="userInfo">
-          <span class="link">👤 {{ userInfo.nickname || userInfo.username }}</span>
-          <span class="link" @click="handleLogout">退出</span>
-        </template>
-        <router-link v-else to="/login" class="link">登录 / 注册</router-link>
-      </div>
-    </header>
+    <AppHeader />
 
     <!-- 通知条 -->
     <div v-if="notification" :class="['notify', notification.type]">
@@ -54,7 +42,7 @@
       <div class="uc-content">
         <!-- 资产卡片 -->
         <div class="kpi-row">
-          <div class="kpi-card" @click="switchTab('profile')">
+          <div class="kpi-card" @click="$router.push('/recharge')">
             <div class="kpi-label">账户余额</div>
             <div class="kpi-val">¥{{ userInfo ? userInfo.balance : '--' }}</div>
             <div class="kpi-act">充值 ›</div>
@@ -109,7 +97,7 @@
         <!-- ========== 动态面板区域 ========== -->
         <keep-alive>
           <UserProfile
-            v-if="currentTab === 'profile' || currentTab === 'password'"
+            v-if="currentTab === 'profile'"
             :user-info="userInfo"
             @update-user="loadUserInfo"
             @logout="handleLogout"
@@ -145,6 +133,19 @@
             @notify="notify"
           />
         </keep-alive>
+
+        <!-- 修改密码弹窗 -->
+        <el-dialog
+          title="修改密码"
+          :visible.sync="showPasswordModal"
+          width="460px"
+          :close-on-click-modal="false"
+        >
+          <UserPassword
+            @notify="notify"
+            @logout="handleLogout"
+          />
+        </el-dialog>
       </div>
     </div>
 
@@ -153,6 +154,7 @@
 </template>
 
 <script>
+import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
 import UserProfile from "@/views/user/UserProfile.vue";
 import UserOrders from "@/views/user/UserOrders.vue";
@@ -161,6 +163,7 @@ import UserFavorites from "@/views/user/UserFavorites.vue";
 import UserCoupons from "@/views/user/UserCoupons.vue";
 import UserMembership from "@/views/user/UserMembership.vue";
 import UserMessages from "@/views/user/UserMessages.vue";
+import UserPassword from "@/views/user/UserPassword.vue";
 
 import { getUserInfo, getMembershipLevels } from "@/api/modules/user.js";
 import { getStore, setStore, removestore } from "@/libs/storage.js";
@@ -168,6 +171,7 @@ import { getStore, setStore, removestore } from "@/libs/storage.js";
 export default {
   name: "UserCenter",
   components: { 
+    AppHeader,
     AppFooter,
     UserProfile,
     UserOrders,
@@ -175,7 +179,8 @@ export default {
     UserFavorites,
     UserCoupons,
     UserMembership,
-    UserMessages
+    UserMessages,
+    UserPassword
   },
   data() {
     return {
@@ -188,7 +193,7 @@ export default {
         { key: "coupons",    label: "优惠券",      icon: "🎫" },
         { key: "membership", label: "会员中心",    icon: "👑" },
         { key: "messages",   label: "消息中心",    icon: "💬" },
-        { key: "password",   label: "🔒 修改密码", icon: "🔒" },
+        { key: "password",   label: "修改密码", icon: "🔒" },
       ],
 
       // 用户数据
@@ -203,6 +208,7 @@ export default {
       // UI
       loading: true,
       notification: null,
+      showPasswordModal: false,
     };
   },
   computed: {
@@ -246,7 +252,7 @@ export default {
     // ========== 菜单切换 ==========
     switchTab(key) {
       if (key === 'password') {
-        this.currentTab = 'profile'; // Keep it on profile view which now handles password too
+        this.showPasswordModal = true;
       } else {
         this.currentTab = key;
       }
@@ -277,17 +283,7 @@ export default {
 /* ========== 全局布局 ========== */
 .user-center { background: #f4f5f7; min-height: 100vh; display: flex; flex-direction: column; }
 
-.topbar {
-  display: flex; align-items: center; gap: 18px;
-  padding: 12px 24px; background: #fff; border-bottom: 1px solid #e6e8eb;
-  position: sticky; top: 0; z-index: 10;
-}
-.logo { font-weight: 700; font-size: 18px; color: #5b8def; text-decoration: none; white-space: nowrap; }
-.logo .paw { margin-right: 4px; }
-.spacer { flex: 1; }
-.right { display: flex; align-items: center; gap: 14px; font-size: 13px; color: #555; white-space: nowrap; }
-.link { color: #5b8def; cursor: pointer; text-decoration: none; }
-.link:hover { text-decoration: underline; }
+
 
 .notify {
   padding: 10px 24px; font-size: 13px; display: flex; align-items: center; justify-content: space-between;
