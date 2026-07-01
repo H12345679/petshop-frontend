@@ -6,6 +6,13 @@
         <el-form-item label="标题">
           <el-input v-model="query.title" placeholder="模糊搜索" clearable @keyup.enter.native="doSearch" style="width: 200px" />
         </el-form-item>
+        <el-form-item label="状态">
+          <el-select v-model="query.status" placeholder="全部状态" clearable @change="doSearch" style="width: 120px">
+            <el-option label="待审核" :value="2"></el-option>
+            <el-option label="已上架" :value="1"></el-option>
+            <el-option label="已下架" :value="0"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="doSearch">查询</el-button>
         </el-form-item>
@@ -33,6 +40,8 @@
         <el-table-column label="标题" min-width="200">
           <template slot-scope="scope">
             <div class="video-title">{{ scope.row.title }}</div>
+            <el-tag v-if="scope.row.status === 2" type="warning" size="mini">待审核</el-tag>
+            <el-tag v-if="scope.row.status === 1" type="success" size="mini">已上架</el-tag>
             <el-tag v-if="scope.row.status === 0" type="danger" size="mini">已下架</el-tag>
           </template>
         </el-table-column>
@@ -52,10 +61,16 @@
             <span class="muted-text">{{ formatDate(scope.row.createTime) }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="160" fixed="right">
+        <el-table-column label="操作" min-width="240" fixed="right" align="center">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="openEditModal(scope.row)">编辑</el-button>
             <el-divider direction="vertical"></el-divider>
+            <span v-if="scope.row.status === 2 && isAdmin">
+              <el-button type="text" size="small" style="color: #67c23a" @click="handleAudit(scope.row, 1)">通过</el-button>
+              <el-divider direction="vertical"></el-divider>
+              <el-button type="text" size="small" style="color: #f56c6c" @click="handleAudit(scope.row, 0)">驳回</el-button>
+              <el-divider direction="vertical"></el-divider>
+            </span>
             <el-link :href="scope.row.url" target="_blank" type="primary" :underline="false" style="font-size: 12px; margin: 0 5px;" :disabled="!scope.row.url">预览</el-link>
             <el-divider direction="vertical"></el-divider>
             <el-button type="text" size="small" class="danger-text" @click="handleDelete(scope.row.id)">删除</el-button>
@@ -114,7 +129,25 @@
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="关联商品">
-              <el-input v-model.number="formData.productId" placeholder="选填，输入商品ID" />
+              <el-select 
+                v-model="formData.productId" 
+                filterable 
+                remote 
+                reserve-keyword 
+                placeholder="输入商品名称搜索" 
+                :remote-method="remoteSearchProducts" 
+                :loading="productLoading" 
+                clearable 
+                style="width: 100%"
+                @focus="remoteSearchProducts('')">
+                <el-option 
+                  v-for="p in productOptions" 
+                  :key="p.id" 
+                  :label="p.name" 
+                  :value="p.id">
+                  <span>{{ p.name }}</span>
+                </el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -130,8 +163,9 @@
           <el-input type="textarea" v-model="formData.description" :rows="3" placeholder="这是店里新来的加菲猫，超能吃..." />
         </el-form-item>
 
-        <el-form-item label="状态">
+        <el-form-item label="状态" prop="status" v-if="isAdmin">
           <el-radio-group v-model="formData.status">
+            <el-radio :label="2" disabled>待审核</el-radio>
             <el-radio :label="1">上架</el-radio>
             <el-radio :label="0">下架</el-radio>
           </el-radio-group>
@@ -154,24 +188,29 @@
 </template>
 
 <script>
-import { getVideoList, createVideo, updateVideo, deleteVideo, uploadVideoFile } from "@/api/modules/video.js";
-import { uploadImage } from "@/api/modules/product.js";
+import { getManageVideoList, createVideo, updateVideo, deleteVideo, uploadVideoFile } from "@/api/modules/video.js";
+import { uploadImage, searchProducts } from "@/api/modules/product.js";
 import { searchShops } from "@/api/modules/shop.js";
+import { getStore } from "@/libs/storage.js";
 
 export default {
   name: "AdminVideosView",
   data() {
     return {
       loading: false,
+      userInfo: null,
       query: {
         current: 1,
         size: 10,
         title: "",
-        shopId: ""
+        shopId: "",
+        status: ""
       },
       list: [],
       total: 0,
       shopOptions: [],
+      productOptions: [],
+      productLoading: false,
       
       modalVisible: false,
       isEdit: false,
@@ -192,14 +231,17 @@ export default {
       }
     };
   },
-  mounted() {
-    this.fetchShops().then(() => {
-      // 默认选中第一个门店
-      if (this.shopOptions.length > 0) {
-        this.query.shopId = this.shopOptions[0].id;
-      }
-      this.fetchData();
-    });
+  computed: {
+    isAdmin() {
+      return this.userInfo && this.userInfo.role === 'ADMIN';
+    }
+  },
+  created() {
+    try {
+      this.userInfo = JSON.parse(getStore("userInfo") || "null");
+    } catch(e) {}
+    this.loadData();
+    this.fetchShops();
   },
   methods: {
     formatDate(ds) {
@@ -214,14 +256,32 @@ export default {
       try {
         const res = await searchShops({ size: 100 });
         this.shopOptions = res.data.records || [];
+        if (this.shopOptions.length > 0 && !this.query.shopId) {
+          this.query.shopId = this.shopOptions[0].id;
+        }
       } catch (e) {
         this.$message.error("加载店铺失败: " + (e.message || e));
       }
     },
-    async fetchData() {
+    async remoteSearchProducts(query) {
+      this.productLoading = true;
+      try {
+        const params = { size: 50, name: query };
+        if (this.formData.shopId) {
+          params.shopId = this.formData.shopId;
+        }
+        const res = await searchProducts(params);
+        this.productOptions = res.data.records || [];
+      } catch (e) {
+        console.error("加载商品失败", e);
+      } finally {
+        this.productLoading = false;
+      }
+    },
+    async loadData() {
       this.loading = true;
       try {
-        const res = await getVideoList(this.query);
+        const res = await getManageVideoList(this.query);
         this.list = res.data.records || [];
         this.total = res.data.total || 0;
       } catch (e) {
@@ -239,7 +299,7 @@ export default {
       this.fetchData();
     },
     async handleDelete(id) {
-      this.$confirm('确定要删除这个视频吗？', '提示', {
+      this.$confirm('确定要删除该视频吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -247,9 +307,29 @@ export default {
         try {
           await deleteVideo(id);
           this.$message.success("删除成功");
-          this.fetchData();
+          this.loadData();
         } catch (e) {
           this.$message.error(e.message || "删除失败");
+        }
+      }).catch(() => {});
+    },
+    async handleAudit(row, status) {
+      const actionName = status === 1 ? '通过' : '驳回';
+      this.$confirm(`确定要审核${actionName}该视频吗？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        try {
+          // 调用现有的 updateVideo 接口，只修改 status
+          await updateVideo(row.id, {
+            ...row,
+            status: status
+          });
+          this.$message.success(`已${actionName}`);
+          this.loadData();
+        } catch (e) {
+          this.$message.error(e.message || "操作失败");
         }
       }).catch(() => {});
     },
@@ -269,19 +349,18 @@ export default {
         this.$refs.videoForm.clearValidate();
       }
       this.modalVisible = true;
+      this.productOptions = [];
     },
-    openEditModal(p) {
+    openEditModal(row) {
       this.isEdit = true;
       this.formData = {
-        id: p.id,
-        title: p.title,
-        cover: p.cover || "",
-        url: p.url || "",
-        description: p.description || "",
-        productId: p.productId,
-        shopId: p.shopId,
-        status: p.status
+        ...row
       };
+      if (row.productId) {
+        this.productOptions = [{ id: row.productId, name: "商品 ID: " + row.productId }];
+      } else {
+        this.productOptions = [];
+      }
       if (this.$refs.videoForm) {
         this.$refs.videoForm.clearValidate();
       }

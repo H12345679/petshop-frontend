@@ -1,6 +1,7 @@
 import axios from "axios";
 import qs from "qs";
 import { getStore, removestore } from "../libs/storage.js";
+import router from "../router/index.js";
 
 // 统一 axios 实例：baseURL=/api（dev 下由 vue.config.js 代理到后端 8088）
 const instance = axios.create({
@@ -25,11 +26,14 @@ instance.interceptors.response.use(
     if (result && result.code === 200) {
       return result;
     }
-    // 未登录 / 过期：清本地登录态并跳登录页
+    // 未登录 / 过期：清本地登录态，如果当前页面需要登录则跳登录页
     if (result && result.code === 401) {
       removestore("token");
       removestore("userInfo");
-      if (location.pathname !== "/login") location.href = "/login";
+      const meta = router.currentRoute.meta || {};
+      if (meta.requiresAuth || meta.requiresAdmin) {
+        if (location.pathname !== "/login") location.href = "/login";
+      }
       return Promise.reject(new Error(result.message || "未登录或登录已过期"));
     }
     // 其它（400 参数错 / 403 无权限 / 404 / 500）：把后端 message 抛出去
@@ -39,7 +43,10 @@ instance.interceptors.response.use(
     if (err.response && err.response.status === 401) {
       removestore("token");
       removestore("userInfo");
-      if (location.pathname !== "/login") location.href = "/login";
+      const meta = router.currentRoute.meta || {};
+      if (meta.requiresAuth || meta.requiresAdmin) {
+        if (location.pathname !== "/login") location.href = "/login";
+      }
       return new Promise(() => {});
     }
     return Promise.reject(err);

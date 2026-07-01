@@ -5,6 +5,10 @@ export function getVideoList(params) {
   return get("/videos", params);
 }
 
+export function getManageVideoList(params) {
+  return get("/videos/manage", params);
+}
+
 /** 获取视频详情：GET /api/videos/{id} */
 export function getVideoDetail(id) {
   return get(`/videos/${id}`);

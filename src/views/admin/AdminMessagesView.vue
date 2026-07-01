@@ -25,13 +25,28 @@
         </el-form-item>
 
         <el-form-item v-if="form.scope === 2" label="目标用户" required>
-          <el-input
+          <el-select
             v-model="form.targetUserIdsInput"
-            type="textarea"
-            :rows="3"
-            placeholder="输入用户ID，多个用逗号分隔，如：1,2,3"
-          />
-          <span class="form-tip">可从用户管理页面查看用户 ID</span>
+            multiple
+            filterable
+            remote
+            reserve-keyword
+            placeholder="请输入用户名或手机号搜索用户"
+            :remote-method="remoteSearchUsers"
+            :loading="userLoading"
+            style="width: 100%"
+            @focus="remoteSearchUsers('')"
+          >
+            <el-option
+              v-for="u in userOptions"
+              :key="u.id"
+              :label="u.username"
+              :value="u.id"
+            >
+              <span style="float: left">{{ u.username }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">{{ u.phone || '无手机号' }}</span>
+            </el-option>
+          </el-select>
         </el-form-item>
 
         <el-form-item label="消息内容" required>
@@ -78,7 +93,8 @@
 </template>
 
 <script>
-import { sendMessage, myMessages } from "@/api/modules/message.js";
+import { pushMessage as sendMessage, getManageMessages as myMessages } from "@/api/modules/user.js";
+import { getUserManageList } from "@/api/modules/user.js";
 
 const TYPE_MAP = { 1: "系统", 2: "订单", 3: "活动", 4: "宠物资讯" };
 
@@ -91,12 +107,13 @@ export default {
         type: 1,
         scope: 1,
         content: "",
-        targetUserIdsInput: "",
+        targetUserIdsInput: [],
       },
       sending: false,
-      // 发送记录
       history: [],
       historyLoading: true,
+      userOptions: [],
+      userLoading: false,
     };
   },
   created() {
@@ -134,13 +151,8 @@ export default {
       };
 
       if (f.scope === 2) {
-        const ids = f.targetUserIdsInput
-          .split(/[,，\s]+/)
-          .map(s => s.trim())
-          .filter(Boolean)
-          .map(Number)
-          .filter(n => !isNaN(n) && n > 0);
-        if (ids.length === 0) return this.$message.warning("请输入有效的目标用户 ID");
+        const ids = f.targetUserIdsInput;
+        if (!ids || ids.length === 0) return this.$message.warning("请选择目标用户");
         payload.targetUserIds = ids;
       }
 
@@ -163,8 +175,21 @@ export default {
         type: 1,
         scope: 1,
         content: "",
-        targetUserIdsInput: "",
+        targetUserIdsInput: [],
       };
+      this.userOptions = [];
+    },
+    
+    async remoteSearchUsers(query) {
+      this.userLoading = true;
+      try {
+        const res = await getUserManageList({ size: 50, username: query });
+        this.userOptions = res.data.records || [];
+      } catch (e) {
+        console.error("加载用户失败", e);
+      } finally {
+        this.userLoading = false;
+      }
     },
 
     formatTime(t) {
@@ -177,7 +202,7 @@ export default {
 
 <style scoped>
 .page-title { font-size: 20px; font-weight: 700; color: #2c3e50; margin-bottom: 16px; }
-.form-card { max-width: 700px; }
+.form-card { width: 100%; }
 .form-tip { margin-left: 8px; font-size: 12px; color: #999; }
 .content-preview {
   overflow: hidden; text-overflow: ellipsis; display: -webkit-box;

@@ -271,6 +271,13 @@ export default {
           }
         } catch (e) { /* ignore */ }
       }
+      if (this.product.skus && this.product.skus.length > 0) {
+        this.product.skus.forEach(sku => {
+          if (sku.image && !mList.find(m => m.url === sku.image)) {
+            mList.push({ type: 'image', url: sku.image });
+          }
+        });
+      }
       this.mediaList = mList;
       if (this.mediaList.length > 0) {
         this.activeMedia = this.mediaList[0];
@@ -281,10 +288,8 @@ export default {
       this.currentSku = null;
       
       // 初始化 SKU
-      if (this.product.skus && this.product.skus.length > 0) {
-        // 默认选中第一个有库存的
-        this.currentSku = this.product.skus.find(s => s.stock > 0) || this.product.skus[0];
-      }
+      // 按照需求，刚进入商品时不要默认选中规格，保持为空
+      this.currentSku = null;
       
       // 初始化数量
       this.quantity = 1;
@@ -314,6 +319,18 @@ export default {
       if (this.quantity === 0 && sku.stock > 0) {
         this.quantity = 1;
       }
+      
+      if (sku.image) {
+        const found = this.mediaList.find(m => m.url === sku.image);
+        if (found) {
+          this.activeMedia = found;
+        }
+      } else {
+        // 如果当前选中的规格没有专属图片，则切回商品的主图（即第一张图）
+        if (this.mediaList.length > 0) {
+          this.activeMedia = this.mediaList[0];
+        }
+      }
     },
     decQty() {
       if (this.quantity > 1) this.quantity--;
@@ -327,6 +344,11 @@ export default {
         return;
       }
       if (this.currentStock === 0) return;
+      
+      if (this.product.skus && this.product.skus.length > 0 && !this.currentSku) {
+        alert("请先选择商品规格！");
+        return;
+      }
       
       const payload = {
         productId: this.product.id,
@@ -347,6 +369,11 @@ export default {
         return;
       }
       if (this.currentStock === 0) return;
+      
+      if (this.product.skus && this.product.skus.length > 0 && !this.currentSku) {
+        alert("请先选择商品规格！");
+        return;
+      }
       
       const checkoutItems = [{
         productId: this.product.id,
