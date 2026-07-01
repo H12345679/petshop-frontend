@@ -95,7 +95,7 @@
 
 <script>
 import AppHeader from "@/components/AppHeader.vue";
-import { aiChat, getAiHistory, getAiSessions } from "@/api/modules/ai.js";
+import { getAiHistory, getAiSessions } from "@/api/modules/ai.js";
 import { getStore } from "@/libs/storage.js";
 
 export default {
