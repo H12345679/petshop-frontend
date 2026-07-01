@@ -239,12 +239,14 @@ export default {
 
   beforeDestroy() {
     clearTimeout(this._searchTimer);
-    this.clearShopMarkers();
-    if (this._startMarker && this.map) this.map.remove(this._startMarker);
-    if (this._drivingInstance) { try { this._drivingInstance.clear(); } catch (_) {} }
-    if (this.map) { this.map.destroy(); this.map = null; }
-    const s = document.getElementById("amap-script");
-    if (s) s.remove();
+    try {
+      this.clearShopMarkers();
+      if (this._startMarker && this.map) this.map.remove(this._startMarker);
+      if (this._drivingInstance) { this._drivingInstance.clear(); }
+      if (this.map) { this.map.destroy(); this.map = null; }
+    } catch (e) {
+      console.warn("清理地图实例时出现异常:", e);
+    }
   },
 
   methods: {

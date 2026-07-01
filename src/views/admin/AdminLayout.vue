@@ -14,7 +14,7 @@
       <router-link to="/admin/coupons" v-if="userInfo && userInfo.role === 'ADMIN'">🎫 优惠券管理</router-link>
       <div class="menu-group">运营</div>
       <router-link to="/admin/videos">🎬 视频管理</router-link>
-      <router-link to="/admin/messages" v-if="userInfo && userInfo.role === 'ADMIN'">🔔 消息推送</router-link>
+      <router-link to="/admin/messages" v-if="userInfo && ['ADMIN', 'MERCHANT'].includes(userInfo.role)">🔔 消息推送</router-link>
       <router-link to="/admin/my-messages">📩 我的消息</router-link>
       <template v-if="userInfo && userInfo.role === 'ADMIN'">
         <div class="menu-group">用户</div>

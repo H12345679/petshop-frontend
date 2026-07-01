@@ -154,6 +154,11 @@ export function getUserManageList(params) {
   return get("/users/manage", params);
 }
 
+/** 商家查询本店客户：GET /api/users/customers */
+export function getMerchantCustomers(params) {
+  return get("/users/customers", params);
+}
+
 /** 启用/禁用用户：PUT /api/users/{id}/status */
 export function updateUserStatus(id, status) {
   return put(`/users/${id}/status`, { status });
