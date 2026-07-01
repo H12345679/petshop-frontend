@@ -1,4 +1,4 @@
-import { get, postJson, put, del } from "../axios.js";
+import { get, postJson, put, del, upload } from "../axios.js";
 
 /**
  * 用户信息 & 收货地址 & 会员等级接口
@@ -18,6 +18,11 @@ export const getMe = getUserInfo;
 /** 修改当前用户信息：PUT /api/users/me */
 export function updateUserInfo(data) {
   return put("/users/me", data);
+}
+
+/** 上传头像图片：POST /api/files/avatar */
+export function uploadAvatar(formData) {
+  return upload("/files/avatar", formData);
 }
 
 /** 修改密码：PUT /api/users/me/password */
