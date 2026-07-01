@@ -21,6 +21,11 @@ export function payOrder(id, payType) {
   return put(`/orders/${id}/pay`, { payType });
 }
 
+/** 批量支付 POST /api/orders/batch-pay body { orderIds, payType } */
+export function batchPayOrder(orderIds, payType) {
+  return postJson("/orders/batch-pay", { orderIds, payType });
+}
+
 /** 获取单笔订单详情（含 orderItems） GET /api/orders/{id} */
 export function getOrderById(id) {
   return get(`/orders/${id}`);
@@ -95,4 +100,9 @@ export function deleteReview(id) {
 /** 恢复已删除评价 PUT /api/reviews/{id}/restore */
 export function restoreReview(id) {
   return put(`/reviews/${id}/restore`);
+}
+
+/** 删除订单 DELETE /api/orders/{id} */
+export function deleteOrder(id) {
+  return del(`/orders/${id}`);
 }

@@ -119,6 +119,13 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: "/payment",
+    name: "payment",
+    component: () =>
+      import(/* webpackChunkName: "order" */ "../views/order/PaymentView.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
     path: "/orders",
     name: "orders",
     component: () =>

@@ -11,6 +11,12 @@
       </div>
 
       <template v-if="!loading && !loadError && order">
+        <!-- 顶部返回 -->
+        <div class="top-bar">
+          <router-link to="/orders" class="back-link">← 返回订单列表</router-link>
+          <span class="top-order-no">订单号：{{ order.orderNo }}</span>
+        </div>
+
         <!-- 状态横幅 -->
         <div class="banner" :class="bannerClass">
           <div class="banner-icon">{{ statusIcon }}</div>
@@ -39,7 +45,7 @@
           <div class="small muted mt8">{{ order.receiverAddress }}</div>
         </div>
 
-        <!-- 商品明细 -->
+        <!-- 商品明细（同店商品合并在一个卡片内，table 样式） -->
         <div class="card">
           <h3>商品明细　<span class="small muted">{{ order.shopName || '店铺' }}</span></h3>
           <table class="tbl">
@@ -57,7 +63,7 @@
               <tr v-for="item in items" :key="item.id">
                 <td>
                   <div class="prod-cell">
-                    <div class="prod-img"><img :src="item.productImage || '/logo.png'" /></div>
+                    <div class="prod-img"><img :src="item.productImage || '/logo.png'" :alt="item.productName" /></div>
                     {{ item.productName }}
                   </div>
                 </td>
@@ -92,14 +98,15 @@
         <div class="bottom-bar">
           <span class="small muted">应付：<span class="price" style="font-size:20px">¥{{ (order.payAmount || 0).toFixed(2) }}</span></span>
           <div class="bottom-actions">
-            <span v-if="order.status === 0 || order.status === 1" class="btn" @click="cancelOrder">取消订单</span>
+            <span v-if="isTerminal" class="btn lg" @click="deleteOrderConfirm">删除订单</span>
+            <span v-if="order.status === 0 || order.status === 1" class="btn lg" @click="cancelOrder">取消订单</span>
             <span v-if="order.status === 0" class="btn primary lg" @click="payOrder" :class="{ disabled: paying }">{{ paying ? '支付中…' : '立即支付' }}</span>
-            <span v-if="order.status === 2" class="btn" @click="openRefund">申请退款</span>
+            <span v-if="order.status === 2" class="btn lg" @click="openRefund">申请退款</span>
             <span v-if="order.status === 2" class="btn primary lg" @click="receiveOrder">确认收货</span>
-            <span v-if="order.status === 3" class="btn" @click="openRefund">申请退款</span>
+            <span v-if="order.status === 3" class="btn lg" @click="openRefund">申请退款</span>
             <span v-if="order.status === 3" class="btn primary lg" @click="goReview">去评价</span>
-            <span v-if="order.status >= 4" class="btn sm">再次购买</span>
-            <span v-if="order.status < 0" class="btn" disabled>已取消/已退款</span>
+            <span v-if="order.status >= 4" class="btn lg">再次购买</span>
+            <span v-if="order.status < 0 && order.status > -4" class="btn lg" disabled>已取消/已退款</span>
           </div>
         </div>
       </template>
@@ -110,7 +117,7 @@
 </template>
 
 <script>
-import { getOrderById, payOrder, cancelOrder, receiveOrder } from "@/api/modules/order.js";
+import { getOrderById, payOrder, cancelOrder, receiveOrder, deleteOrder } from "@/api/modules/order.js";
 import { getUserInfo } from "@/api/modules/user.js";
 import { setStore } from "@/libs/storage.js";
 import AppFooter from "@/components/AppFooter.vue";
@@ -128,6 +135,10 @@ export default {
     };
   },
   computed: {
+    isTerminal() {
+      const s = this.order?.status;
+      return s === -1 || s === 4 || s === -3 || s === -4;
+    },
     statusIcon() {
       const m = { 0:'●', 1:'📦', 2:'🚚', 3:'⭐', 4:'✅', '-1':'❌', '-2':'🔁', '-3':'✅', '-4':'✅' };
       return m[this.order?.status] || '📄';
@@ -171,7 +182,6 @@ export default {
         }
       } catch (e) {
         this.loadError = e.message || "订单加载失败，请稍后再试";
-        // 兜底：从订单列表查
         try {
           const { myOrders } = await import("@/api/modules/order.js");
           const fallbackRes = await myOrders({ current: 1, size: 200 });
@@ -191,9 +201,7 @@ export default {
     async refreshBalance() {
       try {
         const res = await getUserInfo();
-        if (res && res.data) {
-          setStore("userInfo", JSON.stringify(res.data));
-        }
+        if (res && res.data) setStore("userInfo", JSON.stringify(res.data));
       } catch (e) { /* 静默刷新 */ }
     },
 
@@ -209,12 +217,10 @@ export default {
       try {
         await payOrder(this.order.id, 1);
         this.$message.success("支付成功！");
-        await this.refreshBalance(); // 刷新余额
+        await this.refreshBalance();
         this.loadDetail();
       } catch (e) {
-        if (e !== 'cancel') {
-          this.$message.error(e.message || "支付失败");
-        }
+        if (e !== 'cancel') this.$message.error(e.message || "支付失败");
       } finally {
         this.paying = false;
       }
@@ -242,6 +248,20 @@ export default {
       }
     },
 
+    deleteOrderConfirm() {
+      this.$confirm("确定删除该订单？删除后无法恢复。", "删除订单", {
+        confirmButtonText: "删除", cancelButtonText: "取消", type: "warning",
+      }).then(async () => {
+        try {
+          await deleteOrder(this.order.id);
+          this.$message.success("订单已删除");
+          this.$router.push("/orders");
+        } catch (e) {
+          this.$message.error(e.message || "删除失败");
+        }
+      }).catch(() => {});
+    },
+
     copyOrderNo() {
       if (this.order?.orderNo) {
         navigator.clipboard.writeText(this.order.orderNo).catch(() => {});
@@ -262,6 +282,15 @@ export default {
 .loading-wrap { text-align: center; padding: 80px; color: #888; }
 .empty-state { text-align: center; padding: 80px; color: #888; }
 .empty-state .back-link { font-size: 14px; color: #5b8def; text-decoration: none; font-weight: 500; }
+
+/* 顶部返回 */
+.top-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.back-link { font-size: 14px; color: #5b8def; text-decoration: none; font-weight: 500; }
+.back-link:hover { opacity: 0.8; }
+.top-order-no { font-size: 12px; color: #999; }
 
 /* 状态横幅 */
 .banner {
@@ -293,12 +322,17 @@ export default {
 
 /* 商品表格 */
 .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
-.tbl th { background: #f7f8fa; text-align: left; padding: 8px; border-bottom: 1px solid #cfd4da; color: #555; font-weight: 600; }
-.tbl td { padding: 8px; border-bottom: 1px solid #eef0f3; color: #555; vertical-align: middle; }
+.tbl th { background: #f7f8fa; text-align: left; padding: 10px; border-bottom: 1px solid #cfd4da; color: #555; font-weight: 600; white-space: nowrap; }
+.tbl td { padding: 10px; border-bottom: 1px solid #eef0f3; color: #555; vertical-align: middle; }
 .tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: #fafbfc; }
 .prod-cell { display: flex; align-items: center; gap: 8px; }
 .prod-img { width: 40px; height: 40px; border-radius: 6px; overflow: hidden; background: #f5f5f5; flex-shrink: 0; }
 .prod-img img { width: 100%; height: 100%; object-fit: cover; }
+
+.price { color: #d9534f; font-weight: 700; }
+.small { font-size: 12px; }
+.muted { color: #888; }
 .mt8 { margin-top: 8px; }
 .mb8 { margin-bottom: 8px; }
 
@@ -321,9 +355,7 @@ export default {
 .btn.lg { padding: 11px 22px; font-size: 15px; }
 .btn:hover { opacity: 0.85; }
 .btn.disabled { opacity: 0.4; cursor: not-allowed; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-.price { color: #d9534f; font-weight: 700; }
-.small { font-size: 12px; }
-.muted { color: #888; }
 .copy-link { color: #5b8def; cursor: pointer; }
 </style>
