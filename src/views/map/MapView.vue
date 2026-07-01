@@ -8,11 +8,10 @@
         <!-- 搜索框 -->
         <div class="search-box">
           <div class="search-inner">
-            <span class="search-icon">🔍</span>
             <input
               v-model="searchKeyword"
               class="search-input"
-              placeholder="🔍 输入地址以设置起始位置..."
+              placeholder="输入地址以设置起始位置..."
               @input="onSearchInput"
               @keyup.enter="triggerSearch"
               @blur="onSearchBlur"
@@ -303,6 +302,7 @@ export default {
         getCityWhenFail: true,
       });
       geo.getCurrentPosition((status, result) => {
+        if (!this.map) return;
         this.locating = false;
         if (status === "complete" && result.position) {
           const { lng, lat } = result.position;
@@ -336,6 +336,7 @@ export default {
         getCityWhenFail: true,
       });
       geo.getCurrentPosition((status, result) => {
+        if (!this.map) return;
         this.locating = false;
         if (status === "complete" && result.position) {
           const { lng, lat } = result.position;
@@ -372,6 +373,7 @@ export default {
       if (this._infoWindow) this.map && this.map.clearInfoWindow();
       try {
         const res = await searchNearbyShops(params);
+        if (!this.map) return;
         let list = res.data || [];
         // 如果是搜索/半径筛选模式，严格过滤掉距离大于当前搜索半径的门店
         if (isSearchMode && params.radius != null) {
@@ -445,6 +447,7 @@ export default {
       } else {
         const geocoder = new AMap.Geocoder({ city: DEFAULT_CITY });
         geocoder.getAddress([lng, lat], (status, result) => {
+          if (!this.map) return;
           if (status === "complete" && result.regeocode) {
             this.searchKeyword = result.regeocode.formattedAddress;
           }
@@ -473,6 +476,7 @@ export default {
 
         const geocoder = new AMap.Geocoder({ city: DEFAULT_CITY });
         geocoder.getAddress([newLng, newLat], (status, result) => {
+          if (!this.map) return;
           let newAddr = "自定义位置";
           if (status === "complete" && result.regeocode) {
             newAddr = result.regeocode.formattedAddress;
@@ -484,7 +488,9 @@ export default {
         });
       });
 
-      this.map.add(this._startMarker);
+      if (this.map) {
+        this.map.add(this._startMarker);
+      }
     },
 
     /* ==================== 点击标注 / 列表：弹出预览 ==================== */
@@ -546,6 +552,7 @@ export default {
       this._searchTimer = setTimeout(() => {
         if (!this._autoComplete) return;
         this._autoComplete.search(val, (status, result) => {
+          if (!this.map) return;
           if (status === "complete" && result.tips) {
             this.searchTips = result.tips.filter((t) => t.location && t.name);
           } else {
@@ -562,6 +569,7 @@ export default {
         const AMap = window.AMap;
         const geocoder = new AMap.Geocoder({ city: DEFAULT_CITY });
         geocoder.getLocation(this.searchKeyword, (status, result) => {
+          if (!this.map) return;
           if (status === "complete" && result.geocodes.length) {
             const location = result.geocodes[0].location;
             this.map.setZoomAndCenter(14, location);
@@ -584,6 +592,7 @@ export default {
       this.searchKeyword = tip.name;
       this.searchTips = [];
       if (tip.location) {
+        if (!this.map) return;
         const { lng, lat } = tip.location;
         this.setStartMarker(lng, lat);
         this.map.setZoomAndCenter(14, tip.location);
