@@ -1,29 +1,80 @@
-# petshop-frontend
+# 🐾 PetShop Frontend - 宠物商城前端终端
 
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+基于 **Vue 3 + Vue Router** 构建的 B2B2C 宠物商城前端。项目包含面向消费者的 C 端购物商城（商品浏览、多媒体、地图、购物车、订单、AI 对话）以及面向商家/管理员的复杂 B 端管理后台（数据看板、订单发货、用户管理等）。
 
 ---
 
-## 🛠 开发说明 (Development Notes)
+## 🏗 核心技术栈
 
-### 后台管理模块 (Admin) 路由说明
-为了避免代码重复，提高后台页面的可维护性，后台页面现已使用 **嵌套路由** 机制进行重构：
-- **公共外壳**：`src/views/admin/AdminLayout.vue` 包含了通用的左侧边栏 (`.aside`) 和顶部信息栏 (`.atop`)。
-- **添加新后台页面**：在开发新的后台管理页面（如视频管理、订单管理）时，**无需**在页面内重复编写侧边栏和顶栏。只需编写页面核心内容区块，并在 `router/index.js` 中将其作为 `/admin` 路由的 `children` 注册即可。
-- **页面标题**：在路由的 `meta: { title: 'xxx / xxx' }` 中配置，顶栏将自动读取并展示。
+- **框架核心**: Vue 3 (Composition API / Options API 混合模式)
+- **路由控制**: Vue Router 4 (支持嵌套路由与导航守卫)
+- **网络与状态**: Axios (全局请求拦截与响应统一处理), 本地 Storage 数据持久化
+- **UI 风格**: 原生 HTML/CSS + 现代化高亮 UI 组件 (无重量级组件库束缚，极致定制)
+
+---
+
+## 🧩 系统核心模块与详细代码架构讲解
+
+前端项目针对不同的用户身份和场景，将系统划分为两大核心路由模块：**前台门户 (Client App)** 与 **统一管理后台 (Admin Dashboard)**。
+
+### 1. 统一管理后台模块架构 (Admin Layout & Router)
+后台模块承载了平台管理员和入驻商家的所有操作，是前端逻辑的密集区。
+- **嵌套路由结构最佳实践 (`router/index.js` & `AdminLayout.vue`)**：
+  为彻底解决在各个管理视图中重复编写左侧导航树和顶部操作栏的问题，代码采用了经典的嵌套路由机制。父组件 `AdminLayout.vue` 负责整体布局结构（`.aside` 和 `.atop`），所有具体的管理视图（如 `AdminOrdersView.vue`, `AdminManage.vue`）均作为子组件挂载在父级的 `<router-view>` 中，极大提升了代码复用率与渲染性能。
+- **路由元信息控制面包屑导航**：
+  依赖路由配置中的 `meta: { title: 'xxx / xxx' }` 属性，顶部信息栏会自动侦听当前路由，实时且准确地展示当前所处的页面层级导航。
+
+### 2. 后台管理业务重构模块 (Admin Management)
+- **用户管理与精准联动查询 (`AdminManage.vue`)**：
+  - **废弃虚假前端分页**：彻底移除了原代码中使用 `Array.filter` 仅对当前单页数据（如 10 条记录）进行检索的错误实现，避免了深层分页数据永远检索不到的致命 Bug。
+  - **全服务端多维联动**：重构了下拉筛选器组件，为所有搜索项（角色、会员等级、状态）绑定 `@change="doSearch"`，使用户在任意操作时，直接向后端发起携带完整条件参数的 API 请求，实现真正的全库精确查询。增加了对“游客” (`:value="0"`) 选项的支持。
+  - **KPI 数据解耦聚合**：KPI 仪表盘（总用户数、商家数、付费会员数）数据不再依赖于列表分页结果，而是使用独立的 `fetchStats()` 方法，通过 `Promise.all` 发起多条无分页请求进行全局聚合统计，保证了宏观数据的绝对精准。
+
+### 3. 电商交易与状态流转核心 (Cart & Order UI)
+涵盖购物车结算、多店拆单及完整的订单状态机。
+- **跨店结算数据展示**：
+  在购物车确认订单页面，前端根据商品所属的不同店铺 (`shopId`)，自动对数据进行二次洗牌与分组（GroupBy），渲染成不同商铺相互隔离的 UI 结构，完美贴合现代 B2B2C 平台的展示规范。
+- **状态机与容错反馈机制 (`OrderDetailView.vue` & `OrderListView.vue`)**：
+  - **动态横幅与颜色警示**：针对诸如超时取消 (`-1`)、退款申请中 (`-2`) 等高风险状态，页面顶部会动态渲染不同色块的横幅（红/灰/黄等），带来直观的视觉警示。
+  - **安全防误触弹窗**：在点击“确认收货”、“取消订单”、“删除订单”和“支付”等可能直接影响用户资产和交易链路的关键按钮前，统一加入了 `confirm` 或 `prompt` 二次确认拦截，防止用户因界面卡顿产生的手滑误触。
+  - **“再次购买”业务闭环**：完善了已完成订单（状态 `4`）的复购逻辑，前端直接提取该历史订单首个商品的 ID 并重定向至详情页，构建无缝的购物闭环。
+
+### 4. 社交化体验与 AI 客服 (Social & AI Chat)
+紧跟时代潮流，赋予了传统电商更加沉浸的多媒体和互动体验。
+- **沉浸式全屏视频流 (`VideoView.vue`)**：
+  基于七牛云 CDN 获取流媒体资源，配合前端原生触控滚动监听以及基于可见区域 (`IntersectionObserver`) 的自动播放/暂停调度策略，提供了媲美主流短视频平台的丝滑交互。
+- **悬浮 DeepSeek AI 宠物客服**：
+  将深色模式的 AI 聊天悬浮球组件置于全站底层。通过打字机动画、自动滚动至底部等细节交互处理，前端高度仿真了流式输出效果，带来真实生动的宠物饲养答疑与导购对话。
+
+---
+
+## 🚀 开发部署与运行指南
+
+### 环境依赖
+- **Node.js**: 推荐 v16+ 或 v18+ 长期支持版
+- **包管理器**: npm
+
+### 命令说明
+
+```bash
+# 1. 下载并安装所有第三方依赖
+npm install
+
+# 2. 启动本地开发服务器 (支持热更新、错误追踪)
+npm run serve
+
+# 3. 构建生产环境压缩包 (输出至 /dist 目录)
+npm run build
+```
+
+### 核心环境与接口配置
+开发与生产环境中，如果需要修改后端数据接口所在的服务器地址，请直接在配置入口或网络拦截器初始化中调整 Axios 的根路径 (`baseURL`)：
+```javascript
+// src/api/index.js
+import axios from 'axios';
+axios.defaults.baseURL = 'http://localhost:8088'; // 或线上云服务器 IP
+```
+
+<div align="center">
+<b>🐾 PetShop Frontend · Crafted with ❤️</b>
+</div>
