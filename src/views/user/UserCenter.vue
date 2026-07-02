@@ -132,6 +132,10 @@
             v-else-if="currentTab === 'messages'"
             @notify="notify"
           />
+          <UserReviews
+            v-else-if="currentTab === 'reviews'"
+            @notify="notify"
+          />
         </keep-alive>
 
         <!-- 修改密码弹窗 -->
@@ -163,6 +167,7 @@ import UserFavorites from "@/views/user/UserFavorites.vue";
 import UserCoupons from "@/views/user/UserCoupons.vue";
 import UserMembership from "@/views/user/UserMembership.vue";
 import UserMessages from "@/views/user/UserMessages.vue";
+import UserReviews from "@/views/user/UserReviews.vue";
 import UserPassword from "@/views/user/UserPassword.vue";
 
 import { getUserInfo, getMembershipLevels, getFavorites } from "@/api/modules/user.js";
@@ -180,6 +185,7 @@ export default {
     UserCoupons,
     UserMembership,
     UserMessages,
+    UserReviews,
     UserPassword
   },
   data() {
@@ -192,6 +198,7 @@ export default {
         { key: "favorites",  label: "我的收藏",    icon: "❤️" },
         { key: "coupons",    label: "优惠券",      icon: "🎫" },
         { key: "membership", label: "会员中心",    icon: "👑" },
+        { key: "reviews",    label: "我的评价",    icon: "⭐" },
         { key: "messages",   label: "消息中心",    icon: "💬" },
         { key: "password",   label: "修改密码", icon: "🔒" },
       ],

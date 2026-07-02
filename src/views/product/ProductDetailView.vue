@@ -143,6 +143,9 @@
                   <span class="review-time">{{ formatTime(rv.createTime) }}</span>
                 </div>
                 <div class="review-content">{{ rv.content }}</div>
+                <div v-if="rv.parsedImages && rv.parsedImages.length > 0" class="review-images row gap8 mt8">
+                  <div v-for="(img, idx) in rv.parsedImages" :key="idx" class="r-img" :style="{ backgroundImage: 'url(' + img + ')' }"></div>
+                </div>
                 <div v-if="rv.reply" class="review-reply">
                   <span class="reply-label">商家回复：</span>{{ rv.reply }}
                 </div>
@@ -420,7 +423,15 @@ export default {
       if (!this.product) return;
       try {
         const res = await getProductReviews(this.product.id, { current: 1, size: 10 });
-        this.reviews = res.data?.records || [];
+        const records = res.data?.records || [];
+        records.forEach(r => {
+          try {
+            r.parsedImages = r.images ? JSON.parse(r.images) : [];
+          } catch (e) {
+            r.parsedImages = [];
+          }
+        });
+        this.reviews = records;
         this.totalReviews = res.data?.total || 0;
       } catch (e) {
         console.error("加载评价失败", e);
@@ -540,6 +551,8 @@ export default {
 .star.filled { color: #f5a623; }
 .review-time { font-size: 12px; color: #bbb; margin-left: auto; }
 .review-content { font-size: 14px; color: #555; line-height: 1.6; }
-.review-reply { margin-top: 8px; padding: 8px 12px; background: #f9fafb; border-radius: 6px; font-size: 13px; color: #666; }
-.reply-label { color: #6b8dd6; font-weight: 500; }
+.review-reply { margin-top: 12px; padding: 12px; background: #f8f9fa; border-radius: 4px; font-size: 13px; color: #555; }
+.reply-label { color: #5b8def; font-weight: bold; }
+.review-images { display: flex; flex-wrap: wrap; }
+.r-img { width: 80px; height: 80px; border-radius: 4px; background-size: cover; background-position: center; border: 1px solid #eee; cursor: pointer; }
 </style>

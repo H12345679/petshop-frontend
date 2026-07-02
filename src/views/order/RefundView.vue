@@ -1,5 +1,6 @@
 <template>
   <div id="refund-page">
+    <AppHeader />
     <div class="refund-wrap">
       <div class="section-title">申请退款 / 退货</div>
 
@@ -89,7 +90,16 @@
               <div v-for="(img, idx) in form.images" :key="idx" class="upload-item">
                 <img :src="img" />
               </div>
-              <div v-if="form.images.length < 6" class="upload-add" @click="addImage">＋</div>
+              <el-upload
+                v-if="form.images.length < 6"
+                class="upload-add-wrap"
+                action="#"
+                :show-file-list="false"
+                :http-request="uploadImage"
+                accept="image/*"
+              >
+                <div class="upload-add">＋</div>
+              </el-upload>
             </div>
           </div>
 
@@ -114,11 +124,12 @@
 </template>
 
 <script>
+import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
 
 export default {
   name: "RefundView",
-  components: { AppFooter },
+  components: { AppHeader, AppFooter },
   data() {
     return {
       loading: true,
@@ -158,9 +169,22 @@ export default {
       } catch (e) { /* ignore */ }
       this.loading = false;
     },
-    addImage() {
-      const url = prompt("输入图片URL（模拟上传）");
-      if (url && this.form.images.length < 6) this.form.images.push(url);
+    async uploadImage(options) {
+      try {
+        const { upload } = await import("@/api/axios.js");
+        const formData = new FormData();
+        formData.append("file", options.file);
+        const res = await upload("/files/image", formData);
+        const url = res.data?.url;
+        if (url) {
+          this.form.images.push(url);
+          this.$message.success("上传成功");
+        } else {
+          this.$message.error(res.message || "上传失败");
+        }
+      } catch (e) {
+        this.$message.error("上传图片失败：" + e.message);
+      }
     },
     async submitRefund() {
       if (this.submitting) return;
