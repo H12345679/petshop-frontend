@@ -45,9 +45,10 @@
           <div class="cp-desc">满{{ c.threshold }}元可用 · 剩余 {{ c.remain }} / {{ c.total }}</div>
           <div class="cp-time">{{ c.startTime }} ~ {{ c.endTime }}</div>
         </div>
-        <button class="btn primary sm" :disabled="c.claiming" @click="doReceiveCoupon(c)">
+        <button v-if="!c.received" class="btn primary sm" :disabled="c.claiming" @click="doReceiveCoupon(c)">
           {{ c.claiming ? '领取中…' : '立即领取' }}
         </button>
+        <span v-else style="font-size:12px;color:#27ae60;font-weight:600;white-space:nowrap;">已领取</span>
       </div>
     </div>
   </div>
@@ -108,7 +109,17 @@ export default {
       this.loadingAvailCoupons = true;
       try {
         const res = await getCouponList();
-        this.availableCoupons = (res.data || []).map(c => ({ ...c, claiming: false }));
+        // 取出当前用户已领的 couponId，标记"已领取"，避免领券中心对已领券仍显示"立即领取"
+        let claimedIds = new Set();
+        try {
+          const mineRes = await getMyCoupons({});
+          claimedIds = new Set((mineRes.data || []).map(uc => String(uc.couponId)));
+        } catch (e) { /* 未登录/失败则都按未领取处理 */ }
+        this.availableCoupons = (res.data || []).map(c => ({
+          ...c,
+          claiming: false,
+          received: claimedIds.has(String(c.id)),
+        }));
       } catch (e) {
         this.availableCoupons = [];
       } finally {
@@ -120,6 +131,7 @@ export default {
       try {
         await receiveCoupon(coupon.id);
         this.$emit('notify', "success", "领取成功！");
+        this.$set(coupon, "received", true); // 即时标记，避免刷新前仍显示可领
         await this.loadMyCoupons();
         await this.loadAvailableCoupons();
       } catch (e) {
