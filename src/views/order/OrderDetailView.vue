@@ -76,7 +76,6 @@
               </tr>
             </tbody>
           </table>
-          <div class="small muted mt8">💡 分摊实付 realPayAmount 为退款上限</div>
         </div>
 
         <!-- 付款信息 -->

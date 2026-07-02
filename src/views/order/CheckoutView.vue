@@ -95,11 +95,6 @@
             </div>
           </div>
 
-          <!-- 买家留言 -->
-          <div class="card">
-            <h3>买家留言</h3>
-            <textarea v-model="remark" class="remark-input" placeholder="选填：对本次交易的备注（限50字）" maxlength="50" rows="2"></textarea>
-          </div>
         </div>
 
         <!-- 右栏：金额试算 -->
@@ -179,7 +174,6 @@ export default {
       userCoupons: [],
       selectedAddressId: null,
       selectedCouponId: null,
-      remark: "",
       settleData: { totalAmount: 0, payAmount: 0, couponDiscount: 0, memberDiscount: 0 },
       loading: true,
       submitting: false,
@@ -280,7 +274,7 @@ export default {
       try {
         const requestId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c==='x'?r:(r&0x3|0x8)).toString(16); });
         const items = this.checkoutItems.map(i => ({ cartId: i.cartId, productId: i.productId, skuId: i.skuId || 0, quantity: i.quantity }));
-        const res = await createOrder({ requestId, couponId: this.selectedCouponId || 0, addressId: this.selectedAddressId, items, remark: this.remark });
+        const res = await createOrder({ requestId, couponId: this.selectedCouponId || 0, addressId: this.selectedAddressId, items });
         const d = res.data || {};
         localStorage.removeItem("CHECKOUT_ITEMS");
         const ids = d.orderIds || []; const nos = d.orderNos || [];
@@ -366,10 +360,6 @@ export default {
 .c-type.reduce { background: #e74c3c; }
 .c-type.discount { background: #e67e22; }
 .dialog-coupons { max-height: 400px; overflow-y: auto; }
-
-/* 买家留言 */
-.remark-input { width: 100%; padding: 9px 12px; border: 1px solid #cfd4da; border-radius: 6px; font-size: 13px; resize: vertical; outline: none; font-family: inherit; color: #666; }
-.remark-input:focus { border-color: #5b8def; }
 
 /* 金额明细 */
 .settle-card { position: sticky; top: 80px; }

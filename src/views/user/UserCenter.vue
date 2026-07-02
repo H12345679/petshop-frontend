@@ -62,11 +62,6 @@
             <div class="kpi-val">{{ favoriteTotal }}</div>
             <div class="kpi-act">查看 ›</div>
           </div>
-          <div class="kpi-card" @click="switchTab('shopFavorites')">
-            <div class="kpi-label">关注店铺</div>
-            <div class="kpi-val">{{ shopFavoriteTotal }}</div>
-            <div class="kpi-act">查看 ›</div>
-          </div>
         </div>
 
         <!-- 订单快捷入口 -->
@@ -316,7 +311,7 @@ export default {
 
 <style scoped>
 /* ========== 全局布局 ========== */
-.user-center { background: #f4f5f7; min-height: 100vh; display: flex; flex-direction: column; }
+.user-center { background: #f4f5f7; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
 
 
@@ -328,13 +323,13 @@ export default {
 .notify-close { cursor: pointer; font-weight: 700; }
 
 .uc-body {
-  flex: 1; display: flex; width: 1600px; max-width: 100%; margin: 20px auto; gap: 20px; padding: 0 24px;
+  flex: 1; display: flex; width: 1600px; max-width: 100%; margin: 20px auto; gap: 20px; padding: 0 24px; overflow: hidden;
 }
 
 /* ========== 左侧菜单 ========== */
 .uc-sidebar {
   width: 210px; flex-shrink: 0; background: #fff; border: 1px solid #e6e8eb; border-radius: 10px;
-  padding: 20px 0; align-self: flex-start; position: sticky; top: 70px;
+  padding: 20px 0; overflow-y: auto; height: 100%; box-sizing: border-box;
 }
 .side-avatar { text-align: center; padding: 0 16px 16px; border-bottom: 1px solid #e6e8eb; margin-bottom: 8px; }
 .avatar-ring {
@@ -367,7 +362,12 @@ export default {
 .side-icon { width: 20px; text-align: center; }
 
 /* ========== 右侧内容 ========== */
-.uc-content { flex: 1; min-width: 0; }
+.uc-content { flex: 1; min-width: 0; height: 100%; overflow-y: auto; padding-right: 8px; }
+
+/* 自定义滚动条样式 */
+.uc-content::-webkit-scrollbar, .uc-sidebar::-webkit-scrollbar { width: 6px; }
+.uc-content::-webkit-scrollbar-thumb, .uc-sidebar::-webkit-scrollbar-thumb { background: #dcdfe6; border-radius: 4px; }
+.uc-content::-webkit-scrollbar-track, .uc-sidebar::-webkit-scrollbar-track { background: transparent; }
 
 .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
 .kpi-card {
