@@ -270,9 +270,6 @@ export default {
       try {
         const res = await searchShops({ size: 100 });
         this.shopOptions = res.data.records || [];
-        if (this.shopOptions.length > 0 && !this.query.shopId) {
-          this.query.shopId = this.shopOptions[0].id;
-        }
       } catch (e) {
         this.$message.error("加载店铺失败: " + (e.message || e));
       }
