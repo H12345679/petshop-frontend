@@ -71,7 +71,7 @@
               <el-button type="text" size="small" style="color: #f56c6c" @click="handleAudit(scope.row, 0)">驳回</el-button>
               <el-divider direction="vertical"></el-divider>
             </span>
-            <el-link :href="scope.row.url" target="_blank" type="primary" :underline="false" style="font-size: 12px; margin: 0 5px;" :disabled="!scope.row.url">预览</el-link>
+            <el-button type="text" size="small" style="margin: 0 5px;" :disabled="!scope.row.url" @click="openPreviewModal(scope.row)">预览</el-button>
             <el-divider direction="vertical"></el-divider>
             <el-button type="text" size="small" class="danger-text" @click="handleDelete(scope.row.id)">删除</el-button>
           </template>
@@ -85,7 +85,7 @@
           :current-page="query.current"
           :page-size="query.size"
           layout="total, prev, pager, next"
-          :total="total">
+          :total="Number(total) || 0">
         </el-pagination>
       </div>
     </el-card>
@@ -183,6 +183,14 @@
       <input type="file" ref="coverInput" accept="image/*" style="display:none" @change="onCoverSelected" />
       <input type="file" ref="videoInput" accept="video/*" style="display:none" @change="onVideoSelected" />
     </el-dialog>
+
+    <!-- 视频在线预览弹窗 -->
+    <el-dialog :title="previewData.title || '视频在线预览'" :visible.sync="previewModalVisible" width="680px" custom-class="video-preview-dialog" @close="closePreviewModal" :append-to-body="true">
+      <div class="video-preview-wrapper" v-if="previewModalVisible && previewData.url">
+        <video :src="previewData.url" :poster="previewData.cover" controls autoplay class="preview-video-player"></video>
+      </div>
+      <div v-else class="preview-empty">暂无有效视频链接</div>
+    </el-dialog>
   </div>
 </template>
 
@@ -211,6 +219,13 @@ export default {
       productOptions: [],
       productLoading: false,
       
+      previewModalVisible: false,
+      previewData: {
+        title: "",
+        url: "",
+        cover: ""
+      },
+
       modalVisible: false,
       isEdit: false,
       uploading: false,
@@ -255,9 +270,6 @@ export default {
       try {
         const res = await searchShops({ size: 100 });
         this.shopOptions = res.data.records || [];
-        if (this.shopOptions.length > 0 && !this.query.shopId) {
-          this.query.shopId = this.shopOptions[0].id;
-        }
       } catch (e) {
         this.$message.error("加载店铺失败: " + (e.message || e));
       }
@@ -282,7 +294,7 @@ export default {
       try {
         const res = await getManageVideoList(this.query);
         this.list = res.data.records || [];
-        this.total = res.data.total || 0;
+        this.total = Number(res.data.total) || 0;
       } catch (e) {
         this.$message.error("获取视频列表失败: " + (e.message || e));
       } finally {
@@ -291,11 +303,11 @@ export default {
     },
     doSearch() {
       this.query.current = 1;
-      this.fetchData();
+      this.loadData();
     },
     changePage(p) {
       this.query.current = p;
-      this.fetchData();
+      this.loadData();
     },
     async handleDelete(id) {
       this.$confirm('确定要删除该视频吗？', '提示', {
@@ -365,6 +377,18 @@ export default {
       }
       this.modalVisible = true;
     },
+    openPreviewModal(row) {
+      this.previewData = {
+        title: row.title || "视频在线预览",
+        url: row.url || "",
+        cover: row.cover || ""
+      };
+      this.previewModalVisible = true;
+    },
+    closePreviewModal() {
+      this.previewModalVisible = false;
+      this.previewData = { title: "", url: "", cover: "" };
+    },
     triggerUpload(type) {
       if (type === 'cover') {
         this.$refs.coverInput.click();
@@ -429,7 +453,7 @@ export default {
           }
           this.$message.success("保存成功");
           this.modalVisible = false;
-          this.fetchData();
+          this.loadData();
         } catch (e) {
           this.$message.error(e.message || "保存失败");
         } finally {
@@ -545,5 +569,25 @@ export default {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+}
+
+.video-preview-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  min-height: 240px;
+}
+.preview-video-player {
+  width: 100%;
+  max-height: 480px;
+  outline: none;
+}
+.preview-empty {
+  text-align: center;
+  padding: 40px 0;
+  color: #909399;
 }
 </style>

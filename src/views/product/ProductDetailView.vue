@@ -5,7 +5,7 @@
     <div class="container" v-if="product">
       <div class="breadcrumb small muted mb12">
         <router-link to="/" class="bc-link">首页</router-link> / 
-        <a :href="'/products?type=' + product.type" class="bc-link">{{ product.type === 1 ? '活体' : '周边商品' }}</a> / 
+        <router-link :to="'/products?type=' + product.type" class="bc-link">{{ product.type === 1 ? '活体' : '周边商品' }}</router-link> / 
         {{ product.name }}
       </div>
 
