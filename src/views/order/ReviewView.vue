@@ -1,5 +1,6 @@
 <template>
   <div id="review-page">
+    <AppHeader />
     <div class="review-wrap">
       <div class="section-title">发表评价</div>
 
@@ -79,11 +80,12 @@
 </template>
 
 <script>
+import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
 
 export default {
   name: "ReviewView",
-  components: { AppFooter },
+  components: { AppHeader, AppFooter },
   data() {
     return {
       loading: true,
