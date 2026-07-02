@@ -3,6 +3,14 @@
     <h2 class="page-title">🔔 消息推送</h2>
 
     <el-card class="form-card">
+      <el-alert
+        v-if="userInfo && userInfo.role === 'MERCHANT'"
+        title="品牌宣发说明：为方便客户识别店铺，系统将在推送消息时自动为您追加【专属店铺名称】标题前缀与文末签名，您无需在正文中重复填写。"
+        type="info"
+        show-icon
+        :closable="false"
+        style="margin-bottom: 16px;"
+      />
       <el-form ref="form" :model="form" label-width="100px" size="small">
         <el-form-item label="消息标题" required>
           <el-input v-model="form.title" placeholder="如：系统维护通知" maxlength="100" />
