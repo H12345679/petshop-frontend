@@ -109,7 +109,7 @@
           <span class="form-tip">{{ form.type === 1 ? '元' : '（如 0.90 = 9折）' }}</span>
         </el-form-item>
         <el-form-item label="发行总量" required>
-          <el-input-number v-model="form.total" :min="1" :precision="0" style="width:200px" />
+          <el-input-number v-model="form.total" :min="1" :max="100000" :precision="0" style="width:200px" />
           <span class="form-tip">张</span>
         </el-form-item>
         <el-form-item label="状态">
