@@ -76,10 +76,7 @@
                   <span v-if="p.userDiscount < 1" class="del">¥{{ (p.price / p.userDiscount).toFixed(2) }}</span>
                   <span v-else-if="p.originalPrice && p.originalPrice > p.price" class="del">¥{{ p.originalPrice }}</span>
                 </div>
-                <div class="row between center small muted mt8">
-                  <span>已售 {{ p.sales || 0 }}</span>
-                  <span>{{ p.shopName || '宠物商城直营' }}</span>
-                </div>
+                <div class="small muted sales">已售 {{ p.sales || 0 }} 件</div>
               </div>
             </div>
           </div>
@@ -321,6 +318,7 @@ export default {
 .price { color: #d9534f; font-weight: 700; font-size: 18px; }
 .price .cur { font-size: 13px; }
 .del { color: #aaa; text-decoration: line-through; font-size: 12px; margin-left: 6px; }
+.sales { color: #94a3b8; font-size: 12px; margin-top: 8px; }
 
 /* 分页 */
 .pager { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 24px; font-size: 14px; padding-bottom: 20px;}

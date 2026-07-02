@@ -173,7 +173,6 @@
       </el-form>
 
       <div slot="footer" class="dialog-footer">
-        <div class="ai-tip">💡 选做：可接入大模型（通义万相）AI 生成宠物介绍视频。</div>
         <div class="footer-btns">
           <el-button @click="modalVisible = false" size="small">取消</el-button>
           <el-button type="primary" @click="saveVideo" :loading="uploading" size="small">保存</el-button>
@@ -544,11 +543,7 @@ export default {
 
 .dialog-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-}
-.ai-tip {
-  font-size: 12px;
-  color: #909399;
 }
 </style>
