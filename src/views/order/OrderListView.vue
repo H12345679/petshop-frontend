@@ -80,7 +80,7 @@
               <!-- 状态4：已完成 -->
               <template v-if="order.status === 4">
                 <span class="btn sm" @click="deleteOrderConfirm(order)">删除订单</span>
-                <span class="btn sm">再次购买</span>
+                <span class="btn sm" @click="buyAgain(order)">再次购买</span>
               </template>
               <!-- 退款状态 -->
               <template v-if="order.status === -1">
@@ -208,6 +208,11 @@ export default {
     },
     openRefund(order) { this.$router.push(`/refund?orderId=${order.id}`); },
     goReview(order) { this.$router.push(`/review?orderId=${order.id}`); },
+    buyAgain(order) {
+      if (order.orderItems && order.orderItems.length > 0) {
+        this.$router.push(`/product/${order.orderItems[0].productId}`);
+      }
+    },
     async deleteOrderConfirm(order) {
       try {
         await this.$confirm("确定删除该订单？删除后无法恢复。", "删除订单", {

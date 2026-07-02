@@ -38,7 +38,7 @@
         </aside>
       </div>
 
-      <!-- 三个展示策略分区 -->
+      <!-- 首页商品展示策略分区 -->
       <section v-for="sec in sections" :key="sec.key" class="block">
         <div class="section-title">
           <span>{{ sec.title }}</span>
@@ -84,9 +84,10 @@ export default {
       categories: [],
       userInfo: null,
       sections: [
+        { key: "rec", title: "💡 为你推荐", tag: "RECOMMEND", list: [], loading: true },
+        { key: "hot", title: "🔥 热销榜单", tag: "HOT", list: [], loading: true },
+        { key: "new", title: "✨ 新鲜上架", tag: "NEW", list: [], loading: true },
         { key: "cf", title: "🛍️ 大家都在买", tag: "CF", list: [], loading: true },
-        { key: "rec", title: "🌟 为你推荐", tag: "RECOMMEND", list: [], loading: true },
-        { key: "hot", title: "🔥 热卖", tag: "HOT", list: [], loading: true },
       ],
       banners: [
         'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=800&q=80',
@@ -109,9 +110,9 @@ export default {
     }
     // 拉数据（都是公开接口，免登录可看）
     this.loadCategories();
-    this.loadSection(this.sections[0], "HOT");
-    this.loadSection(this.sections[1], "CF");
-    this.loadSection(this.sections[2], "RECOMMEND");
+    this.sections.forEach(sec => {
+      this.loadSection(sec, sec.tag);
+    });
   },
   methods: {
     async refreshUserInfo() {

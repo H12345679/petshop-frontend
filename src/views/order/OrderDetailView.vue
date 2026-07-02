@@ -106,7 +106,7 @@
             <span v-if="order.status === 2" class="btn primary lg" @click="receiveOrder">确认收货</span>
             <span v-if="order.status === 3" class="btn lg" @click="openRefund">申请退款</span>
             <span v-if="order.status === 3" class="btn primary lg" @click="goReview">去评价</span>
-            <span v-if="order.status >= 4" class="btn lg">再次购买</span>
+            <span v-if="order.status >= 4" class="btn lg" @click="buyAgain">再次购买</span>
             <span v-if="order.status < 0 && order.status > -4" class="btn lg" disabled>已取消/已退款</span>
           </div>
         </div>
@@ -274,6 +274,11 @@ export default {
 
     openRefund() { this.$router.push(`/refund?orderId=${this.order.id}`); },
     goReview() { this.$router.push(`/review?orderId=${this.order.id}`); },
+    buyAgain() {
+      if (this.items && this.items.length > 0) {
+        this.$router.push(`/product/${this.items[0].productId}`);
+      }
+    },
   },
 };
 </script>
