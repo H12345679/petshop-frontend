@@ -101,7 +101,7 @@
             v-else
             v-model="form.amount"
             :min="0.01"
-            :max="9.99"
+            :max="0.99"
             :precision="2"
             :step="0.05"
             style="width:200px"
