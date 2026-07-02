@@ -41,26 +41,24 @@ export function deleteShop(id) {
   return del(`/shops/${id}`);
 }
 
+// ==================== 鍏虫敞搴楅摵 ====================
 
-// ==================== 关注店铺 ====================
-
-/** 我的关注店铺列表：GET /api/shop-favorites */
+/** 鎴戠殑鍏虫敞搴楅摵鍒楄〃锛欸ET /api/shop-favorites */
 export function getShopFavorites(params) {
   return get('/shop-favorites', params);
 }
 
-/** 关注店铺：POST /api/shop-favorites/{shopId} */
+/** 鍏虫敞搴楅摵锛歅OST /api/shop-favorites/{shopId} */
 export function addShopFavorite(shopId) {
-  return post(/shop-favorites/);
+  return post(`/shop-favorites/${shopId}`);
 }
 
-/** 取消关注店铺：DELETE /api/shop-favorites/{shopId} */
+/** 鍙栨秷鍏虫敞搴楅摵锛欴ELETE /api/shop-favorites/{shopId} */
 export function removeShopFavorite(shopId) {
-  return del(/shop-favorites/);
+  return del(`/shop-favorites/${shopId}`);
 }
 
-/** 判断是否已关注：GET /api/shop-favorites/{shopId}/check */
+/** 鍒ゆ柇鏄惁宸插叧娉細GET /api/shop-favorites/{shopId}/check */
 export function checkShopFavorite(shopId) {
-  return get(/shop-favorites//check);
+  return get(`/shop-favorites/${shopId}/check`);
 }
-
