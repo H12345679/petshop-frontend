@@ -42,7 +42,7 @@
             <span class="filter-label">搜索半径</span>
             <div class="radius-tags">
               <span
-                v-for="item in [{val: 3, label: '3km'}, {val: 5, label: '5km'}, {val: 10, label: '10km'}, {val: 20, label: '20km'}, {val: 100, label: '>20km'}]"
+                v-for="item in [{val: 3, label: '3km'}, {val: 5, label: '5km'}, {val: 10, label: '10km'}, {val: 20, label: '20km'}, {val: 1000, label: '>20km'}]"
                 :key="item.val"
                 class="radius-tag"
                 :class="{ active: radius === item.val }"
@@ -114,7 +114,7 @@
           </div>
           <div v-else class="empty-text">
             该范围内暂无宠物店<br />
-            <span class="empty-hint" v-if="radius < 100">试试扩大搜索半径</span>
+            <span class="empty-hint" v-if="radius < 1000">试试扩大搜索半径</span>
             <span class="empty-hint" v-else>全城范围内暂无门店，建议尝试搜索其他城市</span>
           </div>
         </div>
@@ -179,7 +179,7 @@
 
 <script>
 import { DEFAULT_LNG, DEFAULT_LAT, DEFAULT_CITY } from "@/config/env.js";
-import { searchNearbyShops } from "@/api/modules/map.js";
+import { searchNearbyShops, getShopLocation } from "@/api/modules/map.js";
 import { getMapConfig } from "@/api/modules/config.js";
 
 /** 动态插入高德地图脚本（避免重复插入） */
@@ -303,26 +303,32 @@ export default {
         timeout: 8000,
         getCityWhenFail: true,
       });
-      geo.getCurrentPosition((status, result) => {
+      geo.getCurrentPosition(async (status, result) => {
         if (!this.map) return;
         this.locating = false;
+        let userLng = DEFAULT_LNG;
+        let userLat = DEFAULT_LAT;
+
         if (status === "complete" && result.position) {
-          const { lng, lat } = result.position;
+          userLng = result.position.lng;
+          userLat = result.position.lat;
           this.map.setZoomAndCenter(14, result.position);
-          this.setStartMarker(lng, lat);
-          this.startPoint = { lng, lat };
-          // 初始模式：仅加载最近5家，不带半径限制（后端用 limit:5）
-          this.fetchShops({ longitude: lng, latitude: lat, limit: 5 }, false);
+          this.setStartMarker(userLng, userLat);
+          this.startPoint = { lng: userLng, lat: userLat };
         } else {
           // 定位失败：使用默认城市中心，同时初始化起点，确保距离切换正常工作
           this.locationFailed = true;
           this.map.setZoomAndCenter(14, [DEFAULT_LNG, DEFAULT_LAT]);
           this.setStartMarker(DEFAULT_LNG, DEFAULT_LAT, "默认位置（杭州）");
           this.startPoint = { lng: DEFAULT_LNG, lat: DEFAULT_LAT };
-          this.fetchShops(
-            { longitude: DEFAULT_LNG, latitude: DEFAULT_LAT, limit: 5 },
-            false
-          );
+        }
+
+        const targetShopId = this.$route.query.shopId;
+        if (targetShopId) {
+          await this.loadTargetShopAndNavigate(targetShopId, userLng, userLat);
+        } else {
+          // 初始模式：仅加载最近5家，不带半径限制（后端用 limit:5）
+          this.fetchShops({ longitude: userLng, latitude: userLat, limit: 5 }, false);
         }
       });
     },
@@ -365,6 +371,41 @@ export default {
           this.$message && this.$message.warning("自动定位失败，已切换至默认城市中心");
         }
       });
+    },
+
+    /* ==================== 加载目标商店并自动导航 ==================== */
+    async loadTargetShopAndNavigate(shopId, userLng, userLat) {
+      this.loadingShops = true;
+      this.selectedShop = null;
+      if (this._drivingInstance) { try { this._drivingInstance.clear(); } catch (_) {} }
+      if (this._infoWindow) this.map && this.map.clearInfoWindow();
+      try {
+        const res = await getShopLocation(shopId);
+        if (res.data) {
+          const shop = res.data;
+          // 计算用户当前位置到店铺的直线距离 (公里数)
+          const AMap = window.AMap;
+          const p1 = new AMap.LngLat(userLng, userLat);
+          const p2 = new AMap.LngLat(shop.longitude, shop.latitude);
+          const distanceMeters = p1.distance(p2);
+          shop.distanceKm = (distanceMeters / 1000).toFixed(1);
+
+          this.shops = [shop];
+          this.searchMode = true; // 开启半径/搜索模式状态
+          this.placeShopMarkers();
+          this.previewShop(shop, 0);
+
+          // 自动启动导航路线规划
+          this.goToShop(shop);
+        }
+      } catch (err) {
+        console.error("加载目标店铺位置及导航路线失败:", err);
+        this.$message && this.$message.error("加载目标店铺失败");
+        this.shops = [];
+        this.clearShopMarkers();
+      } finally {
+        this.loadingShops = false;
+      }
     },
 
     /* ==================== 拉取门店数据 ==================== */
