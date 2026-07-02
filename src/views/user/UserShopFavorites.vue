@@ -3,14 +3,14 @@
     <h3>关注店铺</h3>
     <div v-if="loadingFavorites" class="empty">加载中…</div>
     <div v-else-if="favorites.length === 0" class="empty">还没有关注任何店铺，去逛逛吧~</div>
-    <div v-else class="fav-grid">
-      <div v-for="shop in favorites" :key="shop.id" class="fav-card shop-fav-card" @click="$router.push('/shop/' + shop.id)">
-        <div class="fav-img" :style="shop.logo ? { backgroundImage: 'url(' + shop.logo + ')' } : null" style="border-radius: 50%;">
-          <span v-if="!shop.logo">店 LOGO</span>
+    <div v-else class="shop-fav-grid">
+      <div v-for="shop in favorites" :key="shop.id" class="shop-fav-card" @click="$router.push('/shop/' + shop.id)">
+        <div class="shop-fav-img" :style="shop.logo ? { backgroundImage: 'url(' + shop.logo + ')' } : null">
+          <span v-if="!shop.logo">{{ shop.name ? shop.name[0] : '店' }}</span>
         </div>
-        <div class="fav-body" style="text-align: center;">
-          <div class="fav-name" style="margin-top: 8px;">{{ shop.name }}</div>
-          <div class="small muted mt8" style="font-size: 12px; color: #888;">
+        <div class="shop-fav-body">
+          <div class="shop-fav-name">{{ shop.name }}</div>
+          <div class="shop-fav-status" :class="shop.status === 1 ? 'status-ok' : 'status-stopped'">
             {{ shop.status === 1 ? '营业中' : '已停业' }}
           </div>
         </div>
@@ -85,23 +85,90 @@ export default {
 </script>
 
 <style scoped>
+.shop-fav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 16px;
+}
 .shop-fav-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 16px;
+  padding: 24px 16px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
-.shop-fav-card .fav-img {
+.shop-fav-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+  border-color: #5b8def;
+}
+.shop-fav-img {
   width: 80px;
   height: 80px;
   background-size: cover;
   background-position: center;
-  background-color: #f0f2f5;
+  background-color: #f5f7fa;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #bbb;
+  color: #909399;
+  font-size: 24px;
+  font-weight: bold;
+  border: 1px solid #ebeef5;
+  margin-bottom: 16px;
+}
+.shop-fav-body {
+  text-align: center;
+  width: 100%;
+}
+.shop-fav-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #303133;
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.shop-fav-status {
   font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: inline-block;
+}
+.status-ok {
+  background: #e1f3d8;
+  color: #67c23a;
+}
+.status-stopped {
+  background: #f4f4f5;
+  color: #909399;
+}
+.fav-del {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  border-radius: 50%;
+  color: #ccc;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(0,0,0,0.02);
+}
+.fav-del:hover {
+  color: #f56c6c;
+  background: rgba(245, 108, 108, 0.1);
+  transform: scale(1.1);
 }
 </style>
