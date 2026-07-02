@@ -42,7 +42,7 @@
             <span class="filter-label">搜索半径</span>
             <div class="radius-tags">
               <span
-                v-for="item in [{val: 3, label: '3km'}, {val: 5, label: '5km'}, {val: 10, label: '10km'}, {val: 20, label: '20km'}, {val: 100, label: '>20km'}]"
+                v-for="item in [{val: 3, label: '3km'}, {val: 5, label: '5km'}, {val: 10, label: '10km'}, {val: 20, label: '20km'}, {val: 1000, label: '>20km'}]"
                 :key="item.val"
                 class="radius-tag"
                 :class="{ active: radius === item.val }"
@@ -114,7 +114,7 @@
           </div>
           <div v-else class="empty-text">
             该范围内暂无宠物店<br />
-            <span class="empty-hint" v-if="radius < 100">试试扩大搜索半径</span>
+            <span class="empty-hint" v-if="radius < 1000">试试扩大搜索半径</span>
             <span class="empty-hint" v-else>全城范围内暂无门店，建议尝试搜索其他城市</span>
           </div>
         </div>
