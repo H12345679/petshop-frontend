@@ -16,8 +16,12 @@
           <div class="small muted mt8">{{ shop.description || '暂无店铺简介' }} · 在售商品 {{ total }} 件</div>
           <div class="small muted mt8">📍 {{ shop.address || '暂无地址信息' }}　☎ {{ shop.phone || '暂无联系电话' }}</div>
         </div>
-        <div style="text-align: center;">
-          <div class="btn primary-btn mb8">＋ 关注店铺</div>
+          <div v-if="userInfo" class="btn primary-btn mb8" :class="{ outline: isFollowed }" @click="toggleFollow" :style="{ opacity: followLoading ? 0.7 : 1 }">
+            {{ isFollowed ? '已关注店铺' : '＋ 关注店铺' }}
+          </div>
+          <div v-else class="btn primary-btn mb8" @click="$router.push('/login')">
+            ＋ 关注店铺
+          </div>
           <div class="btn sm outline" @click="$router.push({ path: '/map', query: { shopId: shop.id } })">🗺 查看地图</div>
         </div>
       </div>
@@ -93,7 +97,7 @@
 </template>
 
 <script>
-import { getShopDetail } from "@/api/modules/shop.js";
+import { getShopDetail, checkShopFavorite, addShopFavorite, removeShopFavorite } from "@/api/modules/shop.js";
 import { searchProducts } from "@/api/modules/product.js";
 import { getStore } from "@/libs/storage.js";
 
@@ -106,6 +110,8 @@ export default {
       loading: true,
       shop: null,
       searchKeyword: "",
+      isFollowed: false,
+      followLoading: false,
       
       activeTab: "all",
       
@@ -140,6 +146,7 @@ export default {
         const res = await getShopDetail(id);
         if (res.data) {
           this.shop = res.data;
+          this.checkFollowStatus();
           this.fetchProducts();
         }
       } catch (e) {
@@ -194,6 +201,32 @@ export default {
       if (p < 1 || p > this.totalPages || p === this.query.page) return;
       this.query.page = p;
       this.fetchProducts();
+    },
+    async checkFollowStatus() {
+      if (!this.userInfo || !this.shop) return;
+      try {
+        const res = await checkShopFavorite(this.shop.id);
+        this.isFollowed = res.data;
+      } catch (e) {
+        console.warn("检查关注状态失败", e);
+      }
+    },
+    async toggleFollow() {
+      if (!this.shop || this.followLoading) return;
+      this.followLoading = true;
+      try {
+        if (this.isFollowed) {
+          await removeShopFavorite(this.shop.id);
+          this.isFollowed = false;
+        } else {
+          await addShopFavorite(this.shop.id);
+          this.isFollowed = true;
+        }
+      } catch (e) {
+        console.warn("关注操作失败", e);
+      } finally {
+        this.followLoading = false;
+      }
     }
   }
 };

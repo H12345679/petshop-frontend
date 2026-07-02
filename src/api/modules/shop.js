@@ -40,3 +40,27 @@ export function updateShop(id, data) {
 export function deleteShop(id) {
   return del(`/shops/${id}`);
 }
+
+
+// ==================== 关注店铺 ====================
+
+/** 我的关注店铺列表：GET /api/shop-favorites */
+export function getShopFavorites(params) {
+  return get('/shop-favorites', params);
+}
+
+/** 关注店铺：POST /api/shop-favorites/{shopId} */
+export function addShopFavorite(shopId) {
+  return post(/shop-favorites/);
+}
+
+/** 取消关注店铺：DELETE /api/shop-favorites/{shopId} */
+export function removeShopFavorite(shopId) {
+  return del(/shop-favorites/);
+}
+
+/** 判断是否已关注：GET /api/shop-favorites/{shopId}/check */
+export function checkShopFavorite(shopId) {
+  return get(/shop-favorites//check);
+}
+

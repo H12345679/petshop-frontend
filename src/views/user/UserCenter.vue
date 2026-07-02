@@ -58,8 +58,13 @@
             <div class="kpi-act">查看 ›</div>
           </div>
           <div class="kpi-card" @click="switchTab('favorites')">
-            <div class="kpi-label">收藏</div>
+            <div class="kpi-label">收藏商品</div>
             <div class="kpi-val">{{ favoriteTotal }}</div>
+            <div class="kpi-act">查看 ›</div>
+          </div>
+          <div class="kpi-card" @click="switchTab('shopFavorites')">
+            <div class="kpi-label">关注店铺</div>
+            <div class="kpi-val">{{ shopFavoriteTotal }}</div>
             <div class="kpi-act">查看 ›</div>
           </div>
         </div>
@@ -117,6 +122,11 @@
             @update-total="val => favoriteTotal = val"
             @notify="notify"
           />
+          <UserShopFavorites
+            v-else-if="currentTab === 'shopFavorites'"
+            @update-total="val => shopFavoriteTotal = val"
+            @notify="notify"
+          />
           <UserCoupons
             v-else-if="currentTab === 'coupons'"
             @update-count="val => couponCount = val"
@@ -163,8 +173,9 @@ import AppFooter from "@/components/AppFooter.vue";
 import UserProfile from "@/views/user/UserProfile.vue";
 import UserOrders from "@/views/user/UserOrders.vue";
 import UserAddress from "@/views/user/UserAddress.vue";
-import UserFavorites from "@/views/user/UserFavorites.vue";
-import UserCoupons from "@/views/user/UserCoupons.vue";
+import UserFavorites from "./UserFavorites.vue";
+import UserShopFavorites from "./UserShopFavorites.vue";
+import UserCoupons from "./UserCoupons.vue";
 import UserMembership from "@/views/user/UserMembership.vue";
 import UserMessages from "@/views/user/UserMessages.vue";
 import UserReviews from "@/views/user/UserReviews.vue";
@@ -182,6 +193,7 @@ export default {
     UserOrders,
     UserAddress,
     UserFavorites,
+    UserShopFavorites,
     UserCoupons,
     UserMembership,
     UserMessages,
@@ -193,10 +205,10 @@ export default {
       currentTab: "profile",
       tabs: [
         { key: "profile",    label: "个人资料",    icon: "👤" },
-        { key: "orders",     label: "我的订单",    icon: "📋" },
-        { key: "address",    label: "收货地址",    icon: "📍" },
-        { key: "favorites",  label: "我的收藏",    icon: "❤️" },
-        { key: "coupons",    label: "优惠券",      icon: "🎫" },
+        { key: "orders", label: "我的订单", icon: "📦" },
+        { key: "favorites", label: "我的收藏", icon: "⭐" },
+        { key: "shopFavorites", label: "关注店铺", icon: "🏪" },
+        { key: "coupons", label: "我的优惠券", icon: "🎫" },
         { key: "membership", label: "会员中心",    icon: "👑" },
         { key: "reviews",    label: "我的评价",    icon: "⭐" },
         { key: "messages",   label: "消息中心",    icon: "💬" },
