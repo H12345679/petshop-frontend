@@ -70,14 +70,14 @@ export default {
       if (!confirm("确定要取消关注该店铺吗？")) return;
       try {
         await removeShopFavorite(id);
-        this.$emit("notify", { type: "success", message: "已取消关注" });
+        this.$emit("notify", "success", "已取消关注");
         if (this.favorites.length === 1 && this.favoritePage > 1) {
           this.favoritePage--;
         }
         this.loadFavorites(this.favoritePage);
       } catch (e) {
         console.error(e);
-        this.$emit("notify", { type: "error", message: e.message || "取消失败" });
+        this.$emit("notify", "error", e.message || "取消失败");
       }
     }
   }
