@@ -16,6 +16,7 @@
           <div class="small muted mt8">{{ shop.description || '暂无店铺简介' }} · 在售商品 {{ total }} 件</div>
           <div class="small muted mt8">📍 {{ shop.address || '暂无地址信息' }}　☎ {{ shop.phone || '暂无联系电话' }}</div>
         </div>
+        <div style="text-align: center;">
           <div v-if="userInfo" class="btn primary-btn mb8" :class="{ outline: isFollowed }" @click="toggleFollow" :style="{ opacity: followLoading ? 0.7 : 1 }">
             {{ isFollowed ? '已关注店铺' : '＋ 关注店铺' }}
           </div>
