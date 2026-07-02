@@ -1,5 +1,6 @@
 <template>
   <div id="detail-page">
+    <AppHeader />
     <div class="detail-wrap">
       <!-- 加载 -->
       <div v-if="loading" class="loading-wrap">⏳ 加载中…</div>
@@ -120,11 +121,12 @@
 import { getOrderById, payOrder, cancelOrder, receiveOrder, deleteOrder } from "@/api/modules/order.js";
 import { getUserInfo } from "@/api/modules/user.js";
 import { setStore } from "@/libs/storage.js";
+import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
 
 export default {
   name: "OrderDetailView",
-  components: { AppFooter },
+  components: { AppHeader, AppFooter },
   data() {
     return {
       order: null,
