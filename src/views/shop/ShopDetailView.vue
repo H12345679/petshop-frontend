@@ -18,7 +18,7 @@
         </div>
         <div style="text-align: center;">
           <div class="btn primary-btn mb8">＋ 关注店铺</div>
-          <div class="btn sm outline" @click="$router.push('/map')">🗺 查看地图</div>
+          <div class="btn sm outline" @click="$router.push({ path: '/map', query: { shopId: shop.id } })">🗺 查看地图</div>
         </div>
       </div>
 

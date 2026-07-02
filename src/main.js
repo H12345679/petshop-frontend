@@ -1,3 +1,15 @@
+// 拦截 Canvas 2D getContext 以解决高德地图等第三方组件频繁 getImageData 导致的 Canvas2D willReadFrequently 警告
+(function () {
+  const originalGetContext = HTMLCanvasElement.prototype.getContext;
+  HTMLCanvasElement.prototype.getContext = function (type, attribs) {
+    if (type === "2d") {
+      attribs = attribs || {};
+      attribs.willReadFrequently = true;
+    }
+    return originalGetContext.call(this, type, attribs);
+  };
+})();
+
 import Vue from 'vue'
 import App from './App.vue'
 import './registerServiceWorker'
