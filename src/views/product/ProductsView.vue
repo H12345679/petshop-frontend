@@ -5,7 +5,7 @@
     <div class="container">
       <div class="breadcrumb small muted mb12">
         <router-link to="/" class="bc-link">首页</router-link> / 
-        <a href="/products" class="bc-link">全部商品</a>
+        <router-link to="/products" class="bc-link">全部商品</router-link>
         <span v-if="currentCategoryName"> / {{ currentCategoryName }}</span>
       </div>
       
@@ -247,11 +247,6 @@ export default {
     },
     goToDetail(id) {
       this.$router.push('/product/' + id);
-    },
-    logout() {
-      removestore("token");
-      removestore("userInfo");
-      this.userInfo = null;
     }
   }
 };
