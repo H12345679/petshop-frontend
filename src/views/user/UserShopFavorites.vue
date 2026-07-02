@@ -3,14 +3,14 @@
     <h3>关注店铺</h3>
     <div v-if="loadingFavorites" class="empty">加载中…</div>
     <div v-else-if="favorites.length === 0" class="empty">还没有关注任何店铺，去逛逛吧~</div>
-    <div v-else class="shop-fav-grid">
-      <div v-for="shop in favorites" :key="shop.id" class="shop-fav-card" @click="$router.push('/shop/' + shop.id)">
-        <div class="shop-fav-img" :style="shop.logo ? { backgroundImage: 'url(' + shop.logo + ')' } : null">
+    <div v-else class="fav-grid">
+      <div v-for="shop in favorites" :key="shop.id" class="fav-card" @click="$router.push('/shop/' + shop.id)">
+        <div class="fav-img" :style="shop.logo ? { backgroundImage: 'url(' + shop.logo + ')' } : null">
           <span v-if="!shop.logo">{{ shop.name ? shop.name[0] : '店' }}</span>
         </div>
-        <div class="shop-fav-body">
-          <div class="shop-fav-name">{{ shop.name }}</div>
-          <div class="shop-fav-status" :class="shop.status === 1 ? 'status-ok' : 'status-stopped'">
+        <div class="fav-body" style="text-align: center; padding: 12px 0;">
+          <div class="fav-name" style="margin-bottom: 8px;">{{ shop.name }}</div>
+          <div class="fav-status" :class="shop.status === 1 ? 'status-ok' : 'status-stopped'">
             {{ shop.status === 1 ? '营业中' : '已停业' }}
           </div>
         </div>
@@ -85,59 +85,38 @@ export default {
 </script>
 
 <style scoped>
-.shop-fav-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-  margin-top: 16px;
+.panel {
+  background: #fff; border: 1px solid #e6e8eb; border-radius: 10px; padding: 20px;
 }
-.shop-fav-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 24px 16px;
-  background: #fff;
-  border-radius: 8px;
-  border: 1px solid #eee;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.panel h3 { margin: 0 0 16px; font-size: 16px; }
+
+/* 收藏 */
+.fav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.fav-card {
+  background: #fff; border: 1px solid #e6e8eb; border-radius: 10px; overflow: hidden;
+  position: relative; transition: .12s; cursor: pointer;
 }
-.shop-fav-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  transform: translateY(-2px);
-  border-color: #5b8def;
+.fav-card:hover { box-shadow: 0 4px 14px rgba(60,90,160,.1); }
+.fav-img {
+  width: 100%; aspect-ratio: 1 / 1; background-size: cover; background-position: center;
+  display: flex; align-items: center; justify-content: center; color: #aab0b8; font-size: 16px;
+  background-color: #eef0f3;
 }
-.shop-fav-img {
-  width: 80px;
-  height: 80px;
-  background-size: cover;
-  background-position: center;
-  background-color: #f5f7fa;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #909399;
-  font-size: 24px;
-  font-weight: bold;
-  border: 1px solid #ebeef5;
-  margin-bottom: 16px;
+.fav-body { padding: 8px 10px; }
+.fav-name {
+  font-size: 14px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-bottom: 4px;
 }
-.shop-fav-body {
-  text-align: center;
-  width: 100%;
+.fav-del {
+  position: absolute; right: 8px; top: 8px; width: 24px; height: 24px; line-height: 22px;
+  text-align: center; background: rgba(0,0,0,.3); color: #fff; border-radius: 50%;
+  font-size: 14px; opacity: 0; transition: .2s;
 }
-.shop-fav-name {
-  font-size: 16px;
-  font-weight: 500;
-  color: #303133;
-  margin-bottom: 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.shop-fav-status {
+.fav-card:hover .fav-del { opacity: 1; }
+.fav-del:hover { background: rgba(0,0,0,.6); }
+
+.fav-status {
   font-size: 12px;
   padding: 2px 8px;
   border-radius: 12px;
@@ -150,25 +129,5 @@ export default {
 .status-stopped {
   background: #f4f4f5;
   color: #909399;
-}
-.fav-del {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
-  text-align: center;
-  border-radius: 50%;
-  color: #ccc;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: rgba(0,0,0,0.02);
-}
-.fav-del:hover {
-  color: #f56c6c;
-  background: rgba(245, 108, 108, 0.1);
-  transform: scale(1.1);
 }
 </style>
