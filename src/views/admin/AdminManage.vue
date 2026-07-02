@@ -81,7 +81,7 @@
               <span class="tag" :class="getMemberClass(user.memberLevelId)" v-if="user.memberLevelId > 0">
                 {{ getMemberLevelName(user.memberLevelId) }}
               </span>
-              <span class="small muted" v-else>—</span>
+              <span class="small muted" v-else>游客</span>
             </td>
             <td class="price">¥{{ formatPrice(user.balance) }}</td>
             <td>{{ user.points || 0 }}</td>
@@ -97,6 +97,7 @@
               </span>
               <span class="action-divider" v-if="user.role !== 'ADMIN'">·</span>
               <span class="action-btn"
+                v-if="user.role !== 'ADMIN'"
                 :class="{ danger: user.status === 1 }"
                 @click="toggleStatus(user)">
                 {{ user.status === 1 ? '禁用' : '启用' }}
@@ -247,7 +248,7 @@ export default {
     computeStats() {
       // 从列表数据推算统计信息（仅当前页可见数据）
       const records = this.users;
-      this.stats.totalUsers = this.total;
+      this.stats.totalUsers = this.total - records.filter(u => u.role === 'ADMIN').length;
       this.stats.merchantCount = records.filter(u => u.role === 'MERCHANT').length;
       this.stats.memberCount = records.filter(u => u.memberLevelId > 0).length;
 
