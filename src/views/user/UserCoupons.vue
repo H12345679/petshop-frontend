@@ -81,6 +81,10 @@ export default {
     this.loadMyCoupons();
     this.loadAvailableCoupons();
   },
+  activated() {
+    this.loadMyCoupons();
+    this.loadAvailableCoupons();
+  },
   methods: {
     setFilter(val) {
       this.couponStatusFilter = val;
