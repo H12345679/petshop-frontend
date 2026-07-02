@@ -85,6 +85,19 @@
         <div class="audit-row"><span class="muted">申请金额</span><span class="price">¥{{ (auditAmount || 0).toFixed(2) }}</span></div>
         <div class="audit-row"><span class="muted">可退上限(分摊实付)</span><span>¥{{ (auditMaxRefund || 0).toFixed(2) }}</span></div>
         <div class="audit-row"><span class="muted">退款原因</span><span>{{ auditReason }}</span></div>
+        <!-- 客户凭证 -->
+        <div v-if="auditImages && auditImages.length > 0" class="audit-images mt12">
+          <div class="muted mb4">客户凭证</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap">
+            <el-image
+              v-for="(img, idx) in auditImages" :key="idx"
+              :src="img"
+              :preview-src-list="auditImages"
+              style="width:80px; height:80px; border-radius:4px; border:1px solid #eee;"
+              fit="cover"
+            />
+          </div>
+        </div>
       </div>
       <div class="field mt12">
         <label>审核意见</label>
@@ -129,6 +142,7 @@ export default {
       auditAmount: 0,
       auditMaxRefund: 0,
       auditReason: "",
+      auditImages: [],
       auditRemark: "",
       auditLoading: false,
       // Direct refund
@@ -205,6 +219,11 @@ export default {
       this.auditAmount = rf.amount || 0;
       this.auditMaxRefund = rf.maxRefund || 0;
       this.auditReason = rf.reason || '—';
+      try {
+        this.auditImages = rf.images ? JSON.parse(rf.images) : [];
+      } catch (e) {
+        this.auditImages = [];
+      }
       this.auditRemark = result === 1 ? '同意退款，金额已返回您的余额账号' : '';
       this.showAudit = true;
     },
