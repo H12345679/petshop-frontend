@@ -174,7 +174,7 @@ export default {
         const { upload } = await import("@/api/axios.js");
         const formData = new FormData();
         formData.append("file", options.file);
-        const res = await upload("/files/image", formData);
+        const res = await upload("/files/refund", formData);
         const url = res.data?.url;
         if (url) {
           this.form.images.push(url);
