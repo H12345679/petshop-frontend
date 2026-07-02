@@ -25,7 +25,15 @@
                 <span class="tree-label">· {{ sub.name }} <span v-if="query.categoryId === sub.id">✓</span></span>
               </li>
             </template>
-            <li v-if="!categories.length" class="muted small" style="padding: 10px 16px;">加载中...</li>
+            <template v-if="!categories.length">
+              <li v-for="i in 6" :key="'cat-skel-'+i" style="pointer-events: none; padding: 10px 16px;">
+                <el-skeleton animated style="width: 100%;">
+                  <template slot="template">
+                    <el-skeleton-item variant="text" style="width: 70%;" />
+                  </template>
+                </el-skeleton>
+              </li>
+            </template>
           </ul>
         </aside>
 
@@ -64,7 +72,27 @@
           </div>
 
           <!-- 商品网格 -->
-          <div class="product-grid" v-if="!loading && products.length">
+          <!-- 1. 骨架屏（加载中展示） -->
+          <div class="product-grid" v-if="loading">
+            <div class="pcard" v-for="i in 10" :key="'skel-'+i" style="cursor: default;">
+              <el-skeleton style="width: 100%" animated>
+                <template slot="template">
+                  <el-skeleton-item variant="image" style="width: 100%; height: 200px; display: block; border-radius: 8px 8px 0 0;" />
+                  <div style="padding: 14px;">
+                    <el-skeleton-item variant="p" style="width: 85%; margin-bottom: 8px;" />
+                    <el-skeleton-item variant="p" style="width: 50%; margin-bottom: 14px;" />
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <el-skeleton-item variant="text" style="width: 35%" />
+                      <el-skeleton-item variant="text" style="width: 25%" />
+                    </div>
+                  </div>
+                </template>
+              </el-skeleton>
+            </div>
+          </div>
+
+          <!-- 2. 真实商品列表 -->
+          <div class="product-grid" v-else-if="products.length">
             <div class="pcard" v-for="p in products" :key="p.id" @click="goToDetail(p.id)">
               <div class="pimg" :class="{ ph: !p.mainImage }" :style="p.mainImage ? { backgroundImage: 'url(' + p.mainImage + ')' } : null">
                 <span v-if="!p.mainImage">商品主图</span>
@@ -81,11 +109,9 @@
             </div>
           </div>
           
-          <div class="empty-state" v-if="!loading && !products.length">
+          <!-- 3. 空状态 -->
+          <div class="empty-state" v-else>
             没有找到符合条件的商品，换个关键词或分类试试吧。
-          </div>
-          <div class="loading-state" v-if="loading">
-            加载中...
           </div>
 
           <!-- 分页 -->

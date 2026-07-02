@@ -9,7 +9,15 @@
           <div class="cat-title">商品分类</div>
           <ul class="cat-list">
             <li v-for="c in categories" :key="c.id" @click="$router.push({ path: '/products', query: { categoryId: c.id } })">{{ c.name }} <span class="arrow">›</span></li>
-            <li v-if="!categories.length" class="muted small">加载中…</li>
+            <template v-if="!categories.length">
+              <li v-for="i in 5" :key="'cat-skel-'+i" style="pointer-events: none; padding: 10px 16px;">
+                <el-skeleton animated style="width: 100%;">
+                  <template slot="template">
+                    <el-skeleton-item variant="text" style="width: 65%;" />
+                  </template>
+                </el-skeleton>
+              </li>
+            </template>
           </ul>
         </aside>
 
@@ -46,22 +54,46 @@
           <span class="more" @click="$router.push('/products')">查看更多 ›</span>
         </div>
         <div class="grid">
-          <div class="pcard" v-for="p in sec.list" :key="p.id" @click="$router.push('/product/' + p.id)">
-            <div class="pimg" :class="{ ph: !p.mainImage }"
-                 :style="p.mainImage ? { backgroundImage: 'url(' + p.mainImage + ')' } : null">
-              <span v-if="!p.mainImage">商品图</span>
+          <!-- 1. 骨架屏（加载中展示） -->
+          <template v-if="sec.loading">
+            <div class="pcard" v-for="i in 6" :key="'skel-'+i" style="cursor: default;">
+              <el-skeleton style="width: 100%" animated>
+                <template slot="template">
+                  <el-skeleton-item variant="image" style="width: 100%; height: 180px; display: block; border-radius: 8px 8px 0 0;" />
+                  <div style="padding: 12px;">
+                    <el-skeleton-item variant="p" style="width: 85%; margin-bottom: 6px;" />
+                    <el-skeleton-item variant="p" style="width: 50%; margin-bottom: 12px;" />
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <el-skeleton-item variant="text" style="width: 35%" />
+                      <el-skeleton-item variant="text" style="width: 25%" />
+                    </div>
+                  </div>
+                </template>
+              </el-skeleton>
             </div>
-            <div class="pbody">
-              <div class="pname">{{ p.name }}</div>
-              <div class="price-row">
-                <span class="price"><span class="cur">¥</span>{{ Number(p.price).toFixed(2) }}</span>
-                <span v-if="p.userDiscount < 1" class="del">¥{{ (p.price / p.userDiscount).toFixed(2) }}</span>
-                <span v-else-if="p.originalPrice && p.originalPrice > p.price" class="del">¥{{ p.originalPrice }}</span>
+          </template>
+
+          <!-- 2. 真实商品卡片 -->
+          <template v-else-if="sec.list.length > 0">
+            <div class="pcard" v-for="p in sec.list" :key="p.id" @click="$router.push('/product/' + p.id)">
+              <div class="pimg" :class="{ ph: !p.mainImage }"
+                   :style="p.mainImage ? { backgroundImage: 'url(' + p.mainImage + ')' } : null">
+                <span v-if="!p.mainImage">商品图</span>
               </div>
-              <div class="small muted sales">已售 {{ p.sales || 0 }} 件</div>
+              <div class="pbody">
+                <div class="pname">{{ p.name }}</div>
+                <div class="price-row">
+                  <span class="price"><span class="cur">¥</span>{{ Number(p.price).toFixed(2) }}</span>
+                  <span v-if="p.userDiscount < 1" class="del">¥{{ (p.price / p.userDiscount).toFixed(2) }}</span>
+                  <span v-else-if="p.originalPrice && p.originalPrice > p.price" class="del">¥{{ p.originalPrice }}</span>
+                </div>
+                <div class="small muted sales">已售 {{ p.sales || 0 }} 件</div>
+              </div>
             </div>
-          </div>
-          <div v-if="!sec.loading && !sec.list.length" class="empty">暂无数据（确认后端有 status=1 的上架商品）</div>
+          </template>
+
+          <!-- 3. 空状态 -->
+          <div v-else class="empty">暂无数据（确认后端有 status=1 的上架商品）</div>
         </div>
       </section>
     </div>
