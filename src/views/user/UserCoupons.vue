@@ -18,13 +18,13 @@
         :class="['coupon-card', { used: c.status !== 0, expired: c.status === 2 }]"
       >
         <div class="cp-left">
-          <div class="cp-amount" v-if="c.type === 1"><span class="cp-yen">¥</span>{{ c.amount }}</div>
-          <div class="cp-amount" v-else>{{ (c.amount * 100).toFixed(0) }}<span class="cp-yen">折</span></div>
+          <div class="cp-amount" v-if="c.type === 1 || !c.type"><span class="cp-yen">¥</span>{{ c.amount || 0 }}</div>
+          <div class="cp-amount" v-else>{{ (c.amount * 10).toFixed(1).replace('.0', '') }}<span class="cp-yen">折</span></div>
         </div>
         <div class="cp-right">
-          <div class="cp-name">{{ c.name }}</div>
+          <div class="cp-name">{{ c.name || '（已失效优惠券）' }}</div>
           <div class="cp-desc">满{{ c.threshold }}元可用</div>
-          <div class="cp-time">有效期至 {{ c.endTime }}</div>
+          <div class="cp-time">有效期至 {{ c.endTime || '未知' }}</div>
         </div>
         <div class="cp-badge" v-if="c.status === 1">已使用</div>
         <div class="cp-badge expired" v-else-if="c.status === 2">已过期</div>
@@ -37,8 +37,8 @@
     <div v-else class="coupon-list">
       <div v-for="c in availableCoupons" :key="c.id" class="coupon-card">
         <div class="cp-left highlight">
-          <div class="cp-amount" v-if="c.type === 1"><span class="cp-yen">¥</span>{{ c.amount }}</div>
-          <div class="cp-amount" v-else>{{ (c.amount * 100).toFixed(0) }}<span class="cp-yen">折</span></div>
+          <div class="cp-amount" v-if="c.type === 1 || !c.type"><span class="cp-yen">¥</span>{{ c.amount || 0 }}</div>
+          <div class="cp-amount" v-else>{{ (c.amount * 10).toFixed(1).replace('.0', '') }}<span class="cp-yen">折</span></div>
         </div>
         <div class="cp-right">
           <div class="cp-name">{{ c.name }}</div>
