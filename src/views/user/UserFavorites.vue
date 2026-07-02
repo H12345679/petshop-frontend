@@ -40,6 +40,9 @@ export default {
   created() {
     this.loadFavorites(1);
   },
+  activated() {
+    this.loadFavorites(this.favoritePage);
+  },
   methods: {
     async loadFavorites(page) {
       this.favoritePage = page || this.favoritePage;

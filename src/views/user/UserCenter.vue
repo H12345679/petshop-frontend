@@ -170,7 +170,7 @@ import UserMessages from "@/views/user/UserMessages.vue";
 import UserReviews from "@/views/user/UserReviews.vue";
 import UserPassword from "@/views/user/UserPassword.vue";
 
-import { getUserInfo, getMembershipLevels, getFavorites } from "@/api/modules/user.js";
+import { getUserInfo, getMembershipLevels, getFavorites, getMyCoupons } from "@/api/modules/user.js";
 import { getStore, setStore, removestore } from "@/libs/storage.js";
 
 export default {
@@ -237,6 +237,7 @@ export default {
     this.loadUserInfo();
     this.loadMembershipLevels();
     this.loadFavoriteCount();
+    this.loadCouponCount();
   },
   methods: {
     restoreLocal() {
@@ -262,6 +263,12 @@ export default {
         if (res && res.data && res.data.total !== undefined) {
           this.favoriteTotal = res.data.total;
         }
+      } catch (e) { /* ignore */ }
+    },
+    async loadCouponCount() {
+      try {
+        const res = await getMyCoupons({ status: 0 });
+        this.couponCount = res.data ? res.data.length : 0;
       } catch (e) { /* ignore */ }
     },
 
