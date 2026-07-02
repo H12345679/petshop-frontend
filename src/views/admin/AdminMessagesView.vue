@@ -10,7 +10,7 @@
 
         <el-form-item label="消息类型" required>
           <el-radio-group v-model="form.type">
-            <el-radio :label="1">系统</el-radio>
+            <el-radio :label="1" v-if="userInfo && userInfo.role === 'ADMIN'">系统</el-radio>
             <el-radio :label="2">订单</el-radio>
             <el-radio :label="3">活动</el-radio>
             <el-radio :label="4">宠物资讯</el-radio>
@@ -19,7 +19,7 @@
 
         <el-form-item label="发送范围" required>
           <el-radio-group v-model="form.scope">
-            <el-radio :label="1">📢 全体广播（所有用户都能收到）</el-radio>
+            <el-radio :label="1">{{ userInfo && userInfo.role === 'MERCHANT' ? '📢 本店全客户广播' : '📢 全体广播（所有用户都能收到）' }}</el-radio>
             <el-radio :label="2">🎯 定向发送（指定用户）</el-radio>
           </el-radio-group>
         </el-form-item>
@@ -94,7 +94,8 @@
 
 <script>
 import { pushMessage as sendMessage, getManageMessages as myMessages } from "@/api/modules/user.js";
-import { getUserManageList } from "@/api/modules/user.js";
+import { getUserManageList, getMerchantCustomers } from "@/api/modules/user.js";
+import { getStore } from "@/libs/storage.js";
 
 const TYPE_MAP = { 1: "系统", 2: "订单", 3: "活动", 4: "宠物资讯" };
 
@@ -114,9 +115,20 @@ export default {
       historyLoading: true,
       userOptions: [],
       userLoading: false,
+      userInfo: null,
     };
   },
   created() {
+    const u = getStore("userInfo");
+    try {
+      this.userInfo = u ? JSON.parse(u) : null;
+    } catch (e) {
+      this.userInfo = null;
+    }
+    // 商家默认选中“活动”消息
+    if (this.userInfo && this.userInfo.role === 'MERCHANT') {
+      this.form.type = 3;
+    }
     this.loadHistory();
   },
   methods: {
@@ -183,7 +195,12 @@ export default {
     async remoteSearchUsers(query) {
       this.userLoading = true;
       try {
-        const res = await getUserManageList({ size: 50, username: query });
+        let res;
+        if (this.userInfo && this.userInfo.role === 'MERCHANT') {
+          res = await getMerchantCustomers({ size: 50, username: query });
+        } else {
+          res = await getUserManageList({ size: 50, username: query });
+        }
         this.userOptions = res.data.records || [];
       } catch (e) {
         console.error("加载用户失败", e);

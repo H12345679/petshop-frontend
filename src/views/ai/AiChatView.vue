@@ -188,6 +188,8 @@ export default {
     formatText(text) {
       if (!text) return "";
       let html = text
+        // 0. 防御 XSS：转义 < 和 >
+        .replace(/</g, "&lt;").replace(/>/g, "&gt;")
         // 1. 处理 **[text](url)** 格式（加粗包裹的标准链接）
         .replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
         // 2. 处理普通标准 [text](url) 格式

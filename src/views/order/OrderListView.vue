@@ -42,8 +42,7 @@
               <div class="oc-info">
                 <div class="oc-name">{{ item.productName }}</div>
                 <div class="oc-spec" v-if="item.specName">{{ item.specName }}</div>
-                <div class="oc-status-hint" v-if="order.status === 2 && item.shipNo">已发货 · 顺丰 {{ item.shipNo }}</div>
-                <div class="oc-status-hint" v-else-if="order.status === 3">已收货</div>
+                <div class="oc-status-hint" v-if="order.status === 3">已收货</div>
                 <div class="oc-status-hint" v-else-if="order.status >= 4">已评价</div>
               </div>
               <div class="oc-qty">× {{ item.quantity }}</div>

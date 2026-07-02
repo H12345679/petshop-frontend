@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="ai-chat-float-wrapper">
     <!-- 悬浮按钮 -->
     <div
@@ -115,6 +115,8 @@ export default {
     formatText(text) {
       if (!text) return "";
       let html = text
+        // 0. 防御 XSS：转义 < 和 >
+        .replace(/</g, "&lt;").replace(/>/g, "&gt;")
         .replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
         .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
         .replace(/(【[^】]+】)\s*[（(]\s*(\/product\/\d+)\s*[）)]/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')

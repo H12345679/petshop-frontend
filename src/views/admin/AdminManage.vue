@@ -28,7 +28,7 @@
       </div>
       <span class="small muted">角色</span>
       <div class="input-wrap select-wrap" style="width:120px">
-        <select v-model="query.role">
+        <select v-model="query.role" @change="doSearch">
           <option value="">全部</option>
           <option value="USER">USER</option>
           <option value="MERCHANT">MERCHANT</option>
@@ -37,14 +37,15 @@
       </div>
       <span class="small muted">会员等级</span>
       <div class="input-wrap select-wrap" style="width:130px">
-        <select v-model="query.memberLevelId">
+        <select v-model="query.memberLevelId" @change="doSearch">
           <option value="">全部</option>
+          <option :value="0">游客</option>
           <option v-for="lv in memberLevelOptions" :key="lv.id" :value="lv.id">{{ lv.name }}</option>
         </select>
       </div>
       <span class="small muted">状态</span>
       <div class="input-wrap select-wrap" style="width:110px">
-        <select v-model="query.status">
+        <select v-model="query.status" @change="doSearch">
           <option value="">全部</option>
           <option :value="1">正常</option>
           <option :value="0">已禁用</option>
@@ -81,7 +82,7 @@
               <span class="tag" :class="getMemberClass(user.memberLevelId)" v-if="user.memberLevelId > 0">
                 {{ getMemberLevelName(user.memberLevelId) }}
               </span>
-              <span class="small muted" v-else>—</span>
+              <span class="small muted" v-else>游客</span>
             </td>
             <td class="price">¥{{ formatPrice(user.balance) }}</td>
             <td>{{ user.points || 0 }}</td>
@@ -97,6 +98,7 @@
               </span>
               <span class="action-divider" v-if="user.role !== 'ADMIN'">·</span>
               <span class="action-btn"
+                v-if="user.role !== 'ADMIN'"
                 :class="{ danger: user.status === 1 }"
                 @click="toggleStatus(user)">
                 {{ user.status === 1 ? '禁用' : '启用' }}
@@ -204,13 +206,9 @@ export default {
       return Math.ceil(this.total / this.query.size) || 1;
     }
   },
-  watch: {
-    "query.role": "applyLocalFilter",
-    "query.memberLevelId": "applyLocalFilter",
-    "query.status": "applyLocalFilter"
-  },
   created() {
     this.fetchMemberLevels().then(() => {
+      this.fetchStats();
       this.fetchData();
     });
   },
@@ -224,6 +222,34 @@ export default {
         console.warn("获取会员等级失败", e);
       }
     },
+    async fetchStats() {
+      try {
+        // 全量统计：分别查 total / merchant
+        const [allRes, merchantRes] = await Promise.all([
+          getUserManageList({ current: 1, size: 1 }),
+          getUserManageList({ current: 1, size: 1, role: 'MERCHANT' })
+        ]);
+        this.stats.totalUsers = (allRes.data?.total || 0);
+        this.stats.merchantCount = (merchantRes.data?.total || 0);
+        // 会员统计：遍历所有等级并求和
+        let memberTotal = 0;
+        if (this.memberLevelOptions.length > 0) {
+          const memberRequests = this.memberLevelOptions.map(lv =>
+            getUserManageList({ current: 1, size: 1, memberLevelId: lv.id })
+          );
+          const memberResults = await Promise.all(memberRequests);
+          memberTotal = memberResults.reduce((sum, r) => sum + (r.data?.total || 0), 0);
+        }
+        this.stats.memberCount = memberTotal;
+        // 今日新增：从当前页数据推算
+        const today = new Date().toISOString().substring(0, 10);
+        this.stats.todayNew = (this.users || []).filter(u => {
+          return u.createTime && u.createTime.substring(0, 10) === today;
+        }).length;
+      } catch (e) {
+        console.warn("获取统计失败", e);
+      }
+    },
     async fetchData() {
       try {
         const params = {
@@ -231,31 +257,20 @@ export default {
           size: this.query.size
         };
         if (this.query.username) params.username = this.query.username;
+        if (this.query.role) params.role = this.query.role;
+        if (this.query.memberLevelId !== "") params.memberLevelId = this.query.memberLevelId;
+        if (this.query.status !== "") params.status = this.query.status;
 
         const res = await getUserManageList(params);
         if (res.data) {
           this.users = res.data.records || [];
           this.total = res.data.total || 0;
-          this.applyLocalFilter();
-          this.computeStats();
+          this.displayUsers = this.users;
         }
       } catch (e) {
         console.warn("获取用户列表失败", e);
         alert(e.message || "获取用户列表失败");
       }
-    },
-    computeStats() {
-      // 从列表数据推算统计信息（仅当前页可见数据）
-      const records = this.users;
-      this.stats.totalUsers = this.total;
-      this.stats.merchantCount = records.filter(u => u.role === 'MERCHANT').length;
-      this.stats.memberCount = records.filter(u => u.memberLevelId > 0).length;
-
-      // 今日新增：注册时间为今日的用户数
-      const today = new Date().toISOString().substring(0, 10);
-      this.stats.todayNew = records.filter(u => {
-        return u.createTime && u.createTime.substring(0, 10) === today;
-      }).length;
     },
     doSearch() {
       this.query.page = 1;
@@ -267,20 +282,8 @@ export default {
       this.query.memberLevelId = "";
       this.query.status = "";
       this.query.page = 1;
+      this.fetchStats();
       this.fetchData();
-    },
-    applyLocalFilter() {
-      let list = this.users;
-      if (this.query.role) {
-        list = list.filter(u => String(u.role) === String(this.query.role));
-      }
-      if (this.query.memberLevelId !== "") {
-        list = list.filter(u => String(u.memberLevelId) === String(this.query.memberLevelId));
-      }
-      if (this.query.status !== "") {
-        list = list.filter(u => String(u.status) === String(this.query.status));
-      }
-      this.displayUsers = list;
     },
     changePage(p) {
       if (p < 1 || p > this.totalPages || p === this.query.page) return;

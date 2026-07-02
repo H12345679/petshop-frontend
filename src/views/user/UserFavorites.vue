@@ -4,7 +4,7 @@
     <div v-if="loadingFavorites" class="empty">加载中…</div>
     <div v-else-if="favorites.length === 0" class="empty">还没有收藏商品，去逛逛吧~</div>
     <div v-else class="fav-grid">
-      <div v-for="p in favorites" :key="p.id" class="fav-card">
+      <div v-for="p in favorites" :key="p.id" class="fav-card" @click="$router.push('/product/' + p.id)">
         <div class="fav-img" :style="p.mainImage ? { backgroundImage: 'url(' + p.mainImage + ')' } : null">
           <span v-if="!p.mainImage">商品图</span>
         </div>
@@ -12,7 +12,7 @@
           <div class="fav-name">{{ p.name }}</div>
           <div class="fav-price">¥{{ p.price }}</div>
         </div>
-        <span class="fav-del" title="取消收藏" @click="doRemoveFavorite(p.id)">✕</span>
+        <span class="fav-del" title="取消收藏" @click.stop="doRemoveFavorite(p.id)">✕</span>
       </div>
     </div>
     <div class="pager" v-if="favoritePages > 1">
@@ -86,7 +86,7 @@ export default {
 .fav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .fav-card {
   background: #fff; border: 1px solid #e6e8eb; border-radius: 10px; overflow: hidden;
-  position: relative; transition: .12s;
+  position: relative; transition: .12s; cursor: pointer;
 }
 .fav-card:hover { box-shadow: 0 4px 14px rgba(60,90,160,.1); }
 .fav-img {
