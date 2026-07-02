@@ -413,9 +413,10 @@ export default {
     onMapSelect(loc) {
       this.formData.latitude = loc.lat;
       this.formData.longitude = loc.lng;
-      if (loc.address && !this.formData.address) {
-        this.formData.address = loc.address;
-      }
+      if (loc.province) this.formData.province = loc.province;
+      if (loc.city) this.formData.city = loc.city;
+      if (loc.district) this.formData.district = loc.district;
+      if (loc.detail) this.formData.address = loc.detail;
       this.mapPickerVisible = false;
     },
     doSearch() {
