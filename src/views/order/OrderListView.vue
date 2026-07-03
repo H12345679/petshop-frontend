@@ -77,14 +77,26 @@
                 <span class="btn sm" @click="openRefund(order)">申请退款</span>
                 <span class="btn sm primary" @click="goReview(order)">去评价</span>
               </template>
-              <!-- 状态4：已完成 -->
+              <!-- 状态4：已完成（已评价仍可申请退款，但必须退货退款） -->
               <template v-if="order.status === 4">
+                <span class="btn sm" @click="openRefund(order)">申请退款</span>
                 <span class="btn sm" @click="deleteOrderConfirm(order)">删除订单</span>
                 <span class="btn sm" @click="buyAgain(order)">再次购买</span>
               </template>
-              <!-- 退款状态 -->
+              <!-- 已取消 -->
               <template v-if="order.status === -1">
                 <span class="btn sm" @click="deleteOrderConfirm(order)">删除订单</span>
+              </template>
+              <!-- 退款中(-2)：展示退款/退货进度 -->
+              <template v-if="order.status === -2 && order.refund">
+                <span v-if="order.refund.status === 0" class="refund-hint">⏳ 退款申请审核中</span>
+                <template v-else-if="order.refund.status === 3">
+                  <span class="refund-hint warn">商家已同意退货，请寄回商品</span>
+                  <span class="btn sm primary" @click="openReturnDialog(order)">填写退货单号</span>
+                </template>
+                <span v-else-if="order.refund.status === 4" class="refund-hint">
+                  🚚 退货已寄出（{{ order.refund.returnCourierCompany }} {{ order.refund.returnTrackingNumber }}），待商家确认收货
+                </span>
               </template>
             </div>
           </div>
@@ -99,12 +111,31 @@
       </div>
     </div>
 
+    <!-- 退货快递单号弹窗（商家同意退货后填写） -->
+    <el-dialog title="填写退货快递单号" :visible.sync="returnDialog.show" width="420px">
+      <div class="rd-field">
+        <label>快递公司</label>
+        <el-select v-model="returnDialog.courierCompany" style="width:100%">
+          <el-option v-for="c in courierOptions" :key="c" :label="c" :value="c" />
+        </el-select>
+      </div>
+      <div class="rd-field">
+        <label><span style="color:#d9534f">*</span> 快递单号</label>
+        <el-input v-model="returnDialog.trackingNumber" placeholder="请输入退货快递单号" maxlength="50" />
+      </div>
+      <div class="small muted">提交后商家将根据单号验收退货，确认收货后退款原路退回余额</div>
+      <span slot="footer">
+        <el-button @click="returnDialog.show = false">取消</el-button>
+        <el-button type="primary" :loading="returnDialog.loading" @click="submitReturn">提交</el-button>
+      </span>
+    </el-dialog>
+
     <AppFooter />
   </div>
 </template>
 
 <script>
-import { myOrders, payOrder, cancelOrder, receiveOrder, deleteOrder } from "@/api/modules/order.js";
+import { myOrders, payOrder, cancelOrder, receiveOrder, deleteOrder, submitReturnShipping } from "@/api/modules/order.js";
 import { getUserInfo } from "@/api/modules/user.js";
 import { setStore } from "@/libs/storage.js";
 import AppHeader from "@/components/AppHeader.vue";
@@ -130,6 +161,8 @@ export default {
       total: 0,
       activeStatus: null,
       loading: false,
+      courierOptions: ["顺丰速运", "中通快递", "圆通速递", "韵达快递", "申通快递", "邮政EMS", "京东物流", "其他"],
+      returnDialog: { show: false, refundId: null, courierCompany: "顺丰速运", trackingNumber: "", loading: false },
     };
   },
   computed: {
@@ -207,6 +240,29 @@ export default {
       catch (e) { if (e !== 'cancel') this.$message.error(e.message || "操作失败"); }
     },
     openRefund(order) { this.$router.push(`/refund?orderId=${order.id}`); },
+    openReturnDialog(order) {
+      this.returnDialog.refundId = order.refund.id;
+      this.returnDialog.trackingNumber = "";
+      this.returnDialog.show = true;
+    },
+    async submitReturn() {
+      const d = this.returnDialog;
+      if (!d.trackingNumber.trim()) return this.$message.warning("请输入退货快递单号");
+      d.loading = true;
+      try {
+        await submitReturnShipping(d.refundId, {
+          courierCompany: d.courierCompany,
+          trackingNumber: d.trackingNumber.trim(),
+        });
+        this.$message.success("退货单号已提交，等待商家确认收货");
+        d.show = false;
+        this.loadOrders();
+      } catch (e) {
+        this.$message.error(e.message || "提交失败");
+      } finally {
+        d.loading = false;
+      }
+    },
     goReview(order) { this.$router.push(`/review?orderId=${order.id}`); },
     buyAgain(order) {
       if (order.orderItems && order.orderItems.length > 0) {
@@ -274,7 +330,13 @@ export default {
   display: flex; justify-content: space-between; align-items: center;
   padding: 10px 14px; border-top: 1px solid #eef0f3;
 }
-.oc-actions { display: flex; gap: 8px; }
+.oc-actions { display: flex; gap: 8px; align-items: center; }
+
+/* 退款/退货进度提示 */
+.refund-hint { font-size: 12px; color: #888; }
+.refund-hint.warn { color: #e6914e; font-weight: 600; }
+.rd-field { margin-bottom: 14px; }
+.rd-field label { display: block; font-size: 13px; color: #555; margin-bottom: 5px; }
 
 /* 标签 */
 .tag { display: inline-block; background: #e9ecf1; border: 1px solid #cfd4da; border-radius: 4px; padding: 1px 8px; font-size: 12px; color: #555; }

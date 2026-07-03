@@ -37,11 +37,29 @@
 
         <!-- 退款表单 -->
         <div class="card">
+          <!-- 是否收到货：仅待收货(2)订单需要声明 -->
+          <div class="field" v-if="orderStatus === 2">
+            <label>货物状态</label>
+            <div class="chip-row">
+              <span :class="['chip', { on: form.received === 1 }]" @click="setReceived(1)">已收到货</span>
+              <span :class="['chip', { on: form.received === 0 }]" @click="setReceived(0)">未收到货（快递退回/丢件）</span>
+            </div>
+            <div v-if="form.received === 0" class="small warn-tip">
+              📦 未收到货将按「快递退款」处理：无需退货，商家核实快递退回后确认退款
+            </div>
+          </div>
+
           <div class="field">
             <label>退款类型</label>
             <div class="chip-row">
-              <span :class="['chip', { on: form.type === 1 }]" @click="form.type = 1">仅退款</span>
-              <span :class="['chip', { on: form.type === 2 }]" @click="form.type = 2">退货退款</span>
+              <span :class="['chip', { on: form.type === 1, disabled: orderStatus === 4 }]" @click="setType(1)">仅退款</span>
+              <span :class="['chip', { on: form.type === 2, disabled: form.received === 0 }]" @click="setType(2)">退货退款</span>
+            </div>
+            <div v-if="orderStatus === 4" class="small warn-tip">
+              ⚠ 该订单已评价，退款必须退货：商家同意后请寄回商品并填写退货快递单号
+            </div>
+            <div v-else-if="form.type === 2" class="small muted tip">
+              商家同意退货后，需在订单列表填写退货快递单号，商家确认收货后退款到账
             </div>
           </div>
 
@@ -135,8 +153,9 @@ export default {
       loading: true,
       submitting: false,
       orderItem: null,
+      orderStatus: null,
       maxRefund: 0,
-      form: { type: 1, amount: 0, reason: "", description: "", images: [] },
+      form: { type: 1, received: 1, amount: 0, reason: "", description: "", images: [] },
     };
   },
   created() {
@@ -153,6 +172,9 @@ export default {
         const orders = res.data?.records || [];
         for (const o of orders) {
           if (String(o.id) === String(orderId)) {
+            this.orderStatus = o.status;
+            // 已评价(4)的订单退款必须退货
+            if (o.status === 4) this.form.type = 2;
             const items = o.orderItems || [];
             // 如果指定了 itemId，只退该明细；否则退整单第一项
             const item = itemId
@@ -168,6 +190,20 @@ export default {
         }
       } catch (e) { /* ignore */ }
       this.loading = false;
+    },
+    setReceived(v) {
+      this.form.received = v;
+      // 未收到货没有货可退，只能仅退款（快递退款）
+      if (v === 0) this.form.type = 1;
+    },
+    setType(t) {
+      if (t === 1 && this.orderStatus === 4) {
+        return this.$message.warning("已评价的订单退款必须退货，请选择退货退款");
+      }
+      if (t === 2 && this.form.received === 0) {
+        return this.$message.warning("未收到货无法退货，请选择仅退款");
+      }
+      this.form.type = t;
     },
     async uploadImage(options) {
       try {
@@ -200,6 +236,7 @@ export default {
           reason: this.form.reason,
           description: this.form.description,
           refundType: this.form.type,
+          received: this.form.received,
           images: this.form.images,
         });
         this.$message.success("退款申请已提交，等待商家处理");
@@ -248,6 +285,8 @@ export default {
 .chip { padding: 8px 22px; border-radius: 100px; font-size: 14px; cursor: pointer; background: #f0f2f5; color: #666; font-weight: 500; transition: .15s; border: 1px solid transparent; }
 .chip:hover { border-color: #5b8def; }
 .chip.on { background: #e7eefc; border-color: #5b8def; color: #5b8def; font-weight: 600; }
+.chip.disabled { opacity: .45; cursor: not-allowed; }
+.warn-tip { margin-top: 8px; color: #e6914e; }
 
 /* 金额 */
 .amount-row { display: flex; align-items: center; gap: 10px; }

@@ -75,6 +75,16 @@ export function manageRefunds(params) {
   return get("/refunds/manage", params);
 }
 
+/** 用户填写退货快递单号 PUT /api/refunds/{id}/return-shipping（退单状态3→4） */
+export function submitReturnShipping(id, data) {
+  return put(`/refunds/${id}/return-shipping`, data);
+}
+
+/** 商家确认收到退货并打款 PUT /api/refunds/{id}/confirm-return（退单状态4→1） */
+export function confirmReturnRefund(id, data) {
+  return put(`/refunds/${id}/confirm-return`, data || {});
+}
+
 // ==================== 评价 ====================
 
 /** 提交评价 POST /api/reviews */
