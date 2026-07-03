@@ -5,7 +5,7 @@ module.exports = {
   productionSourceMap: false, // 生产环境是否生成 SourceMap
   devServer: {
     open: true, // 启动服务后是否打开浏览器
-    host: "localhost",
+    host: "0.0.0.0", // 允许局域网内的其他设备通过 IP 访问
     port: 8099, // 服务端口
     https: false,
     historyApiFallback: true,
