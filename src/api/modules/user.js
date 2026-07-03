@@ -57,6 +57,28 @@ export function setDefaultAddress(id) {
   return put(`/addresses/${id}/default`);
 }
 
+// ==================== 宠物档案（推荐深化：档案标签参与首页推荐） ====================
+
+/** 我的宠物列表：GET /api/user/pets */
+export function getMyPets() {
+  return get("/user/pets");
+}
+
+/** 新增宠物：POST /api/user/pets */
+export function addPet(data) {
+  return postJson("/user/pets", data);
+}
+
+/** 修改宠物：PUT /api/user/pets/{id} */
+export function updatePet(id, data) {
+  return put(`/user/pets/${id}`, data);
+}
+
+/** 删除宠物：DELETE /api/user/pets/{id} */
+export function deletePet(id) {
+  return del(`/user/pets/${id}`);
+}
+
 // ==================== 会员等级 ====================
 
 /** 会员等级列表：GET /api/membership/levels */

@@ -82,6 +82,7 @@
               </div>
               <div class="pbody">
                 <div class="pname">{{ p.name }}</div>
+                <div v-if="p.recommendReason" class="reason">🐾 {{ p.recommendReason }}</div>
                 <div class="price-row">
                   <span class="price"><span class="cur">¥</span>{{ Number(p.price).toFixed(2) }}</span>
                   <span v-if="p.userDiscount < 1" class="del">¥{{ (p.price / p.userDiscount).toFixed(2) }}</span>
@@ -282,6 +283,11 @@ export default {
 .pbody { padding: 16px; position: relative; background: #fff; z-index: 2; }
 .pname { font-size: 14px; font-weight: 500; color: #222; height: 40px; line-height: 20px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; transition: color 0.2s; }
 .pcard:hover .pname { color: #6B8DD6; }
+.reason {
+  display: inline-block; margin-top: 6px; font-size: 11px; color: #e6914e;
+  background: #fdf3e7; border-radius: 8px; padding: 2px 8px; max-width: 100%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 .price-row { margin: 12px 0 4px; display: flex; align-items: baseline; }
 .price { color: #FF4757; font-weight: 700; font-size: 20px; letter-spacing: -0.5px; }
 .price .cur { font-size: 13px; margin-right: 2px; }

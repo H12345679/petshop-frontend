@@ -112,6 +112,10 @@
             v-else-if="currentTab === 'address'"
             @notify="notify"
           />
+          <UserPets
+            v-else-if="currentTab === 'pets'"
+            @notify="notify"
+          />
           <UserFavorites
             v-else-if="currentTab === 'favorites'"
             @update-total="val => favoriteTotal = val"
@@ -168,6 +172,7 @@ import AppFooter from "@/components/AppFooter.vue";
 import UserProfile from "@/views/user/UserProfile.vue";
 import UserOrders from "@/views/user/UserOrders.vue";
 import UserAddress from "@/views/user/UserAddress.vue";
+import UserPets from "@/views/user/UserPets.vue";
 import UserFavorites from "./UserFavorites.vue";
 import UserShopFavorites from "./UserShopFavorites.vue";
 import UserCoupons from "./UserCoupons.vue";
@@ -187,6 +192,7 @@ export default {
     UserProfile,
     UserOrders,
     UserAddress,
+    UserPets,
     UserFavorites,
     UserShopFavorites,
     UserCoupons,
@@ -200,6 +206,7 @@ export default {
       currentTab: "profile",
       tabs: [
         { key: "profile",    label: "个人资料",    icon: "👤" },
+        { key: "pets",       label: "我的宠物",    icon: "🐾" },
         { key: "orders", label: "我的订单", icon: "📦" },
         { key: "favorites", label: "我的收藏", icon: "⭐" },
         { key: "shopFavorites", label: "关注店铺", icon: "🏪" },
