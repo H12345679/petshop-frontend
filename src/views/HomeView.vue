@@ -122,11 +122,11 @@ export default {
         { key: "cf", title: "🛍️ 大家都在买", tag: "CF", list: [], loading: true },
       ],
       banners: [
-        'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1525253086316-d0c936c814f8?auto=format&fit=crop&w=800&q=80'
+        '/img/banners/banner1.jpg',
+        '/img/banners/banner2.jpg',
+        '/img/banners/banner3.jpg',
+        '/img/banners/banner4.jpg',
+        '/img/banners/banner5.jpg'
       ],
     };
   },
