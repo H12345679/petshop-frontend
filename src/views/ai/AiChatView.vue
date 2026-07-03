@@ -228,8 +228,11 @@ export default {
       
       try {
         const token = getStore("token") || "";
-        // SSE 直连后端，跳过 webpack devServer 代理（代理层会缓冲流式数据）
-        const response = await fetch('http://localhost:8088/api/ai/chat/stream', {
+        // 动态获取当前主机名（支持 localhost 及局域网 IP），开发环境直连后端 8088 端口，跳过 webpack-dev-server 缓冲从而保证流式输出
+        const streamUrl = process.env.NODE_ENV === 'production' 
+          ? '/api/ai/chat/stream' 
+          : `${window.location.protocol}//${window.location.hostname}:8088/api/ai/chat/stream`;
+        const response = await fetch(streamUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
