@@ -50,7 +50,7 @@
               </template>
               
               <span class="small muted label" style="margin-left:20px">排序：</span>
-              <span class="tag" :class="{ accent: query.sort === '' }" @click="selectSort('')">综合</span>
+              <span class="tag" :class="{ accent: query.sort === '' || query.sort === 'recommend' }" @click="selectSort('recommend')">综合</span>
               <span class="tag" :class="{ accent: query.sort === 'sales_desc' }" @click="selectSort('sales_desc')">销量</span>
               <span class="tag" :class="{ accent: query.sort === 'price_asc' || query.sort === 'price_desc' }" @click="togglePriceSort">
                 价格 {{ query.sort === 'price_asc' ? '↑' : (query.sort === 'price_desc' ? '↓' : '↑↓') }}
@@ -150,7 +150,7 @@ export default {
         categoryId: "",
         name: "",
         type: "",
-        sort: "",
+        sort: "recommend",
         minPrice: null,
         maxPrice: null,
         page: 1,
