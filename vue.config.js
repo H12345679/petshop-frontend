@@ -7,6 +7,10 @@ module.exports = {
     open: true, // 启动服务后是否打开浏览器
     host: "0.0.0.0", // 允许局域网内的其他设备通过 IP 访问
     port: 8099, // 服务端口
+    client: {
+      // 关键修复：解决 Vue CLI 5 局域网访问时无限刷新的问题
+      webSocketURL: 'auto://0.0.0.0:0/ws'
+    },
     https: false,
     historyApiFallback: true,
     //hotOnly: false,
