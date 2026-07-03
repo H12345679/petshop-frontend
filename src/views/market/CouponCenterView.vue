@@ -270,12 +270,12 @@ export default {
       this.loadMyCoupons();
     },
 
-    // 从 _detail 安全取数据
-    typeOf(uc) { return uc._detail?.type ?? 1; },
-    amountOf(uc) { return uc._detail?.amount ?? 0; },
-    thresholdOf(uc) { return uc._detail?.threshold ?? 0; },
-    nameOf(uc) { return uc._detail?.name ?? '优惠券'; },
-    endTimeOf(uc) { return uc._detail?.endTime ?? uc.endTime ?? ''; },
+    // 从后端直返字段或 _detail 安全取数据
+    typeOf(uc) { return uc.type ?? uc._detail?.type ?? 1; },
+    amountOf(uc) { return uc.amount ?? uc._detail?.amount ?? 0; },
+    thresholdOf(uc) { return uc.threshold ?? uc._detail?.threshold ?? 0; },
+    nameOf(uc) { return uc.name ?? uc._detail?.name ?? '优惠券'; },
+    endTimeOf(uc) { return uc.endTime ?? uc._detail?.endTime ?? ''; },
     usedTimeOf(uc) { return uc.usedTime ?? ''; },
   },
 };
