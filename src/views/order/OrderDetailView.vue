@@ -151,6 +151,15 @@ export default {
     progressSteps() {
       const s = this.order ? this.order.status : null;
       if (s === null) return [];
+      
+      if (s === -2 || s === -3 || s === -4) {
+        return [
+          { num: 1, label: '申请退款', done: true, on: false },
+          { num: 2, label: '退款处理中', done: true, on: s === -2 },
+          { num: 3, label: '退款成功', done: s === -3 || s === -4, on: s === -3 || s === -4 },
+        ];
+      }
+
       const es = s < 0 ? Math.max(0, s + 5) : s;
       return [
         { num: 1, label: '提交订单', done: es >= 0, on: es === 0 },
