@@ -22,7 +22,7 @@
         <table class="tbl">
           <thead>
             <tr>
-              <th style="width:40px">☑</th>
+              <th style="width:40px"></th>
               <th>商品信息</th>
               <th style="width:140px">单价</th>
               <th style="width:140px">数量</th>
