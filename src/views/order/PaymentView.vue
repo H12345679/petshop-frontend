@@ -217,7 +217,7 @@ export default {
         await this.refreshBalance();
         localStorage.removeItem("PAYMENT_ORDER_IDS");
         setTimeout(() => {
-          this.$router.push("/orders");
+          this.$router.push("/orders").catch(() => {});
         }, 1500);
       } catch (e) {
         if (e !== 'cancel') this.$message.error(e.message || "支付失败");
@@ -228,7 +228,7 @@ export default {
 
     goBack() {
       localStorage.removeItem("PAYMENT_ORDER_IDS");
-      this.$router.push("/orders");
+      this.$router.push("/orders").catch(() => {});
     },
   },
 };

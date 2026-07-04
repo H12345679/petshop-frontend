@@ -24,6 +24,10 @@
           <div>
             <div class="banner-title">{{ order.statusName }}</div>
             <div v-if="order.status === 0" class="banner-sub">请尽快完成支付，超时订单自动取消并释放库存</div>
+            <!-- 退款被驳回：订单恢复原状态后优先展示驳回原因 -->
+            <div v-else-if="order.status > 0 && order.refund && order.refund.status === 2" class="banner-sub">
+              ❌ 退款申请已被驳回{{ order.refund.auditRemark ? '：' + order.refund.auditRemark : '' }}，如有需要可重新申请退款
+            </div>
             <div v-else-if="order.status === 2" class="banner-sub">商品已发出，请注意查收</div>
             <div v-else-if="order.status === 3" class="banner-sub">收到货了吗？去评价一下吧</div>
             <div v-else-if="order.status < 0" class="banner-sub">{{ order.cancelReason || '退款处理中' }}</div>
@@ -98,6 +102,7 @@
         <div class="bottom-bar">
           <span class="small muted">应付：<span class="price" style="font-size:20px">¥{{ (order.payAmount || 0).toFixed(2) }}</span></span>
           <div class="bottom-actions">
+            <span v-if="order.trackingNumber" class="btn lg" @click="openLogistics">查看物流</span>
             <span v-if="isTerminal" class="btn lg" @click="deleteOrderConfirm">删除订单</span>
             <span v-if="order.status === 0 || order.status === 1" class="btn lg" @click="cancelOrder">取消订单</span>
             <span v-if="order.status === 0" class="btn primary lg" @click="payOrder" :class="{ disabled: paying }">{{ paying ? '支付中…' : '立即支付' }}</span>
@@ -112,6 +117,9 @@
       </template>
     </div>
 
+    <!-- 模拟物流轨迹弹窗 -->
+    <LogisticsDialog ref="logisticsDialog" />
+
     <AppFooter />
   </div>
 </template>
@@ -122,10 +130,11 @@ import { getUserInfo } from "@/api/modules/user.js";
 import { setStore } from "@/libs/storage.js";
 import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
+import LogisticsDialog from "@/components/LogisticsDialog.vue";
 
 export default {
   name: "OrderDetailView",
-  components: { AppHeader, AppFooter },
+  components: { AppHeader, AppFooter, LogisticsDialog },
   data() {
     return {
       order: null,
@@ -281,6 +290,17 @@ export default {
     },
 
     openRefund() { this.$router.push(`/refund?orderId=${this.order.id}`); },
+    openLogistics() {
+      this.$refs.logisticsDialog.open({
+        title: "物流信息",
+        courierCompany: this.order.courierCompany,
+        trackingNumber: this.order.trackingNumber,
+        address: this.order.receiverAddress,
+        shipTime: this.order.shipTime,
+        receiveTime: this.order.receiveTime,
+        seed: this.order.trackingNumber || this.order.id,
+      });
+    },
     goReview() { this.$router.push(`/review?orderId=${this.order.id}`); },
     buyAgain() {
       if (this.items && this.items.length > 0) {

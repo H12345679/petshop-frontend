@@ -57,6 +57,11 @@
               <span class="price" style="font-size:16px">¥{{ (order.payAmount || 0).toFixed(2) }}</span>
             </span>
             <div class="oc-actions" @click.stop>
+              <!-- 退款被驳回：订单已恢复原状态，仍提示用户驳回结果 -->
+              <span v-if="order.status > 0 && order.refund && order.refund.status === 2"
+                    class="refund-hint reject">
+                ❌ 退款申请已驳回{{ order.refund.auditRemark ? '：' + order.refund.auditRemark : '' }}，可重新申请
+              </span>
               <!-- 状态0：待支付 -->
               <template v-if="order.status === 0">
                 <span class="btn sm" @click="cancelOrder(order)">取消订单</span>
@@ -68,7 +73,7 @@
               </template>
               <!-- 状态2：待收货 -->
               <template v-if="order.status === 2">
-                <span class="btn sm">查看物流</span>
+                <span v-if="order.trackingNumber" class="btn sm" @click="openLogistics(order)">查看物流</span>
                 <span class="btn sm" @click="openRefund(order)">申请退款</span>
                 <span class="btn sm primary" @click="receiveOrder(order)">确认收货</span>
               </template>
@@ -94,9 +99,12 @@
                   <span class="refund-hint warn">商家已同意退货，请寄回商品</span>
                   <span class="btn sm primary" @click="openReturnDialog(order)">填写退货单号</span>
                 </template>
-                <span v-else-if="order.refund.status === 4" class="refund-hint">
-                  🚚 退货已寄出（{{ order.refund.returnCourierCompany }} {{ order.refund.returnTrackingNumber }}），待商家确认收货
-                </span>
+                <template v-else-if="order.refund.status === 4">
+                  <span class="refund-hint">
+                    🚚 退货已寄出（{{ order.refund.returnCourierCompany }} {{ order.refund.returnTrackingNumber }}），待商家确认收货
+                  </span>
+                  <span class="btn sm" @click="openReturnLogistics(order)">查看退货物流</span>
+                </template>
               </template>
             </div>
           </div>
@@ -130,6 +138,9 @@
       </span>
     </el-dialog>
 
+    <!-- 模拟物流轨迹弹窗 -->
+    <LogisticsDialog ref="logisticsDialog" />
+
     <AppFooter />
   </div>
 </template>
@@ -140,6 +151,7 @@ import { getUserInfo } from "@/api/modules/user.js";
 import { setStore } from "@/libs/storage.js";
 import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
+import LogisticsDialog from "@/components/LogisticsDialog.vue";
 
 const TABS = [
   { label: "全部", value: null },
@@ -152,7 +164,7 @@ const TABS = [
 
 export default {
   name: "OrderListView",
-  components: { AppHeader, AppFooter },
+  components: { AppHeader, AppFooter, LogisticsDialog },
   data() {
     return {
       orders: [],
@@ -190,7 +202,8 @@ export default {
         const res = await myOrders(params);
         let recs = res.data?.records || [];
         this.total = res.data?.total || 0;
-        if (isRefund) recs = recs.filter(o => [-2, -3, -4].includes(o.status));
+        // 退款/售后含被驳回的（订单已恢复原状态，但退款单 status=2）
+        if (isRefund) recs = recs.filter(o => [-2, -3, -4].includes(o.status) || (o.refund && o.refund.status === 2));
         this.orders = recs;
       } catch (e) { this.$message.error("加载失败"); }
       finally { this.loading = false; }
@@ -204,7 +217,7 @@ export default {
         if (this.activeStatus !== null && !isRefund) params.status = this.activeStatus;
         const res = await myOrders(params);
         let recs = res.data?.records || [];
-        if (isRefund) recs = recs.filter(o => [-2, -3, -4].includes(o.status));
+        if (isRefund) recs = recs.filter(o => [-2, -3, -4].includes(o.status) || (o.refund && o.refund.status === 2));
         this.orders = recs;
       } catch (e) { this.orders = []; }
       this.loading = false;
@@ -240,6 +253,28 @@ export default {
       catch (e) { if (e !== 'cancel') this.$message.error(e.message || "操作失败"); }
     },
     openRefund(order) { this.$router.push(`/refund?orderId=${order.id}`); },
+    openLogistics(order) {
+      this.$refs.logisticsDialog.open({
+        title: "物流信息",
+        courierCompany: order.courierCompany,
+        trackingNumber: order.trackingNumber,
+        address: order.receiverAddress,
+        shipTime: order.shipTime,
+        receiveTime: order.receiveTime,
+        seed: order.trackingNumber || order.id,
+      });
+    },
+    openReturnLogistics(order) {
+      const rf = order.refund || {};
+      this.$refs.logisticsDialog.open({
+        title: "退货物流",
+        courierCompany: rf.returnCourierCompany,
+        trackingNumber: rf.returnTrackingNumber,
+        shipTime: rf.returnTime,
+        seed: rf.returnTrackingNumber || rf.id,
+        destName: "商家仓库",
+      });
+    },
     openReturnDialog(order) {
       this.returnDialog.refundId = order.refund.id;
       this.returnDialog.trackingNumber = "";
@@ -335,6 +370,7 @@ export default {
 /* 退款/退货进度提示 */
 .refund-hint { font-size: 12px; color: #888; }
 .refund-hint.warn { color: #e6914e; font-weight: 600; }
+.refund-hint.reject { color: #d9534f; }
 .rd-field { margin-bottom: 14px; }
 .rd-field label { display: block; font-size: 13px; color: #555; margin-bottom: 5px; }
 
