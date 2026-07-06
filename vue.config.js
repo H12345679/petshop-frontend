@@ -4,6 +4,17 @@ module.exports = {
   lintOnSave: true, // 在保存时校验格式
   productionSourceMap: false, // 生产环境是否生成 SourceMap
   devServer: {
+    headers: {
+      "X-Frame-Options": "SAMEORIGIN",
+      "X-Content-Type-Options": "nosniff",
+      "Content-Security-Policy": "frame-ancestors 'self'; form-action 'self'; default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;"
+    },
+    setupMiddlewares: (middlewares, devServer) => {
+      if (devServer && devServer.app) {
+        devServer.app.disable('x-powered-by');
+      }
+      return middlewares;
+    },
     open: true, // 启动服务后是否打开浏览器
     host: "0.0.0.0", // 允许局域网内的其他设备通过 IP 访问
     port: 8099, // 服务端口
