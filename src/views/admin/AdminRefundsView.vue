@@ -498,7 +498,7 @@ export default {
   display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-radius: 10px;
   margin-bottom: 16px; font-size: 16px; font-weight: 600;
 }
-.ds-0, .ds-3, .ds-4 { background: #fff8e1; color: #cc4400; }
+.ds-0, .ds-3, .ds-4 { background: #fff8e1; color: #993300; }
 .ds-1 { background: #e8f5e9; color: #0d4212; }
 .ds-2 { background: #fbe9e7; color: #bf360c; }
 .di-section { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }

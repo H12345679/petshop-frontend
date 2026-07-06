@@ -130,6 +130,7 @@ export default {
     try {
       this.userInfo = u ? JSON.parse(u) : null;
     } catch (e) {
+      console.error("解析用户信息失败", e);
       this.userInfo = null;
     }
     // 商家默认选中“活动”消息

@@ -234,6 +234,7 @@ export default {
     try {
       this.userInfo = u ? JSON.parse(u) : null;
     } catch (e) {
+      console.error("解析用户信息失败", e);
       this.userInfo = null;
     }
   },
@@ -286,7 +287,9 @@ export default {
       try {
         const res = await kpi();
         Object.assign(this.kpiData, res.data || {});
-      } catch (e) { /* keep default KPI values */ }
+      } catch (e) {
+        console.error("加载KPI失败", e); /* keep default KPI values */
+      }
     },
     async loadCharts() {
       const promises = [
@@ -329,6 +332,7 @@ export default {
           ],
         }), true);
       } catch (e) {
+        console.error("加载销售趋势失败", e);
         this.paintEmpty("salesChart", "趋势数据加载失败");
       }
     },
@@ -365,6 +369,7 @@ export default {
           ],
         }), true);
       } catch (e) {
+        console.error("加载定时聚合数据失败", e);
         this.paintEmpty("dailyAggChart", "定时聚合数据加载失败");
       }
     },
@@ -379,6 +384,7 @@ export default {
           colors: [PALETTE.amber, PALETTE.blue, PALETTE.green, "#9aa3b2", "#54b56f", "#c4cad4", PALETTE.red],
         });
       } catch (e) {
+        console.error("加载订单状态失败", e);
         this.paintEmpty("orderChart", "订单状态加载失败");
       }
     },
@@ -393,6 +399,7 @@ export default {
           colors: ["#cfd7e3", PALETTE.blue, PALETTE.amber, PALETTE.green, PALETTE.violet],
         });
       } catch (e) {
+        console.error("加载会员数据失败", e);
         this.paintEmpty("memberChart", "会员数据加载失败");
       }
     },
@@ -424,6 +431,7 @@ export default {
           })],
         }), true);
       } catch (e) {
+        console.error("加载日志统计失败", e);
         this.paintEmpty("logOpChart", "日志统计加载失败");
         this.paintEmpty("logHourChart", "日志统计加载失败");
       }
@@ -438,6 +446,7 @@ export default {
           empty: "暂无商品销量数据",
         });
       } catch (e) {
+        console.error("加载商品销量失败", e);
         this.paintEmpty("productChart", "商品销量加载失败");
       }
     },
@@ -451,6 +460,7 @@ export default {
           empty: "暂无店铺排行数据",
         });
       } catch (e) {
+        console.error("加载店铺排行失败", e);
         this.paintEmpty("shopRankChart", "店铺排行加载失败");
       }
     },
@@ -832,19 +842,19 @@ export default {
   flex: 0 0 auto;
   padding: 4px 8px;
   border-radius: 6px;
-  color: #3f6fd8;
+  color: #1e40af;
   background: rgba(63, 111, 216, .1);
   font-size: 11px;
   font-weight: 700;
 }
 
 .chip-warm {
-  color: #a96f17;
+  color: #7c4a0b;
   background: rgba(216, 155, 43, .13);
 }
 
 .chip-green {
-  color: #207654;
+  color: #14523a;
   background: rgba(47, 157, 114, .12);
 }
 

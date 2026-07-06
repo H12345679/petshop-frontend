@@ -412,7 +412,7 @@ export default {
   cursor: pointer; color: #595959; font-size: 12px;
   padding: 3px; border-radius: 50%; transition: all .15s;
 }
-.search-clear:hover { color: #3b82f6; background: #eff6ff; }
+.search-clear:hover { color: #1d4ed8; background: #eff6ff; }
 
 /* ===== 搜索智能下拉建议 ===== */
 .tips-dropdown {
@@ -496,7 +496,7 @@ export default {
 .confirm-btn {
   padding: 11px 28px; border-radius: 12px; font-size: 14px; font-weight: 600;
   border: none;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: #fff; cursor: pointer;
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
   transition: all .2s cubic-bezier(0.25, 0.8, 0.25, 1);

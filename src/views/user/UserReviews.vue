@@ -105,6 +105,7 @@ export default {
           try {
             r.parsedImages = r.images ? JSON.parse(r.images) : [];
           } catch(e) {
+            console.error("解析评价图片失败", e);
             r.parsedImages = [];
           }
         });
@@ -255,7 +256,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #cbd5e1;
+  color: #94a3b8;
   transition: all 0.2s;
   box-shadow: 0 2px 5px rgba(0,0,0,0.02);
   font-weight: bold;
@@ -359,7 +360,7 @@ export default {
   margin-top: 32px;
 }
 ::v-deep .el-pagination.is-background .el-pager li:not(.disabled).active {
-  background-color: #3b82f6 !important;
+  background-color: #2563eb !important;
   color: #fff;
 }
 </style>
