@@ -324,11 +324,9 @@ export default {
         if (found) {
           this.activeMedia = found;
         }
-      } else {
+      } else if (this.mediaList.length > 0) {
         // 如果当前选中的规格没有专属图片，则切回商品的主图（即第一张图）
-        if (this.mediaList.length > 0) {
-          this.activeMedia = this.mediaList[0];
-        }
+        this.activeMedia = this.mediaList[0];
       }
     },
     decQty() {
@@ -424,6 +422,7 @@ export default {
           try {
             r.parsedImages = r.images ? JSON.parse(r.images) : [];
           } catch (e) {
+            console.error("解析评价图片失败", e);
             r.parsedImages = [];
           }
         });

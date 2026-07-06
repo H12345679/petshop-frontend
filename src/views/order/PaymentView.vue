@@ -196,7 +196,9 @@ export default {
           this.userBalance = res.data.balance || 0;
           setStore("userInfo", JSON.stringify(res.data));
         }
-      } catch (e) { /* ignore */ }
+      } catch (e) {
+        console.error("获取用户信息失败", e);
+      }
     },
 
     async batchPay() {
@@ -245,7 +247,7 @@ export default {
 /* 步骤条 */
 .steps { display: flex; align-items: center; justify-content: center; }
 .step { display: flex; align-items: center; color: #595959; font-size: 13px; }
-.step .dot { width: 22px; height: 22px; border-radius: 50%; background: #dfe3e9; color: #777; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 4px; }
+.step .dot { width: 22px; height: 22px; border-radius: 50%; background: #dfe3e9; color: #555; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 4px; }
 .step.on { color: #2a69d4; }
 .step.on .dot { background: #2a69d4; color: #fff; }
 .step + .step { margin-left: 10px; position: relative; }

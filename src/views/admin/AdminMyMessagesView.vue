@@ -77,6 +77,7 @@ export default {
         this.list = d.records || [];
         this.total = d.total || 0;
       } catch (e) {
+        console.error("加载消息失败", e);
         this.$message.error("加载消息失败");
       } finally {
         this.loading = false;
@@ -89,7 +90,7 @@ export default {
         await readMessage(msg.id);
         msg.isRead = 1;
       } catch (e) {
-        /* ignore */
+        console.error("标记已读失败", e);
       }
     },
 
@@ -130,9 +131,9 @@ export default {
   font-size: 12px; padding: 2px 6px; border-radius: 4px; margin-right: 12px;
   background: #f0f2f5; color: #666;
 }
-.type-1 { background: #e6f7ff; color: #1890ff; }
-.type-2 { background: #fff7e6; color: #fa8c16; }
-.type-3 { background: #f6ffed; color: #52c41a; }
+.type-1 { background: #e6f7ff; color: #096dd9; }
+.type-2 { background: #fff7e6; color: #d46b08; }
+.type-3 { background: #f6ffed; color: #389e0d; }
 .msg-title { font-size: 15px; color: #666; }
 .msg-dot { color: #f5222d; margin-left: 8px; font-size: 12px; }
 .msg-time { margin-left: auto; font-size: 13px; color: #595959; }

@@ -366,6 +366,7 @@ export default {
     try {
       this.userInfo = u ? JSON.parse(u) : null;
     } catch (e) {
+      console.error("解析用户信息失败", e);
       this.userInfo = null;
     }
 
@@ -731,7 +732,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ccc;
+  color: #767676;
   font-size: 12px;
   background-size: cover;
   background-position: center;
@@ -750,7 +751,7 @@ export default {
 }
 .tag-sm.stopped {
   background: #f5f5f5;
-  color: #aaa;
+  color: #767676;
 }
 
 /* 操作按钮 */
@@ -887,7 +888,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #aaa;
+  color: #767676;
   font-size: 13px;
   cursor: pointer;
   position: relative;
