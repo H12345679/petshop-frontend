@@ -23,11 +23,11 @@ instance.interceptors.response.use(
   res => {
     const result = res.data;
     // 成功：把 { code, message, data } 直接交给业务层
-    if (result && result.code === 200) {
+    if (result?.code === 200) {
       return result;
     }
     // 未登录 / 过期：清本地登录态，如果当前页面需要登录则跳登录页
-    if (result && result.code === 401) {
+    if (result?.code === 401) {
       removestore("token");
       removestore("userInfo");
       const meta = router.currentRoute.meta || {};
@@ -37,10 +37,10 @@ instance.interceptors.response.use(
       return Promise.reject(new Error(result.message || "未登录或登录已过期"));
     }
     // 其它（400 参数错 / 403 无权限 / 404 / 500）：把后端 message 抛出去
-    return Promise.reject(new Error((result && result.message) || "请求失败"));
+    return Promise.reject(new Error(result?.message || "请求失败"));
   },
   err => {
-    if (err.response && err.response.status === 401) {
+    if (err.response?.status === 401) {
       removestore("token");
       removestore("userInfo");
       const meta = router.currentRoute.meta || {};

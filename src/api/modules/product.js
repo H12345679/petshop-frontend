@@ -1,4 +1,4 @@
-import { get, post, postJson, put, del, upload } from "../axios.js";
+import { get, post, postJson, put, del } from "../axios.js";
 
 /**
  * 分页搜索商品

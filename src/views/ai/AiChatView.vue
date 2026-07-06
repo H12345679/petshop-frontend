@@ -172,7 +172,9 @@ export default {
       }
     },
     handleNewChat() {
-      const sid = 'session_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+      const randomArr = new Uint32Array(1);
+      globalThis.crypto.getRandomValues(randomArr);
+      const sid = 'session_' + Date.now() + '_' + (randomArr[0] % 1000);
       localStorage.setItem("ai_current_session", sid);
       this.currentSessionId = sid;
       this.messages = [
@@ -189,17 +191,17 @@ export default {
       if (!text) return "";
       let html = text
         // 0. 防御 XSS：转义 < 和 >
-        .replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replaceAll("<", "&lt;").replaceAll(">", "&gt;")
         // 1. 处理 **[text](url)** 格式（加粗包裹的标准链接）
-        .replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/\*\*\[([^\]\n]+)\]\(([^)\n]+)\)\*\*/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
         // 2. 处理普通标准 [text](url) 格式
-        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/\[([^\]\n]+)\]\(([^)\n]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
         // 3. 兜底：【name】（ /product/123 ）或 【name】( /product/123 ) — 全角/半角括号带空格
-        .replace(/(【[^】]+】)\s*[（(]\s*(\/product\/\d+)\s*[）)]/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/(【[^】\n]+】)\s*[（(]\s*(\/product\/\d+)\s*[）)]/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
         // 4. 处理 **文字** 加粗（排除已转换的 <a> 标签内容）
         .replace(/\*\*([^*<>]+)\*\*/g, '<strong>$1</strong>')
         // 5. 换行
-        .replace(/\n/g, '<br/>');
+        .replaceAll("\n", "<br/>");
       return html;
     },
     handleChatClick(e) {
@@ -226,6 +228,7 @@ export default {
                 this.currentAiMessage += obj.text;
               }
             } catch (e) {
+              console.warn("ignored", e);
               // ignore parse errors
             }
           }
@@ -395,13 +398,13 @@ export default {
   color: #5b8def;
 }
 .history-item.active {
-  border-color: #5b8def;
+  border-color: #164082;
   background: #f0f5ff;
-  color: #5b8def;
+  color: #164082;
 }
 .empty-tip {
   font-size: 13px;
-  color: #c0c4cc;
+  color: #595959;
   text-align: center;
   margin-top: 20px;
 }
@@ -481,7 +484,7 @@ export default {
   border-top-right-radius: 2px;
 }
 .bubble.typing {
-  color: #999;
+  color: #595959;
   font-style: italic;
 }
 
@@ -499,20 +502,20 @@ export default {
   background: #f4f5f7;
   border-radius: 16px;
   font-size: 13px;
-  color: #606266;
+  color: #434a54;
   cursor: pointer;
   transition: all 0.2s;
 }
 .quick-btn:hover {
   background: #ebeef5;
-  color: #5b8def;
+  color: #164082;
 }
 .input-area {
   margin-bottom: 12px;
 }
 .footer-tip {
   font-size: 12px;
-  color: #e6a23c;
+  color: #994d00;
   background: #fdf6ec;
   padding: 8px 12px;
   border-radius: 4px;

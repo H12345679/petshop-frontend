@@ -91,7 +91,9 @@ export default {
     initSession() {
       let sid = localStorage.getItem("ai_current_session");
       if (!sid) {
-        sid = 'session_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+        const randomArr = new Uint32Array(1);
+        globalThis.crypto.getRandomValues(randomArr);
+        sid = 'session_' + Date.now() + '_' + (randomArr[0] % 1000);
         localStorage.setItem("ai_current_session", sid);
       }
       this.sessionId = sid;
@@ -109,19 +111,19 @@ export default {
           this.scrollToBottom();
         }
       } catch (e) {
-        // 未登录或网络异常时忽略
+        console.warn("ignored", e);
       }
     },
     formatText(text) {
       if (!text) return "";
       let html = text
         // 0. 防御 XSS：转义 < 和 >
-        .replace(/</g, "&lt;").replace(/>/g, "&gt;")
-        .replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
-        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
-        .replace(/(【[^】]+】)\s*[（(]\s*(\/product\/\d+)\s*[）)]/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+        .replace(/\*\*\[([^\]\n]+)\]\(([^)\n]+)\)\*\*/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/\[([^\]\n]+)\]\(([^)\n]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/(【[^】\n]+】)\s*[（(]\s*(\/product\/\d+)\s*[）)]/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
         .replace(/\*\*([^*<>]+)\*\*/g, '<strong>$1</strong>')
-        .replace(/\n/g, '<br/>');
+        .replaceAll("\n", "<br/>");
       return html;
     },
     handleChatClick(e) {
@@ -199,6 +201,7 @@ export default {
           this.currentAiMessage = "";
         }
       } catch (e) {
+        console.warn(e);
         this.currentAiMessage = "";
         this.messages.push({ role: 'ai', content: '网络异常，请稍后再试。' });
       } finally {
@@ -299,8 +302,8 @@ export default {
 .is-user .avatar { display: none; }
 
 .bubble {
-  max-width: 78%; padding: 10px 14px; border-radius: 12px;
-  font-size: 13px; line-height: 1.55; word-break: break-word;
+  max-width: 80%; padding: 10px 14px; border-radius: 8px;
+  font-size: 13px; line-height: 1.55; word-break: break-all;
 }
 .msg-row:not(.is-user) .bubble {
   background: #ffffff; color: #333; border-top-left-radius: 2px;

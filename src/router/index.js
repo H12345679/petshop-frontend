@@ -272,7 +272,7 @@ router.beforeEach((to, from, next) => {
   let userInfo = null;
   try {
     userInfo = JSON.parse(getStore("userInfo") || "null");
-  } catch (e) { }
+  } catch (e) { console.warn("ignored", e); }
 
   // 已登录还去登录/注册页 → 直接回首页
   if (token && (to.path === "/login" || to.path === "/register")) {
@@ -280,7 +280,7 @@ router.beforeEach((to, from, next) => {
   }
 
   // 需要管理员权限的页面
-  if (to.matched.some((r) => r.meta && r.meta.requiresAdmin)) {
+  if (to.matched.some((r) => r.meta?.requiresAdmin)) {
     if (!token) {
       alert("请先登录");
       return next({ path: "/login", query: { redirect: to.fullPath } });
@@ -295,7 +295,7 @@ router.beforeEach((to, from, next) => {
   }
 
   // 检查是否需要超级管理员权限
-  if (to.matched.some((r) => r.meta && r.meta.requiresSuperAdmin)) {
+  if (to.matched.some((r) => r.meta?.requiresSuperAdmin)) {
     if (!userInfo || userInfo.role !== "ADMIN") {
       alert("越权访问，仅系统管理员可查看该页面");
       return next("/admin");
@@ -303,7 +303,7 @@ router.beforeEach((to, from, next) => {
   }
 
   // 普通需要登录的页面
-  if (to.matched.some((r) => r.meta && r.meta.requiresAuth) && !token) {
+  if (to.matched.some((r) => r.meta?.requiresAuth) && !token) {
     return next({ path: "/login", query: { redirect: to.fullPath } });
   }
 

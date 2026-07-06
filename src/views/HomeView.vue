@@ -5,7 +5,7 @@
     <div class="container">
       <!-- 分类 + 轮播 + 用户卡 -->
       <div class="hero">
-        <aside class="cat-card">
+        <aside class="cat-card" aria-label="商品分类">
           <div class="cat-title">商品分类</div>
           <ul class="cat-list">
             <li v-for="c in categories" :key="c.id" @click="$router.push({ path: '/products', query: { categoryId: c.id } })">{{ c.name }} <span class="arrow">›</span></li>
@@ -29,7 +29,7 @@
           </el-carousel>
         </div>
 
-          <aside class="user-card" :class="{ logged: userInfo }">
+          <aside class="user-card" :class="{ logged: userInfo }" aria-label="用户信息">
             <div class="u-top">
               <div class="avatar">{{ userInfo ? (userInfo.nickname || userInfo.username || '我')[0] : '🐾' }}</div>
               <div v-if="userInfo" class="u-info">
@@ -107,7 +107,7 @@
 <script>
 import { homeProducts, categoryTree } from "@/api/modules/home.js";
 import { getUserInfo } from "@/api/modules/user.js";
-import { getStore, setStore, removestore } from "@/libs/storage.js";
+import { getStore, setStore } from "@/libs/storage.js";
 
 export default {
   name: "HomeView",
@@ -135,7 +135,7 @@ export default {
   created() {
     // 读本地登录态
     const u = getStore("userInfo");
-    try { this.userInfo = u ? JSON.parse(u) : null; } catch (e) { this.userInfo = null; }
+    try { this.userInfo = u ? JSON.parse(u) : null; } catch (e) { console.warn(e); this.userInfo = null; }
     // 从 API 刷新最新用户信息（余额同步）
     if (this.userInfo) {
       this.refreshUserInfo();
@@ -154,13 +154,14 @@ export default {
           this.userInfo = res.data;
           setStore("userInfo", JSON.stringify(res.data));
         }
-      } catch (e) { /* 使用本地缓存兜底 */ }
+      } catch (e) { console.warn("ignored", e); /* 使用本地缓存兜底 */ }
     },
     async loadCategories() {
       try {
         const res = await categoryTree();
         this.categories = res.data || [];
       } catch (e) {
+        console.warn(e);
         this.categories = [];
       }
     },
@@ -170,6 +171,7 @@ export default {
         const res = await homeProducts(strategy, 6);
         sec.list = res.data || [];
       } catch (e) {
+        console.warn(e);
         sec.list = [];
       } finally {
         sec.loading = false;
@@ -211,7 +213,7 @@ export default {
   margin-bottom: 4px;
 }
 .cat-list li:hover {
-  background: #f5f8ff; color: #6B8DD6; font-weight: 600;
+  background: #f5f8ff; color: #164082; font-weight: 600;
   transform: translateX(6px);
 }
 .cat-list .arrow { float: right; color: #cbd5e1; transition: transform 0.2s; }
@@ -242,12 +244,12 @@ export default {
 }
 .u-info { flex: 1; }
 .u-name { font-weight: 700; font-size: 16px; color: #222; margin-bottom: 4px; }
-.u-bal { font-size: 12px; color: #888; }
+.u-bal { font-size: 12px; color: #595959; }
 .u-bal span { color: #FF4757; font-weight: 600; font-size: 14px; }
 .recharge-link { margin-left: 8px; font-size: 12px; color: #5b8def; font-weight: 600; text-decoration: none; }
 .recharge-link:hover { opacity: 0.8; }
 .u-login-btn {
-  display: inline-block; background: #ffece8; color: #FF4757;
+  display: inline-block; background: #ffece8; color: #cc0014;
   padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; text-decoration: none; transition: background 0.2s;
 }
 .u-login-btn:hover { background: #ffd9d1; }
@@ -256,14 +258,14 @@ export default {
   display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; margin-top: 12px; cursor: pointer;
   transition: all 0.2s; border: 1px solid transparent;
 }
-.entry:hover { background: #fff; border-color: #dce4f7; color: #6B8DD6; box-shadow: 0 4px 12px rgba(107, 141, 214, 0.1); transform: translateY(-2px); }
+.entry:hover { background: #fff; border-color: #dce4f7; color: #164082; box-shadow: 0 4px 12px rgba(107, 141, 214, 0.1); transform: translateY(-2px); }
 
 /* 分区区块 */
 .block { margin-bottom: 40px; }
 .section-title { display: flex; align-items: center; gap: 12px; font-size: 24px; font-weight: 700; color: #111; margin: 0 0 20px; letter-spacing: -0.5px; }
 .section-title .tag { font-size: 12px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #FF4757, #ff6b81); border-radius: 6px; padding: 4px 10px; box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3); }
-.section-title .more { margin-left: auto; font-size: 14px; font-weight: 500; color: #888; cursor: pointer; transition: color 0.2s; }
-.section-title .more:hover { color: #6B8DD6; }
+.section-title .more { margin-left: auto; font-size: 14px; font-weight: 500; color: #595959; cursor: pointer; transition: color 0.2s; }
+.section-title .more:hover { color: #164082; }
 
 /* 商品网格 & 微交互 */
 .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; }

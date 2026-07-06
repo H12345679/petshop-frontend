@@ -7,7 +7,7 @@ export const setStore = (name, content) => {
     console.log("not String");
     content = JSON.stringify(content)
   }
-  window.localStorage.setItem(`${name.toUpperCase()}`, content)
+  globalThis.localStorage.setItem(`${name.toUpperCase()}`, content)
 }
 
 /**
@@ -15,7 +15,7 @@ export const setStore = (name, content) => {
  */
 export const getStore = name => {
   if (!name) return
-  return window.localStorage.getItem(`${name.toUpperCase()}`)
+  return globalThis.localStorage.getItem(`${name.toUpperCase()}`)
 }
 
 /**
@@ -23,5 +23,5 @@ export const getStore = name => {
  */
 export const removestore = name => {
   if (!name) return
-  window.localStorage.removeItem(`${name.toUpperCase()}`)
+  globalThis.localStorage.removeItem(`${name.toUpperCase()}`)
 }
