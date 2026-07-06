@@ -183,22 +183,17 @@ export default {
 
     matchRegionCode(province, city, district) {
       if (!province) return [];
-      const codeArr = [];
+      
       const prov = this.regionData.find(p => p.label.includes(province) || province.includes(p.label));
-      if (prov) {
-        codeArr.push(prov.value);
-        if (prov.children && city) {
-          const c = prov.children.find(ci => ci.label.includes(city) || city.includes(ci.label));
-          if (c) {
-            codeArr.push(c.value);
-            if (c.children && district) {
-              const dist = c.children.find(d => d.label.includes(district) || district.includes(d.label));
-              if (dist) codeArr.push(dist.value);
-            }
-          }
-        }
-      }
-      return codeArr.length === 3 ? codeArr : [];
+      if (!prov || !prov.children || !city) return [];
+      
+      const c = prov.children.find(ci => ci.label.includes(city) || city.includes(ci.label));
+      if (!c || !c.children || !district) return [];
+      
+      const dist = c.children.find(d => d.label.includes(district) || district.includes(d.label));
+      if (!dist) return [];
+      
+      return [prov.value, c.value, dist.value];
     },
 
     onMapSelect(data) {

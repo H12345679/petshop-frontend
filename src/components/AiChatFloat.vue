@@ -134,6 +134,21 @@ export default {
         }
       }
     },
+    processStreamLines(lines) {
+      for (let line of lines) {
+        if (line.startsWith('data:')) {
+          const jsonStr = line.substring(5).trim();
+          if (!jsonStr) continue;
+          try {
+            const obj = JSON.parse(jsonStr);
+            if (obj.text) {
+              this.currentAiMessage += obj.text;
+              this.scrollToBottom();
+            }
+          } catch (e) { /* ignore */ }
+        }
+      }
+    },
     async handleSend() {
       const text = this.inputVal.trim();
       if (!text || this.loading) return;
@@ -150,7 +165,7 @@ export default {
         // 动态获取当前主机名（支持 localhost 及局域网 IP），开发环境直连后端 8088 端口，跳过 webpack-dev-server 缓冲从而保证流式输出
         const streamUrl = process.env.NODE_ENV === 'production' 
           ? '/api/ai/chat/stream' 
-          : `${window.location.protocol}//${window.location.hostname}:8088/api/ai/chat/stream`;
+          : `${globalThis.location.protocol}//${globalThis.location.hostname}:8088/api/ai/chat/stream`;
         const response = await fetch(streamUrl, {
           method: 'POST',
           headers: {
@@ -176,19 +191,7 @@ export default {
           buffer += decoder.decode(value, { stream: true });
           const lines = buffer.split('\n');
           buffer = lines.pop();
-          for (let line of lines) {
-            if (line.startsWith('data:')) {
-              const jsonStr = line.substring(5).trim();
-              if (!jsonStr) continue;
-              try {
-                const obj = JSON.parse(jsonStr);
-                if (obj.text) {
-                  this.currentAiMessage += obj.text;
-                  this.scrollToBottom();
-                }
-              } catch (e) { /* ignore */ }
-            }
-          }
+          this.processStreamLines(lines);
         }
 
         if (this.currentAiMessage) {
