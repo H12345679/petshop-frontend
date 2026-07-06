@@ -205,7 +205,7 @@ export default {
     handleChatClick(e) {
       const target = e.target;
       if (target.classList.contains('ai-product-link')) {
-        const link = target.getAttribute('data-link');
+        const link = target.dataset.link;
         if (link) {
           this.$router.push(link);
         }
