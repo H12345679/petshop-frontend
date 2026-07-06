@@ -32,10 +32,27 @@ export function deleteVideo(id) {
   return del(`/videos/${id}`);
 }
 
-/** 上传视频文件：POST /api/files/video */
-export function uploadVideoFile(file) {
-  const { upload } = require("../axios.js");
+/** 上传视频文件：前端直传七牛云 */
+export async function uploadVideoFile(file) {
+  const { get } = require("../axios.js");
+  const axios = require("axios");
+  
+  // 1. 获取七牛云直传凭证
+  const res = await get("/files/upload-ticket", { dir: "videos", filename: file.name });
+  if (!res || !res.data) throw new Error("无法获取上传凭证");
+  const { token, key, url } = res.data;
+
+  // 2. 组装表单数据直传七牛
   const formData = new FormData();
+  formData.append("token", token);
+  formData.append("key", key);
   formData.append("file", file);
-  return upload("/files/video", formData);
+
+  // 注意：直接调用原始 axios，避免触发后端 API 的 baseURL 和拦截器
+  await axios.post("https://upload.qiniup.com", formData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
+
+  // 3. 模拟旧版后端响应格式返回，无缝兼容 Vue 组件
+  return { code: 200, message: "success", data: { url } };
 }
