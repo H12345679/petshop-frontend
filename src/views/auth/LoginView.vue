@@ -31,20 +31,20 @@
             <div class="field">
               <label>用户名 / 手机号</label>
               <div class="input-wrap">
-                <input v-model.trim="passwordForm.username" type="text" placeholder="请输入用户名" />
+                <input aria-label="input" v-model.trim="passwordForm.username" type="text" placeholder="请输入用户名" />
               </div>
             </div>
 
             <div class="field">
               <label>密码</label>
               <div class="input-wrap">
-                <input v-model="passwordForm.password" :type="showPassword ? 'text' : 'password'" placeholder="请输入密码" />
+                <input aria-label="input" v-model="passwordForm.password" :type="showPassword ? 'text' : 'password'" placeholder="请输入密码" />
                 <span class="muted small toggle-pwd" @click="showPassword = !showPassword">👁</span>
               </div>
             </div>
 
             <div class="row between center small mb12 mt-10">
-              <label class="muted checkbox-label"><input type="checkbox" /> 记住我</label>
+              <label class="muted checkbox-label"><input aria-label="input" type="checkbox" /> 记住我</label>
               <span class="link">忘记密码？</span>
             </div>
 
@@ -60,14 +60,14 @@
             <div class="field">
               <label>邮箱</label>
               <div class="input-wrap">
-                <input v-model.trim="emailForm.email" type="email" placeholder="请输入邮箱地址" />
+                <input aria-label="input" v-model.trim="emailForm.email" type="email" placeholder="请输入邮箱地址" />
               </div>
             </div>
 
             <div class="field">
               <label>验证码</label>
               <div class="input-wrap code-row">
-                <input v-model.trim="emailForm.code" type="text" maxlength="6" placeholder="请输入6位验证码" />
+                <input aria-label="input" v-model.trim="emailForm.code" type="text" maxlength="6" placeholder="请输入6位验证码" />
                 <button type="button" class="send-code-btn" :disabled="countdown > 0" @click="sendCode">
                   {{ countdown > 0 ? countdown + 's 后重发' : '获取验证码' }}
                 </button>
@@ -206,7 +206,7 @@ export default {
 /* 颜色变量 */
 :root {
   --line: #e6e8eb;
-  --accent: #5b8def;
+  --accent: #2a69d4;
 }
 
 .login-page {
@@ -227,7 +227,7 @@ export default {
 .logo {
   font-weight: 700;
   font-size: 20px;
-  color: #5b8def;
+  color: #2a69d4;
 }
 .paw { margin-right: 6px; }
 .spacer { flex: 1; }
@@ -243,7 +243,7 @@ export default {
   cursor: pointer;
 }
 .right a:hover, .right span:hover {
-  color: #5b8def;
+  color: #2a69d4;
 }
 
 /* 主体 */
@@ -268,7 +268,7 @@ export default {
 /* 左侧宣传 */
 .left-poster {
   flex: 1;
-  background: linear-gradient(135deg, #7faaf2 0%, #5b8def 100%);
+  background: linear-gradient(135deg, #7faaf2 0%, #2a69d4 100%);
   color: #fff;
   display: flex;
   align-items: center;
@@ -308,7 +308,7 @@ export default {
   margin-bottom: 8px;
 }
 
-.muted { color: #888; }
+.muted { color: #595959; }
 .small { font-size: 13px; }
 .mb12 { margin-bottom: 12px; }
 .mt-10 { margin-top: 10px; }
@@ -316,7 +316,7 @@ export default {
 .mt12 { margin-top: 16px; }
 
 .link {
-  color: #5b8def;
+  color: #2a69d4;
   cursor: pointer;
   text-decoration: none;
 }
@@ -343,7 +343,7 @@ export default {
   transition: all 0.2s ease;
 }
 .input-wrap:focus-within {
-  border-color: #5b8def;
+  border-color: #2a69d4;
   background: #fff;
   box-shadow: 0 0 0 3px rgba(91, 141, 239, 0.1);
 }
@@ -381,7 +381,7 @@ export default {
   outline: none;
 }
 .btn.primary {
-  background: #5b8def;
+  background: #2a69d4;
   color: #fff;
 }
 .btn.primary:hover:not(:disabled) {
@@ -402,7 +402,7 @@ export default {
 }
 
 .error-text {
-  color: #d9534f;
+  color: #c0392b;
   font-size: 13px;
   margin: 12px 0 0 0;
 }
@@ -417,7 +417,7 @@ export default {
   background: #e6e8eb;
 }
 .switch-text {
-  color: #5b8def;
+  color: #2a69d4;
   cursor: pointer;
   white-space: nowrap;
   transition: color 0.2s ease;
@@ -442,7 +442,7 @@ export default {
   flex-shrink: 0;
   border: none;
   background: transparent;
-  color: #5b8def;
+  color: #2a69d4;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;

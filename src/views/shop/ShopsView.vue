@@ -11,8 +11,8 @@
           <span class="tag" :class="{ accent: query.status === 0 }" @click="selectStatus(0)">已停业</span>
           <span class="spacer" style="flex: 1;"></span>
           <div style="display: flex; gap: 8px;">
-            <input v-model="query.name" placeholder="搜索门店名称..." @keyup.enter="doSearch" style="padding: 4px 10px; border: 1px solid #d6dbe3; border-radius: 4px; outline: none; font-size: 13px;" />
-            <button class="btn sm outline primary" style="background:#5b8def; color:#fff;" @click="doSearch">搜索</button>
+            <input aria-label="input" v-model="query.name" placeholder="搜索门店名称..." @keyup.enter="doSearch" style="padding: 4px 10px; border: 1px solid #d6dbe3; border-radius: 4px; outline: none; font-size: 13px;" />
+            <button class="btn sm outline primary" style="background:#2a69d4; color:#fff;" @click="doSearch">搜索</button>
           </div>
           <span class="btn sm outline" style="width: auto; padding: 0 12px;" @click="$router.push('/map')">🗺 切换地图模式</span>
         </div>
@@ -43,11 +43,11 @@
       </div>
       
       <div class="container text-center" v-else-if="loading">
-        <div style="padding: 100px; color: #5b8def;">加载中...</div>
+        <div style="padding: 100px; color: #2a69d4;">加载中...</div>
       </div>
 
       <div class="container text-center" v-else>
-        <div class="card" style="padding: 100px; color: #888;">
+        <div class="card" style="padding: 100px; color: #595959;">
           没有找到相关的门店记录
         </div>
       </div>
@@ -145,7 +145,7 @@ export default {
 .mb8 { margin-bottom: 8px; }
 .mt4 { margin-top: 4px; }
 .small { font-size: 13px; }
-.muted { color: #888; }
+.muted { color: #595959; }
 .text-center { text-align: center; }
 .card { background: #fff; border: 1px solid #e6e8eb; border-radius: 10px; padding: 16px; }
 
@@ -154,16 +154,16 @@ export default {
 
 /* 标签与按钮 */
 .tag { margin: 0; padding: 4px 12px; cursor: pointer; border-radius: 4px; transition: 0.2s; color: #555; background: #fff; border: 1px solid transparent; }
-.tag.accent { background: #eef4fe; color: #5b8def; font-weight: 600; }
+.tag.accent { background: #eef4fe; color: #2a69d4; font-weight: 600; }
 .tag:hover:not(.accent) { background: #f8f9fb; }
 .tag-sm { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-left: 6px; }
-.tag-sm.ok { background: #eef4fe; color: #5b8def; }
+.tag-sm.ok { background: #eef4fe; color: #2a69d4; }
 .tag-sm.stopped { background: #f5f5f5; color: #aaa; }
 
 .btn { display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; user-select: none; transition: 0.2s; }
 .btn.sm { height: 32px; padding: 0 12px; font-size: 13px; background: #f0f3fa; color: #555; }
 .btn.outline { border: 1px solid #d6dbe3; background: #fff; }
-.btn.outline.primary { border-color: #5b8def; color: #5b8def; }
+.btn.outline.primary { border-color: #2a69d4; color: #2a69d4; }
 .btn.outline.primary:hover { background: #eef4fe; }
 .btn.disabled { opacity: 0.6; cursor: not-allowed; background: #f5f5f5; color: #aaa; border-color: #eee; }
 
@@ -174,8 +174,8 @@ export default {
 /* 分页 */
 .pager { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 30px; }
 .pager span { display: flex; align-items: center; justify-content: center; min-width: 36px; height: 36px; padding: 0 10px; background: #fff; border: 1px solid #d6dbe3; border-radius: 6px; cursor: pointer; color: #555; user-select: none; }
-.pager span:hover:not(.on):not(.disabled):not(.total-text) { background: #f8f9fb; color: #5b8def; border-color: #5b8def; }
-.pager .on { background: #5b8def; color: #fff; border-color: #5b8def; font-weight: 600; }
+.pager span:hover:not(.on):not(.disabled):not(.total-text) { background: #f8f9fb; color: #2a69d4; border-color: #2a69d4; }
+.pager .on { background: #2a69d4; color: #fff; border-color: #2a69d4; font-weight: 600; }
 .pager .disabled { opacity: 0.4; cursor: not-allowed; }
-.pager .total-text { border: none; background: transparent; cursor: default; color: #888; }
+.pager .total-text { border: none; background: transparent; cursor: default; color: #595959; }
 </style>

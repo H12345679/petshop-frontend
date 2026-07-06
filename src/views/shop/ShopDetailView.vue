@@ -36,8 +36,8 @@
           <span class="tab" :class="{ on: activeTab === 'intro' }" @click="selectTab('intro')">店铺简介</span>
         </div>
         <div v-show="activeTab !== 'intro'" style="display: flex; gap: 8px; margin-bottom: 8px;">
-          <input v-model.trim="searchKeyword" placeholder="店内搜索..." @keyup.enter="onSearch" style="padding: 6px 12px; border: 1px solid #d6dbe3; border-radius: 4px; outline: none; font-size: 13px;" />
-          <button class="btn sm primary" style="background:#5b8def; color:#fff; border: none; padding: 0 16px;" @click="onSearch">搜索</button>
+          <input aria-label="input" v-model.trim="searchKeyword" placeholder="店内搜索..." @keyup.enter="onSearch" style="padding: 6px 12px; border: 1px solid #d6dbe3; border-radius: 4px; outline: none; font-size: 13px;" />
+          <button class="btn sm primary" style="background:#2a69d4; color:#fff; border: none; padding: 0 16px;" @click="onSearch">搜索</button>
         </div>
       </div>
 
@@ -50,15 +50,15 @@
             </div>
             <div class="pbody">
               <div class="pname">{{ p.name }}</div>
-              <div class="price">¥ {{ Number(p.price).toFixed(2) }} <span v-if="p.userDiscount < 1" style="text-decoration: line-through; font-size: 12px; color: #999; margin-left: 4px; font-weight: normal;">¥{{ (p.price / p.userDiscount).toFixed(2) }}</span></div>
+              <div class="price">¥ {{ Number(p.price).toFixed(2) }} <span v-if="p.userDiscount < 1" style="text-decoration: line-through; font-size: 12px; color: #595959; margin-left: 4px; font-weight: normal;">¥{{ (p.price / p.userDiscount).toFixed(2) }}</span></div>
               <div class="small muted mt8">总销量 {{ p.sales || 0 }}</div>
             </div>
           </div>
         </div>
 
-        <div class="text-center" v-else-if="loading" style="padding: 100px; color: #5b8def;">加载中...</div>
+        <div class="text-center" v-else-if="loading" style="padding: 100px; color: #2a69d4;">加载中...</div>
         
-        <div class="text-center card" v-else style="padding: 100px; color: #888; border: none; background: transparent;">
+        <div class="text-center card" v-else style="padding: 100px; color: #595959; border: none; background: transparent;">
           该店铺暂无在售商品
         </div>
 
@@ -83,11 +83,11 @@
     </div>
 
     <div class="container text-center" v-else-if="loading">
-      <div style="padding: 100px; color: #5b8def;">加载中...</div>
+      <div style="padding: 100px; color: #2a69d4;">加载中...</div>
     </div>
     
     <div class="container text-center" v-else>
-      <div class="card" style="padding: 100px; color: #888;">
+      <div class="card" style="padding: 100px; color: #595959;">
         该店铺不存在或已注销
         <div class="mt16"><router-link to="/shops" class="btn outline primary-outline" style="display:inline-block">返回门店列表</router-link></div>
       </div>
@@ -247,7 +247,7 @@ export default {
 .mt8 { margin-top: 8px; }
 .mt16 { margin-top: 16px; }
 .small { font-size: 13px; }
-.muted { color: #888; }
+.muted { color: #595959; }
 .text-center { text-align: center; }
 .card { background: #fff; border: 1px solid #e6e8eb; border-radius: 10px; padding: 16px; }
 .pad20 { padding: 20px; }
@@ -262,23 +262,23 @@ export default {
 .shop-header { display: flex; align-items: center; gap: 18px; margin-bottom: 24px; }
 .shop-logo { width: 88px; height: 88px; background-color: #f0f0f0; border-radius: 8px; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #ccc; flex-shrink: 0; border: 1px solid #eee; }
 .tag-sm { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
-.tag-sm.ok { background: #eef4fe; color: #5b8def; }
+.tag-sm.ok { background: #eef4fe; color: #2a69d4; }
 .tag-sm.stopped { background: #f5f5f5; color: #aaa; }
 
 .btn { display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; user-select: none; transition: 0.2s; font-size: 14px; padding: 0 16px; height: 36px; }
 .btn.sm { height: 30px; padding: 0 12px; font-size: 13px; }
 .btn.outline { border: 1px solid #d6dbe3; background: #fff; color: #555; }
 .btn.outline:hover { background: #f8f9fb; border-color: #bbb;}
-.primary-btn { background: #5b8def; border: 1px solid #5b8def; color: #fff; }
+.primary-btn { background: #2a69d4; border: 1px solid #2a69d4; color: #fff; }
 .primary-btn:hover { background: #4a7ce0; }
-.primary-outline { border-color: #5b8def; color: #5b8def; }
-.primary-outline:hover { background: #eef4fe; border-color: #5b8def; }
+.primary-outline { border-color: #2a69d4; color: #2a69d4; }
+.primary-outline:hover { background: #eef4fe; border-color: #2a69d4; }
 
 /* Tabs */
 .tabs { display: flex; border-bottom: 2px solid #e6e8eb; margin-bottom: 20px; }
 .tab { padding: 12px 24px; font-size: 15px; cursor: pointer; position: relative; color: #555; font-weight: 500; }
-.tab.on { color: #5b8def; font-weight: 600; }
-.tab.on::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background: #5b8def; }
+.tab.on { color: #2a69d4; font-weight: 600; }
+.tab.on::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background: #2a69d4; }
 
 /* 商品网格 */
 .grid.c5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-bottom: 30px; }
@@ -287,13 +287,13 @@ export default {
 .pimg { height: 260px; background-color: #f0f0f0; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #ccc; }
 .pbody { padding: 16px; flex: 1; display: flex; flex-direction: column; }
 .pname { font-size: 15px; font-weight: 500; margin-bottom: 8px; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.price { color: #d9534f; font-weight: 700; font-size: 18px; margin-top: auto; }
+.price { color: #c0392b; font-weight: 700; font-size: 18px; margin-top: auto; }
 
 /* 分页 */
 .pager { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 30px; }
 .pager span { display: flex; align-items: center; justify-content: center; min-width: 36px; height: 36px; padding: 0 10px; background: #fff; border: 1px solid #d6dbe3; border-radius: 6px; cursor: pointer; color: #555; user-select: none; }
-.pager span:hover:not(.on):not(.disabled):not(.total-text) { background: #f8f9fb; color: #5b8def; border-color: #5b8def; }
-.pager .on { background: #5b8def; color: #fff; border-color: #5b8def; font-weight: 600; }
+.pager span:hover:not(.on):not(.disabled):not(.total-text) { background: #f8f9fb; color: #2a69d4; border-color: #2a69d4; }
+.pager .on { background: #2a69d4; color: #fff; border-color: #2a69d4; font-weight: 600; }
 .pager .disabled { opacity: 0.4; cursor: not-allowed; }
-.pager .total-text { border: none; background: transparent; cursor: default; color: #888; }
+.pager .total-text { border: none; background: transparent; cursor: default; color: #595959; }
 </style>

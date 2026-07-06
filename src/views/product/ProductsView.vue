@@ -61,11 +61,11 @@
               
               <span class="small muted label">价格区间：</span>
               <div class="price-input">
-                <input v-model.number="query.minPrice" type="number" placeholder="¥最低" @keyup.enter="doSearch" />
+                <input aria-label="input" v-model.number="query.minPrice" type="number" placeholder="¥最低" @keyup.enter="doSearch" />
               </div>
               <span class="dash">-</span>
               <div class="price-input">
-                <input v-model.number="query.maxPrice" type="number" placeholder="¥最高" @keyup.enter="doSearch" />
+                <input aria-label="input" v-model.number="query.maxPrice" type="number" placeholder="¥最高" @keyup.enter="doSearch" />
               </div>
               <button class="btn-small" @click="doSearch">确定</button>
             </div>
@@ -280,7 +280,7 @@ export default {
 
 <style scoped>
 .bc-link { color: inherit; text-decoration: none; cursor: pointer; transition: color 0.2s; }
-.bc-link:hover { color: #5b8def; }
+.bc-link:hover { color: #2a69d4; }
 .products-page { background: #f4f5f7; min-height: 100vh; display: flex; flex-direction: column; }
 
 /* 布局 */
@@ -295,18 +295,18 @@ export default {
 .mb12 { margin-bottom: 12px; }
 .mt8 { margin-top: 8px; }
 .small { font-size: 13px; }
-.muted { color: #888; }
-.accent { color: #5b8def !important; font-weight: 600; }
+.muted { color: #595959; }
+.accent { color: #2a69d4 !important; font-weight: 600; }
 .spacer { flex: 1; }
 .card { background: #fff; border: 1px solid #e6e8eb; border-radius: 10px; }
 
 /* 侧边分类树 */
 .sidebar { width: 220px; flex-shrink: 0; padding: 20px 0; }
-.cat-title { font-size: 15px; margin: 0 20px 16px; font-weight: 700; color: #888; }
+.cat-title { font-size: 15px; margin: 0 20px 16px; font-weight: 700; color: #595959; }
 .tree-list { list-style: none; margin: 0; padding: 0; }
 .tree-item { padding: 10px 20px; cursor: pointer; color: #444; font-size: 14px; transition: 0.2s; }
-.tree-item:hover { background: #f8f9fb; color: #5b8def; }
-.tree-item.active { color: #5b8def; font-weight: 600; background: #eef4fe; }
+.tree-item:hover { background: #f8f9fb; color: #2a69d4; }
+.tree-item.active { color: #2a69d4; font-weight: 600; background: #eef4fe; }
 .tree-item.parent { font-weight: 600; color: #333; }
 .tree-item.child { padding-left: 36px; font-size: 13px; }
 
@@ -318,8 +318,8 @@ export default {
 .filter-row { display: flex; align-items: center; font-size: 13px; }
 .filter-row .label { margin-right: 4px; }
 .tag { margin: 0 4px; padding: 4px 10px; cursor: pointer; border-radius: 4px; transition: 0.2s; color: #555; }
-.tag:hover { background: #f4f5f7; color: #5b8def; }
-.tag.accent { background: #eef4fe; color: #5b8def; }
+.tag:hover { background: #f4f5f7; color: #2a69d4; }
+.tag.accent { background: #eef4fe; color: #2a69d4; }
 
 .price-input { width: 70px; border: 1px solid #d6dbe3; border-radius: 4px; overflow: hidden; }
 .price-input input { width: 100%; border: 0; padding: 6px 8px; font-size: 12px; outline: none; }
@@ -336,7 +336,7 @@ export default {
 .pbody { padding: 12px; }
 .pname { font-size: 14px; color: #333; height: 40px; line-height: 20px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 8px; }
 .price-row { display: flex; align-items: baseline; }
-.price { color: #d9534f; font-weight: 700; font-size: 18px; }
+.price { color: #c0392b; font-weight: 700; font-size: 18px; }
 .price .cur { font-size: 13px; }
 .del { color: #aaa; text-decoration: line-through; font-size: 12px; margin-left: 6px; }
 .sales { color: #94a3b8; font-size: 12px; margin-top: 8px; }
@@ -344,11 +344,11 @@ export default {
 /* 分页 */
 .pager { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 24px; font-size: 14px; padding-bottom: 20px;}
 .pager span { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; border-radius: 4px; cursor: pointer; color: #555; }
-.pager .num:hover, .pager .arrow:hover { background: #eef4fe; color: #5b8def; }
-.pager .on { background: #5b8def !important; color: #fff !important; font-weight: 600; }
+.pager .num:hover, .pager .arrow:hover { background: #eef4fe; color: #2a69d4; }
+.pager .on { background: #2a69d4 !important; color: #fff !important; font-weight: 600; }
 .pager .disabled { color: #ccc; cursor: not-allowed; background: transparent !important; }
-.pager .total-text { margin-left: 10px; color: #888; font-size: 13px; cursor: default; }
+.pager .total-text { margin-left: 10px; color: #595959; font-size: 13px; cursor: default; }
 
-.empty-state { padding: 60px 0; text-align: center; color: #888; background: #fff; border-radius: 10px; border: 1px solid #e6e8eb; }
-.loading-state { padding: 60px 0; text-align: center; color: #5b8def; font-weight: 500; }
+.empty-state { padding: 60px 0; text-align: center; color: #595959; background: #fff; border-radius: 10px; border: 1px solid #e6e8eb; }
+.loading-state { padding: 60px 0; text-align: center; color: #2a69d4; font-weight: 500; }
 </style>

@@ -55,7 +55,7 @@
           </td>
         </tr>
         <tr v-if="!loading && list.length === 0">
-          <td colspan="8" style="text-align:center;color:#999;padding:32px">暂无数据</td>
+          <td colspan="8" style="text-align:center;color:#595959;padding:32px">暂无数据</td>
         </tr>
       </table>
     </div>
@@ -319,7 +319,7 @@ export default {
 .gap8 { gap: 8px; }
 .spacer { flex: 1; }
 .small { font-size: 12px; }
-.muted { color: #888; }
+.muted { color: #595959; }
 
 .card { background: #fff; border: 1px solid #cfd4da; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
 
@@ -346,7 +346,7 @@ export default {
 .tbl tr:last-child td { border-bottom: none; }
 .tbl tr:hover td { background: #fafbfc; }
 
-.price { color: #e74c3c; font-weight: 600; }
+.price { color: #c0392b; font-weight: 600; }
 
 /* 标签 */
 .tag {
@@ -358,15 +358,15 @@ export default {
   font-size: 12px;
   color: #555;
 }
-.tag.accent { background: #eef2ff; border-color: #b6c8f0; color: #5b8def; }
+.tag.accent { background: #eef2ff; border-color: #b6c8f0; color: #2a69d4; }
 .tag.ok { background: #e6f4ec; border-color: #b6dcc6; color: #4caf7d; }
 .tag.warn { background: #fcefe2; border-color: #f0cda6; color: #e6914e; }
 
 /* 操作链接 */
 .ops { white-space: nowrap; }
-.act-link { color: #5b8def; cursor: pointer; }
+.act-link { color: #2a69d4; cursor: pointer; }
 .act-link:hover { opacity: 0.8; }
-.act-link.danger { color: #d9534f; }
+.act-link.danger { color: #c0392b; }
 .act-link.ok { color: #4caf7d; }
 .act-sep { color: #ccc; margin: 0 4px; }
 
@@ -377,10 +377,10 @@ export default {
   display: flex; align-items: center; justify-content: center; font-size: 13px;
   color: #555; background: #fff; padding: 0 8px; cursor: pointer;
 }
-.pager span:hover { border-color: #5b8def; color: #5b8def; }
-.pager span.on { background: #5b8def; border-color: #5b8def; color: #fff; }
+.pager span:hover { border-color: #2a69d4; color: #2a69d4; }
+.pager span.on { background: #2a69d4; border-color: #2a69d4; color: #fff; }
 .pager span.disabled { opacity: 0.3; cursor: not-allowed; }
-.total-hint { border: none !important; background: transparent !important; color: #888; font-size: 12px; cursor: default !important; }
+.total-hint { border: none !important; background: transparent !important; color: #595959; font-size: 12px; cursor: default !important; }
 
-.form-tip { margin-left: 8px; font-size: 12px; color: #999; }
+.form-tip { margin-left: 8px; font-size: 12px; color: #595959; }
 </style>

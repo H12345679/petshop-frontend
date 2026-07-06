@@ -25,7 +25,7 @@
         <router-link to="/admin/logs">📝 日志审核</router-link>
       </template>
       <div style="flex: 1;"></div>
-      <router-link to="/" class="menu-group" style="margin-bottom: 20px; color: #888;">← 返回前台</router-link>
+      <router-link to="/" class="menu-group" style="margin-bottom: 20px; color: #595959;">← 返回前台</router-link>
     </div>
 
     <div class="amain">
@@ -72,7 +72,7 @@ export default {
 .aside a { display: block; padding: 16px 24px; font-size: 16px; color: #aeb9c2; text-decoration: none; cursor: pointer; border-left: 4px solid transparent; transition: all 0.3s ease; }
 .aside a:hover { background: #343a46; color: #fff; padding-left: 28px; }
 /* vue-router's exact active class automatically applies .router-link-exact-active */
-.aside a.router-link-active { color: #fff; font-weight: 600; background: #3b4252; border-left-color: #5b8def; }
+.aside a.router-link-active { color: #fff; font-weight: 600; background: #3b4252; border-left-color: #2a69d4; }
 
 .amain { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .atop { height: 60px; background: #fff; border-bottom: 1px solid #e6e8eb; display: flex; align-items: center; padding: 0 24px; font-weight: 500; }

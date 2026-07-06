@@ -24,11 +24,11 @@
     <div class="card row center wrap gap8" style="padding:12px 16px; margin-bottom: 20px;">
       <span class="small muted">用户名</span>
       <div class="input-wrap" style="width:170px">
-        <input v-model="query.username" placeholder="用户名模糊搜索" @keyup.enter="doSearch" />
+        <input aria-label="input" v-model="query.username" placeholder="用户名模糊搜索" @keyup.enter="doSearch" />
       </div>
       <span class="small muted">角色</span>
       <div class="input-wrap select-wrap" style="width:120px">
-        <select v-model="query.role" @change="doSearch">
+        <select aria-label="select" v-model="query.role" @change="doSearch">
           <option value="">全部</option>
           <option value="USER">USER</option>
           <option value="MERCHANT">MERCHANT</option>
@@ -37,7 +37,7 @@
       </div>
       <span class="small muted">会员等级</span>
       <div class="input-wrap select-wrap" style="width:130px">
-        <select v-model="query.memberLevelId" @change="doSearch">
+        <select aria-label="select" v-model="query.memberLevelId" @change="doSearch">
           <option value="">全部</option>
           <option :value="0">游客</option>
           <option v-for="lv in memberLevelOptions" :key="lv.id" :value="lv.id">{{ lv.name }}</option>
@@ -45,7 +45,7 @@
       </div>
       <span class="small muted">状态</span>
       <div class="input-wrap select-wrap" style="width:110px">
-        <select v-model="query.status" @change="doSearch">
+        <select aria-label="select" v-model="query.status" @change="doSearch">
           <option value="">全部</option>
           <option :value="1">正常</option>
           <option :value="0">已禁用</option>
@@ -107,10 +107,10 @@
             </td>
           </tr>
           <tr v-if="displayUsers.length === 0 && users.length > 0">
-            <td colspan="9" class="text-center" style="padding: 40px; color: #888;">当前筛选条件下无匹配数据</td>
+            <td colspan="9" class="text-center" style="padding: 40px; color: #595959;">当前筛选条件下无匹配数据</td>
           </tr>
           <tr v-if="users.length === 0">
-            <td colspan="9" class="text-center" style="padding: 40px; color: #888;">暂无数据</td>
+            <td colspan="9" class="text-center" style="padding: 40px; color: #595959;">暂无数据</td>
           </tr>
         </tbody>
       </table>
@@ -143,7 +143,7 @@
             <div class="field mb16">
               <label>目标角色</label>
               <div class="input-wrap select-wrap" style="width:100%">
-                <select v-model="roleModal.selectedRole">
+                <select aria-label="select" v-model="roleModal.selectedRole">
                   <option value="USER">USER（普通用户）</option>
                   <option value="MERCHANT">MERCHANT（商家）</option>
                   <option value="ADMIN">ADMIN（管理员）</option>
@@ -358,7 +358,7 @@ export default {
 }
 .kpi-label {
   font-size: 13px;
-  color: #888;
+  color: #595959;
   margin-bottom: 8px;
 }
 .kpi-value {
@@ -384,7 +384,7 @@ export default {
 .flex1 { flex: 1; }
 .spacer { flex: 1; }
 .small { font-size: 13px; }
-.muted { color: #888; }
+.muted { color: #595959; }
 .text-center { text-align: center; }
 .price { font-family: "SF Mono", "Menlo", monospace; }
 
@@ -435,7 +435,7 @@ export default {
   font-size: 14px;
 }
 .btn:hover { background: #f8f9fb; }
-.btn.primary { background: #5b8def; border-color: #5b8def; color: #fff; }
+.btn.primary { background: #2a69d4; border-color: #2a69d4; color: #fff; }
 .btn.primary:hover { background: #4a7ce0; }
 .btn.sm { height: 28px; padding: 0 12px; font-size: 13px; }
 
@@ -467,15 +467,15 @@ export default {
   background: #f0f0f0;
   color: #666;
 }
-.tag.ok { background: #eef4fe; color: #5b8def; }
-.tag.danger { background: #fde8e8; color: #d9534f; }
-.tag.accent { background: #e8f4fd; color: #5b8def; }
+.tag.ok { background: #eef4fe; color: #2a69d4; }
+.tag.danger { background: #fde8e8; color: #c0392b; }
+.tag.accent { background: #e8f4fd; color: #2a69d4; }
 .tag.warn { background: #fef5e7; color: #e67e22; }
 
 /* 操作按钮 */
-.action-btn { color: #5b8def; cursor: pointer; }
+.action-btn { color: #2a69d4; cursor: pointer; }
 .action-btn:hover { text-decoration: underline; }
-.action-btn.danger { color: #d9534f; }
+.action-btn.danger { color: #c0392b; }
 .action-divider { margin: 0 6px; color: #ccc; }
 
 /* 分页 */
@@ -502,12 +502,12 @@ export default {
 }
 .pager span:hover:not(.on):not(.disabled):not(.total-text) {
   background: #f8f9fb;
-  border-color: #5b8def;
-  color: #5b8def;
+  border-color: #2a69d4;
+  color: #2a69d4;
 }
-.pager .on { background: #5b8def; color: #fff; border-color: #5b8def; }
+.pager .on { background: #2a69d4; color: #fff; border-color: #2a69d4; }
 .pager .disabled { opacity: 0.4; cursor: not-allowed; }
-.pager .total-text { border: none; background: transparent; color: #888; cursor: default; }
+.pager .total-text { border: none; background: transparent; color: #595959; cursor: default; }
 
 /* 弹窗 */
 .modal-mask {

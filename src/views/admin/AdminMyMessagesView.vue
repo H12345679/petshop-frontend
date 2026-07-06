@@ -117,7 +117,7 @@ export default {
   margin-bottom: 20px;
 }
 .page-head h2 { font-size: 20px; color: #2c3e50; margin: 0; }
-.loading-wrap { padding: 40px; text-align: center; color: #999; }
+.loading-wrap { padding: 40px; text-align: center; color: #595959; }
 .msg-list { border-top: 1px solid #eee; }
 .msg-item {
   padding: 16px; border-bottom: 1px solid #eee; cursor: pointer;
@@ -135,7 +135,7 @@ export default {
 .type-3 { background: #f6ffed; color: #52c41a; }
 .msg-title { font-size: 15px; color: #666; }
 .msg-dot { color: #f5222d; margin-left: 8px; font-size: 12px; }
-.msg-time { margin-left: auto; font-size: 13px; color: #999; }
-.msg-body { font-size: 14px; color: #888; line-height: 1.5; margin-top: 4px; }
-.empty-state { padding: 60px 0; text-align: center; color: #999; font-size: 15px; }
+.msg-time { margin-left: auto; font-size: 13px; color: #595959; }
+.msg-body { font-size: 14px; color: #595959; line-height: 1.5; margin-top: 4px; }
+.empty-state { padding: 60px 0; text-align: center; color: #595959; font-size: 15px; }
 </style>

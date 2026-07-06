@@ -13,34 +13,34 @@
       <div class="field-row">
         <div class="field col">
           <label>收货人 <span class="req">*</span></label>
-          <input class="input" v-model.trim="addressForm.receiver" placeholder="收货人姓名" />
+          <input aria-label="input" class="input" v-model.trim="addressForm.receiver" placeholder="收货人姓名" />
         </div>
         <div class="field col">
           <label>手机号 <span class="req">*</span></label>
-          <input class="input" v-model.trim="addressForm.phone" placeholder="手机号" />
+          <input aria-label="input" class="input" v-model.trim="addressForm.phone" placeholder="手机号" />
         </div>
       </div>
       <div class="field-row three">
         <div class="field col">
           <label>省份 <span class="req">*</span></label>
-          <input class="input" v-model.trim="addressForm.province" placeholder="省" />
+          <input aria-label="input" class="input" v-model.trim="addressForm.province" placeholder="省" />
         </div>
         <div class="field col">
           <label>城市 <span class="req">*</span></label>
-          <input class="input" v-model.trim="addressForm.city" placeholder="市" />
+          <input aria-label="input" class="input" v-model.trim="addressForm.city" placeholder="市" />
         </div>
         <div class="field col">
           <label>区/县 <span class="req">*</span></label>
-          <input class="input" v-model.trim="addressForm.district" placeholder="区/县" />
+          <input aria-label="input" class="input" v-model.trim="addressForm.district" placeholder="区/县" />
         </div>
       </div>
       <div class="field">
         <label>详细地址 <span class="req">*</span></label>
-        <input class="input" v-model.trim="addressForm.detail" placeholder="街道门牌号" />
+        <input aria-label="input" class="input" v-model.trim="addressForm.detail" placeholder="街道门牌号" />
       </div>
       <div class="field-row" style="align-items:center">
         <label class="check-label">
-          <input type="checkbox" v-model="addressForm.isDefaultChecked" />
+          <input aria-label="input" type="checkbox" v-model="addressForm.isDefaultChecked" />
           设为默认地址
         </label>
         <div class="spacer"></div>
@@ -195,7 +195,7 @@ export default {
 .form-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .map-btn {
   display: inline-flex; align-items: center; gap: 4px;
-  border-color: #5b8def; color: #5b8def; font-size: 12px;
+  border-color: #2a69d4; color: #2a69d4; font-size: 12px;
   padding: 6px 14px; border-radius: 6px; background: #f0f4ff;
   transition: all .15s;
 }
@@ -205,7 +205,7 @@ export default {
 /* 表单通用 */
 .field { margin-bottom: 12px; }
 .field label { display: block; font-size: 13px; color: #555; margin-bottom: 4px; }
-.field .req { color: #d9534f; }
+.field .req { color: #c0392b; }
 .field-row { display: flex; gap: 14px; margin-bottom: 6px; }
 .field-row.three > .col { flex: 1; }
 .field.col { flex: 1; }
@@ -213,16 +213,16 @@ export default {
   width: 100%; padding: 9px 12px; border: 1px solid #d6dbe3; border-radius: 6px; font-size: 13px;
   color: #333; background: #fafbfc; outline: none; transition: border-color .15s;
 }
-.input:focus { border-color: #5b8def; background: #fff; }
+.input:focus { border-color: #2a69d4; background: #fff; }
 .btn {
   padding: 9px 22px; border-radius: 6px; font-size: 13px; border: 1px solid #d6dbe3; background: #fff;
   color: #444; cursor: pointer; transition: .12s;
 }
 .btn:hover { border-color: #bbb; }
-.btn.primary { background: #5b8def; color: #fff; border-color: #5b8def; }
+.btn.primary { background: #2a69d4; color: #fff; border-color: #2a69d4; }
 .btn.primary:hover { background: #4a7de0; }
 .btn.primary:disabled { background: #9dbef5; border-color: #9dbef5; cursor: not-allowed; }
-.btn.outline { border-color: #5b8def; color: #5b8def; }
+.btn.outline { border-color: #2a69d4; color: #2a69d4; }
 .btn.outline:hover { background: #e7eefc; }
 .check-label { font-size: 13px; color: #555; display: flex; align-items: center; gap: 6px; cursor: pointer; }
 .check-label input { cursor: pointer; }
@@ -235,16 +235,16 @@ export default {
   border: 1px solid #e6e8eb; border-radius: 8px; padding: 14px; display: flex;
   justify-content: space-between; align-items: center; transition: .12s;
 }
-.addr-card.default { border-color: #5b8def; background: #f7faff; }
+.addr-card.default { border-color: #2a69d4; background: #f7faff; }
 .addr-body { flex: 1; min-width: 0; }
 .addr-line1 { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
 .addr-receiver { font-weight: 600; font-size: 14px; }
-.addr-phone { color: #888; font-size: 13px; }
-.addr-tag { font-size: 11px; background: #5b8def; color: #fff; padding: 1px 8px; border-radius: 8px; }
+.addr-phone { color: #595959; font-size: 13px; }
+.addr-tag { font-size: 11px; background: #2a69d4; color: #fff; padding: 1px 8px; border-radius: 8px; }
 .addr-line2 { font-size: 13px; color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .addr-actions { display: flex; gap: 12px; flex-shrink: 0; margin-left: 16px; }
-.addr-actions .link { font-size: 12px; cursor: pointer; color: #5b8def; }
-.addr-actions .link.danger { color: #d9534f; }
+.addr-actions .link { font-size: 12px; cursor: pointer; color: #2a69d4; }
+.addr-actions .link.danger { color: #c0392b; }
 
-.empty { padding: 24px 0; text-align: center; color: #999; font-size: 13px; }
+.empty { padding: 24px 0; text-align: center; color: #595959; font-size: 13px; }
 </style>

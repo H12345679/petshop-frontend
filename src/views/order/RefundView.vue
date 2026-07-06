@@ -258,9 +258,9 @@ export default {
 .refund-wrap { max-width: 700px; width: 100%; margin: 0 auto; padding: 24px 20px 40px; flex: 1; }
 
 .section-title { font-size: 22px; font-weight: 700; color: #2c3e50; margin-bottom: 20px; }
-.loading-wrap { text-align: center; padding: 80px; color: #888; }
-.empty-state { text-align: center; padding: 80px; color: #888; }
-.back-link { font-size: 14px; color: #5b8def; text-decoration: none; font-weight: 500; }
+.loading-wrap { text-align: center; padding: 80px; color: #595959; }
+.empty-state { text-align: center; padding: 80px; color: #595959; }
+.back-link { font-size: 14px; color: #2a69d4; text-decoration: none; font-weight: 500; }
 
 /* 卡片 */
 .card { background: #fff; border: 1px solid #cfd4da; border-radius: 8px; padding: 20px 24px; margin-bottom: 16px; }
@@ -274,19 +274,19 @@ export default {
 .prod-cell { display: flex; align-items: center; gap: 10px; }
 .prod-img { width: 44px; height: 44px; border-radius: 6px; overflow: hidden; background: #f5f5f5; flex-shrink: 0; }
 .prod-img img { width: 100%; height: 100%; object-fit: cover; }
-.price { color: #d9534f; font-weight: 600; }
+.price { color: #c0392b; font-weight: 600; }
 .tip { margin-top: 8px; }
 
 /* 表单 */
 .field { margin-bottom: 18px; }
 .field label, .mock-label { display: block; font-size: 14px; color: #333; font-weight: 500; margin-bottom: 8px; }
-.req { color: #d9534f; }
+.req { color: #c0392b; }
 
 /* 类型选择 */
 .chip-row { display: flex; gap: 8px; }
 .chip { padding: 8px 22px; border-radius: 100px; font-size: 14px; cursor: pointer; background: #f0f2f5; color: #666; font-weight: 500; transition: .15s; border: 1px solid transparent; }
-.chip:hover { border-color: #5b8def; }
-.chip.on { background: #e7eefc; border-color: #5b8def; color: #5b8def; font-weight: 600; }
+.chip:hover { border-color: #2a69d4; }
+.chip.on { background: #e7eefc; border-color: #2a69d4; color: #2a69d4; font-weight: 600; }
 .chip.disabled { opacity: .45; cursor: not-allowed; }
 .warn-tip { margin-top: 8px; color: #e6914e; }
 
@@ -294,10 +294,10 @@ export default {
 .amount-row { display: flex; align-items: center; gap: 10px; }
 .currency { font-size: 20px; color: #333; font-weight: 600; }
 .amount-input {
-  width: 160px; padding: 10px 14px; font-size: 18px; font-weight: 700; color: #d9534f;
+  width: 160px; padding: 10px 14px; font-size: 18px; font-weight: 700; color: #c0392b;
   border: 1px solid #cfd4da; border-radius: 8px; outline: none;
 }
-.amount-input:focus { border-color: #5b8def; }
+.amount-input:focus { border-color: #2a69d4; }
 
 /* 上传 */
 .upload-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -306,9 +306,9 @@ export default {
 .upload-add {
   width: 70px; height: 70px; border: 1px dashed #9aa1aa; border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 22px; color: #888; cursor: pointer; transition: .15s;
+  font-size: 22px; color: #595959; cursor: pointer; transition: .15s;
 }
-.upload-add:hover { border-color: #5b8def; color: #5b8def; }
+.upload-add:hover { border-color: #2a69d4; color: #2a69d4; }
 
 /* 按钮 */
 .btn-row { display: flex; gap: 10px; margin-top: 8px; }
@@ -318,10 +318,10 @@ export default {
   background: #fff; color: #444; font-size: 14px; font-weight: 600; cursor: pointer; transition: .15s;
 }
 .btn:hover { opacity: .85; }
-.btn.primary { background: #5b8def; border-color: #5b8def; color: #fff; }
+.btn.primary { background: #2a69d4; border-color: #2a69d4; color: #fff; }
 .btn.lg { padding: 12px 36px; font-size: 15px; }
 .btn.disabled { opacity: .4; cursor: not-allowed; }
 
 .small { font-size: 12px; }
-.muted { color: #888; }
+.muted { color: #595959; }
 </style>

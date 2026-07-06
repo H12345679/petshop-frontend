@@ -16,7 +16,7 @@
       </div>
       <span class="small muted">状态</span>
       <div class="input-wrap select-wrap" style="width: 120px">
-        <select v-model="query.status" @change="doSearch">
+        <select aria-label="select" v-model="query.status" @change="doSearch">
           <option value="">全部</option>
           <option :value="1">营业中</option>
           <option :value="0">已停业</option>
@@ -86,7 +86,7 @@
             <td
               colspan="7"
               class="text-center"
-              style="padding: 40px; color: #888"
+              style="padding: 40px; color: #595959"
             >
               暂无数据
             </td>
@@ -138,7 +138,7 @@
                 </div>
                 <div
                   v-if="formErrors.name"
-                  style="color: #d9534f; font-size: 12px; margin-top: 4px"
+                  style="color: #c0392b; font-size: 12px; margin-top: 4px"
                 >
                   {{ formErrors.name }}
                 </div>
@@ -146,7 +146,7 @@
               <div class="field col flex1">
                 <label>联系电话</label>
                 <div class="input-wrap">
-                  <input v-model="formData.phone" placeholder="0755-xxxxxxxx" />
+                  <input aria-label="input" v-model="formData.phone" placeholder="0755-xxxxxxxx" />
                 </div>
               </div>
             </div>
@@ -155,19 +155,19 @@
               <div class="field col flex1">
                 <label>省</label>
                 <div class="input-wrap">
-                  <input v-model="formData.province" placeholder="省" />
+                  <input aria-label="input" v-model="formData.province" placeholder="省" />
                 </div>
               </div>
               <div class="field col flex1">
                 <label>市</label>
                 <div class="input-wrap">
-                  <input v-model="formData.city" placeholder="市" />
+                  <input aria-label="input" v-model="formData.city" placeholder="市" />
                 </div>
               </div>
               <div class="field col flex1">
                 <label>区</label>
                 <div class="input-wrap">
-                  <input v-model="formData.district" placeholder="区" />
+                  <input aria-label="input" v-model="formData.district" placeholder="区" />
                 </div>
               </div>
             </div>
@@ -175,7 +175,7 @@
             <div class="field mb16">
               <label>详细地址</label>
               <div class="input-wrap">
-                <input
+                <input aria-label="input"
                   v-model="formData.address"
                   placeholder="街道门牌"
                   style="width: 100%"
@@ -195,7 +195,7 @@
                   >
                 </label>
                 <div class="input-wrap">
-                  <input
+                  <input aria-label="input"
                     v-model="formData.longitude"
                     placeholder="113.943123"
                   />
@@ -204,13 +204,13 @@
               <div class="field col flex1">
                 <label>纬度 latitude</label>
                 <div class="input-wrap">
-                  <input v-model="formData.latitude" placeholder="22.540124" />
+                  <input aria-label="input" v-model="formData.latitude" placeholder="22.540124" />
                 </div>
               </div>
               <div class="field col flex1">
                 <label>营业状态</label>
                 <div class="input-wrap select-wrap">
-                  <select
+                  <select aria-label="select"
                     v-model="formData.status"
                     style="width: 100%; height: 36px; padding: 0 10px"
                   >
@@ -236,7 +236,7 @@
               <div class="field col flex1">
                 <label>门店简介</label>
                 <div class="input-wrap" style="height: auto">
-                  <textarea
+                  <textarea aria-label="textarea"
                     v-model="formData.description"
                     placeholder="一句话简介"
                     style="
@@ -285,7 +285,7 @@
             <div class="btn" @click="deleteModalVisible = false">取消</div>
             <div
               class="btn primary danger"
-              style="background: #d9534f; border-color: #d9534f; color: #fff"
+              style="background: #c0392b; border-color: #c0392b; color: #fff"
               @click="confirmDelete"
             >
               确定删除
@@ -299,7 +299,7 @@
     <MapPicker :visible.sync="mapPickerVisible" @select="onMapSelect" />
 
     <!-- 隐藏的文件上传控件 -->
-    <input
+    <input aria-label="input"
       type="file"
       ref="fileInput"
       style="display: none"
@@ -578,7 +578,7 @@ export default {
   color: #fff;
   font-weight: 600;
   background: #3b4252;
-  border-left-color: #5b8def;
+  border-left-color: #2a69d4;
 }
 
 .amain {
@@ -634,7 +634,7 @@ export default {
   font-size: 13px;
 }
 .muted {
-  color: #888;
+  color: #595959;
 }
 .text-center {
   text-align: center;
@@ -690,8 +690,8 @@ export default {
   background: #f8f9fb;
 }
 .btn.primary {
-  background: #5b8def;
-  border-color: #5b8def;
+  background: #2a69d4;
+  border-color: #2a69d4;
   color: #fff;
 }
 .btn.primary:hover {
@@ -746,7 +746,7 @@ export default {
 }
 .tag-sm.ok {
   background: #eef4fe;
-  color: #5b8def;
+  color: #2a69d4;
 }
 .tag-sm.stopped {
   background: #f5f5f5;
@@ -755,14 +755,14 @@ export default {
 
 /* 操作按钮 */
 .action-btn {
-  color: #5b8def;
+  color: #2a69d4;
   cursor: pointer;
 }
 .action-btn:hover {
   text-decoration: underline;
 }
 .action-btn.danger {
-  color: #d9534f;
+  color: #c0392b;
 }
 .action-divider {
   margin: 0 6px;
@@ -793,13 +793,13 @@ export default {
 }
 .pager span:hover:not(.on):not(.disabled):not(.total-text) {
   background: #f8f9fb;
-  border-color: #5b8def;
-  color: #5b8def;
+  border-color: #2a69d4;
+  color: #2a69d4;
 }
 .pager .on {
-  background: #5b8def;
+  background: #2a69d4;
   color: #fff;
-  border-color: #5b8def;
+  border-color: #2a69d4;
 }
 .pager .disabled {
   opacity: 0.4;
@@ -808,7 +808,7 @@ export default {
 .pager .total-text {
   border: none;
   background: transparent;
-  color: #888;
+  color: #595959;
   cursor: default;
 }
 
@@ -873,7 +873,7 @@ export default {
   color: #555;
 }
 .field .req {
-  color: #d9534f;
+  color: #c0392b;
   margin-right: 2px;
 }
 
@@ -895,8 +895,8 @@ export default {
   background-position: center;
 }
 .img-upload-box:hover {
-  border-color: #5b8def;
-  color: #5b8def;
+  border-color: #2a69d4;
+  color: #2a69d4;
 }
 .img-preview {
   width: 100%;

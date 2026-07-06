@@ -75,7 +75,7 @@
           :key="uc.id"
           class="coupon-card-v"
           :class="{ expired: myStatus === 2 }"
-          :style="{ borderLeftColor: myStatus === 0 ? '#5b8def' : (myStatus === 2 ? '#ccc' : '#4caf7d') }"
+          :style="{ borderLeftColor: myStatus === 0 ? '#2a69d4' : (myStatus === 2 ? '#ccc' : '#4caf7d') }"
         >
           <div class="my-top">
             <span class="my-amount">
@@ -302,7 +302,7 @@ export default {
   margin-bottom: 20px;
 }
 .page-title { font-size: 24px; font-weight: 700; color: #222; margin: 0; }
-.back-link { font-size: 14px; color: #5b8def; text-decoration: none; }
+.back-link { font-size: 14px; color: #2a69d4; text-decoration: none; }
 .back-link:hover { opacity: 0.8; }
 
 /* Tabs */
@@ -320,17 +320,17 @@ export default {
   padding: 12px 0;
   text-align: center;
   font-size: 14px;
-  color: #888;
+  color: #595959;
   cursor: pointer;
   border-bottom: 3px solid transparent;
   transition: all 0.2s;
 }
-.tab:hover { color: #5b8def; background: #f8faff; }
-.tab.on { color: #5b8def; font-weight: 600; border-bottom-color: #5b8def; background: #f8faff; }
+.tab:hover { color: #2a69d4; background: #f8faff; }
+.tab.on { color: #2a69d4; font-weight: 600; border-bottom-color: #2a69d4; background: #f8faff; }
 
 .section-label { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 14px; }
 
-.loading-wrap { text-align: center; padding: 80px; color: #999; }
+.loading-wrap { text-align: center; padding: 80px; color: #595959; }
 .empty-state { text-align: center; padding: 60px; color: #aaa; }
 
 /* ====== 领券中心网格 ====== */
@@ -404,7 +404,7 @@ export default {
   border-radius: 10px;
   padding: 16px 18px;
   margin-bottom: 12px;
-  border-left: 4px solid #5b8def;
+  border-left: 4px solid #2a69d4;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   transition: box-shadow 0.2s;
 }
@@ -412,14 +412,14 @@ export default {
 .coupon-card-v.expired { opacity: 0.65; }
 
 .my-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-.my-amount { font-size: 22px; font-weight: 700; color: #e74c3c; }
+.my-amount { font-size: 22px; font-weight: 700; color: #c0392b; }
 .my-amount .cur { font-size: 14px; }
 
 .tag {
   display: inline-block; padding: 2px 10px; border-radius: 100px;
   font-size: 11px; font-weight: 600; border: 1px solid #cfd4da; color: #555;
 }
-.tag.accent { background: #eef2ff; border-color: #b6c8f0; color: #5b8def; }
+.tag.accent { background: #eef2ff; border-color: #b6c8f0; color: #2a69d4; }
 .tag.ok { background: #e6f4ec; border-color: #b6dcc6; color: #4caf7d; }
 
 .my-name { margin: 6px 0 4px; }
@@ -432,7 +432,7 @@ export default {
   display: inline-block;
   padding: 6px 20px;
   border-radius: 6px;
-  background: #5b8def;
+  background: #2a69d4;
   color: #fff;
   font-size: 13px;
   font-weight: 600;
@@ -441,7 +441,7 @@ export default {
 }
 .btn-use:hover { opacity: 0.85; }
 
-.muted { color: #999; }
+.muted { color: #595959; }
 .small { font-size: 12px; }
 
 /* Pager */
@@ -453,8 +453,8 @@ export default {
   display: flex; align-items: center; justify-content: center;
   font-size: 13px; color: #555; background: #fff; padding: 0 8px; cursor: pointer;
 }
-.pager span:hover { border-color: #5b8def; color: #5b8def; }
-.pager span.on { background: #5b8def; border-color: #5b8def; color: #fff; }
+.pager span:hover { border-color: #2a69d4; color: #2a69d4; }
+.pager span.on { background: #2a69d4; border-color: #2a69d4; color: #fff; }
 .pager span.disabled { opacity: 0.3; cursor: not-allowed; }
 
 @media (max-width: 800px) {

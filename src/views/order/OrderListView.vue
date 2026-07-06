@@ -128,7 +128,7 @@
         </el-select>
       </div>
       <div class="rd-field">
-        <label for="trackingNumberInput"><span style="color:#d9534f">*</span> 快递单号</label>
+        <label for="trackingNumberInput"><span style="color:#c0392b">*</span> 快递单号</label>
         <el-input id="trackingNumberInput" v-model="returnDialog.trackingNumber" placeholder="请输入退货快递单号" maxlength="50" />
       </div>
       <div class="small muted">提交后商家将根据单号验收退货，确认收货后退款原路退回余额</div>
@@ -331,17 +331,17 @@ export default {
 
 .section-title { font-size: 16px; font-weight: 700; margin: 6px 0 12px; }
 .page-header { display: flex; align-items: center; justify-content: space-between; margin: 6px 0 12px; }
-.home-link { font-size: 13px; color: #5b8def; text-decoration: none; }
+.home-link { font-size: 13px; color: #2a69d4; text-decoration: none; }
 .home-link:hover { opacity: 0.8; }
-.loading-wrap { text-align: center; padding: 60px; color: #888; }
-.empty-state { text-align: center; padding: 80px; color: #888; }
-.go-btn { display: inline-block; margin-top: 12px; padding: 10px 32px; background: #5b8def; color: #fff; border-radius: 100px; text-decoration: none; font-weight: 600; }
+.loading-wrap { text-align: center; padding: 60px; color: #595959; }
+.empty-state { text-align: center; padding: 80px; color: #595959; }
+.go-btn { display: inline-block; margin-top: 12px; padding: 10px 32px; background: #2a69d4; color: #fff; border-radius: 100px; text-decoration: none; font-weight: 600; }
 
 /* Tabs（下划线风格） */
 .tabs { display: flex; gap: 0; border-bottom: 1px solid #cfd4da; margin-bottom: 14px; }
 .tab { padding: 8px 16px; font-size: 13px; color: #666; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
-.tab:hover { color: #5b8def; }
-.tab.on { color: #5b8def; border-bottom-color: #5b8def; font-weight: 600; }
+.tab:hover { color: #2a69d4; }
+.tab.on { color: #2a69d4; border-bottom-color: #2a69d4; font-weight: 600; }
 
 /* 订单卡片 */
 .order-card { background: #fff; border: 1px solid #cfd4da; border-radius: 8px; margin-bottom: 12px; cursor: pointer; overflow: hidden; }
@@ -356,9 +356,9 @@ export default {
 .oc-img img { width: 100%; height: 100%; object-fit: cover; }
 .oc-info { flex: 1; min-width: 0; }
 .oc-name { font-size: 13px; color: #333; }
-.oc-spec { font-size: 12px; color: #888; margin-top: 2px; }
-.oc-status-hint { font-size: 12px; color: #888; margin-top: 2px; }
-.oc-qty { font-size: 13px; color: #888; flex-shrink: 0; }
+.oc-spec { font-size: 12px; color: #595959; margin-top: 2px; }
+.oc-status-hint { font-size: 12px; color: #595959; margin-top: 2px; }
+.oc-qty { font-size: 13px; color: #595959; flex-shrink: 0; }
 
 /* 底栏 */
 .oc-foot {
@@ -368,9 +368,9 @@ export default {
 .oc-actions { display: flex; gap: 8px; align-items: center; }
 
 /* 退款/退货进度提示 */
-.refund-hint { font-size: 12px; color: #888; }
+.refund-hint { font-size: 12px; color: #595959; }
 .refund-hint.warn { color: #e6914e; font-weight: 600; }
-.refund-hint.reject { color: #d9534f; }
+.refund-hint.reject { color: #c0392b; }
 .rd-field { margin-bottom: 14px; }
 .rd-field label { display: block; font-size: 13px; color: #555; margin-bottom: 5px; }
 
@@ -378,23 +378,23 @@ export default {
 .tag { display: inline-block; background: #e9ecf1; border: 1px solid #cfd4da; border-radius: 4px; padding: 1px 8px; font-size: 12px; color: #555; }
 .tag.warn { background: #fcefe2; border-color: #f0cda6; color: #e6914e; }
 .tag.ok { background: #e6f4ec; border-color: #b6dcc6; color: #4caf7d; }
-.tag.accent { background: #e7eefc; border-color: #bcd0f6; color: #5b8def; }
-.tag.cancel { background: #fbe7e6; border-color: #f0c2c0; color: #d9534f; }
+.tag.accent { background: #e7eefc; border-color: #bcd0f6; color: #2a69d4; }
+.tag.cancel { background: #fbe7e6; border-color: #f0c2c0; color: #c0392b; }
 
-.price { color: #d9534f; font-weight: 700; }
+.price { color: #c0392b; font-weight: 700; }
 .small { font-size: 12px; }
-.muted { color: #888; }
+.muted { color: #595959; }
 
 /* 按钮 */
 .btn { display: inline-flex; align-items: center; justify-content: center; border: 1px solid #9aa1aa; background: #fff; color: #444; border-radius: 6px; padding: 7px 16px; font-size: 13px; cursor: pointer; white-space: nowrap; }
 .btn.sm { padding: 4px 12px; font-size: 12px; }
-.btn.primary { background: #5b8def; border-color: #5b8def; color: #fff; }
+.btn.primary { background: #2a69d4; border-color: #2a69d4; color: #fff; }
 .btn:hover { opacity: 0.85; }
 
 /* 分页 */
 .pager { display: flex; gap: 6px; justify-content: flex-end; margin-top: 14px; }
 .pager span { min-width: 30px; height: 30px; border: 1px solid #cfd4da; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #555; background: #fff; padding: 0 8px; cursor: pointer; }
-.pager span:hover { border-color: #5b8def; }
-.pager span.on { background: #5b8def; border-color: #5b8def; color: #fff; }
+.pager span:hover { border-color: #2a69d4; }
+.pager span.on { background: #2a69d4; border-color: #2a69d4; color: #fff; }
 .pager span.disabled { opacity: .3; cursor: not-allowed; }
 </style>

@@ -99,18 +99,18 @@ export default {
 }
 .fav-body { padding: 8px 10px; }
 .fav-name { font-size: 12px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.fav-price { font-size: 14px; font-weight: 700; color: #d9534f; margin-top: 4px; }
+.fav-price { font-size: 14px; font-weight: 700; color: #c0392b; margin-top: 4px; }
 .fav-del {
   position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%;
   background: rgba(0,0,0,.4); color: #fff; font-size: 11px; display: flex; align-items: center;
   justify-content: center; cursor: pointer; opacity: 0; transition: .12s;
 }
 .fav-card:hover .fav-del { opacity: 1; }
-.fav-del:hover { background: #d9534f; }
+.fav-del:hover { background: #c0392b; }
 
 /* 分页 */
 .pager { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 16px; }
-.pager-info { font-size: 13px; color: #888; }
+.pager-info { font-size: 13px; color: #595959; }
 .btn {
   padding: 9px 22px; border-radius: 6px; font-size: 13px; border: 1px solid #d6dbe3; background: #fff;
   color: #444; cursor: pointer; transition: .12s;
@@ -118,7 +118,7 @@ export default {
 .btn:hover { border-color: #bbb; }
 .btn.sm { padding: 5px 14px; font-size: 12px; }
 
-.empty { padding: 24px 0; text-align: center; color: #999; font-size: 13px; }
+.empty { padding: 24px 0; text-align: center; color: #595959; font-size: 13px; }
 
 @media (max-width: 860px) {
   .fav-grid { grid-template-columns: repeat(2, 1fr); }

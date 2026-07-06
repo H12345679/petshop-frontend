@@ -3,15 +3,15 @@
     <div class="form-narrow">
       <div class="field">
         <label>当前密码 <span class="req">*</span></label>
-        <input class="input" v-model="form.oldPassword" type="password" placeholder="输入当前密码" />
+        <input aria-label="input" class="input" v-model="form.oldPassword" type="password" placeholder="输入当前密码" />
       </div>
       <div class="field">
         <label>新密码 <span class="req">*</span></label>
-        <input class="input" v-model="form.newPassword" type="password" placeholder="至少 6 位" />
+        <input aria-label="input" class="input" v-model="form.newPassword" type="password" placeholder="至少 6 位" />
       </div>
       <div class="field">
         <label>确认新密码 <span class="req">*</span></label>
-        <input class="input" v-model="form.confirmPassword" type="password" placeholder="再次输入新密码" />
+        <input aria-label="input" class="input" v-model="form.confirmPassword" type="password" placeholder="再次输入新密码" />
       </div>
       <button class="btn primary" :disabled="saving" @click="savePassword">
         {{ saving ? '保存中…' : '保存新密码' }}
@@ -59,18 +59,18 @@ export default {
 .form-narrow { max-width: 420px; }
 .field { margin-bottom: 12px; }
 .field label { display: block; font-size: 13px; color: #555; margin-bottom: 4px; }
-.field .req { color: #d9534f; }
+.field .req { color: #c0392b; }
 .input {
   width: 100%; padding: 9px 12px; border: 1px solid #d6dbe3; border-radius: 6px; font-size: 13px;
   color: #333; background: #fafbfc; outline: none; transition: border-color .15s;
 }
-.input:focus { border-color: #5b8def; background: #fff; }
+.input:focus { border-color: #2a69d4; background: #fff; }
 .btn {
   padding: 9px 22px; border-radius: 6px; font-size: 13px; border: 1px solid #d6dbe3; background: #fff;
   color: #444; cursor: pointer; transition: .12s;
 }
 .btn:hover { border-color: #bbb; }
-.btn.primary { background: #5b8def; color: #fff; border-color: #5b8def; }
+.btn.primary { background: #2a69d4; color: #fff; border-color: #2a69d4; }
 .btn.primary:hover { background: #4a7de0; }
 .btn.primary:disabled { background: #9dbef5; border-color: #9dbef5; cursor: not-allowed; }
 </style>

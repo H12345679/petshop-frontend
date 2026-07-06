@@ -180,8 +180,8 @@
       </div>
       
       <!-- 隐藏的文件输入 -->
-      <input type="file" ref="coverInput" accept="image/*" style="display:none" @change="onCoverSelected" />
-      <input type="file" ref="videoInput" accept="video/*" style="display:none" @change="onVideoSelected" />
+      <input aria-label="input" type="file" ref="coverInput" accept="image/*" style="display:none" @change="onCoverSelected" />
+      <input aria-label="input" type="file" ref="videoInput" accept="video/*" style="display:none" @change="onVideoSelected" />
     </el-dialog>
 
     <!-- 视频在线预览弹窗 -->

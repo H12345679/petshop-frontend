@@ -101,8 +101,7 @@
 </template>
 
 <script>
-import { pushMessage as sendMessage, getManageMessages as myMessages } from "@/api/modules/user.js";
-import { getUserManageList, getMerchantCustomers } from "@/api/modules/user.js";
+import { pushMessage as sendMessage, getManageMessages as myMessages, getUserManageList, getMerchantCustomers } from "@/api/modules/user.js";
 import { getStore } from "@/libs/storage.js";
 
 const TYPE_MAP = { 1: "系统", 2: "订单", 3: "活动", 4: "宠物资讯" };
@@ -228,11 +227,11 @@ export default {
 <style scoped>
 .page-title { font-size: 20px; font-weight: 700; color: #2c3e50; margin-bottom: 16px; }
 .form-card { width: 100%; }
-.form-tip { margin-left: 8px; font-size: 12px; color: #999; }
+.form-tip { margin-left: 8px; font-size: 12px; color: #595959; }
 .content-preview {
   overflow: hidden; text-overflow: ellipsis; display: -webkit-box;
   -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.5;
 }
-.muted { color: #999; }
+.muted { color: #595959; }
 .text-center { text-align: center; }
 </style>

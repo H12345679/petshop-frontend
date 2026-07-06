@@ -127,19 +127,19 @@ export default {
 .lg-head { background: #f7f8fa; border: 1px solid #eef0f3; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; }
 .lg-row { display: flex; font-size: 13px; color: #333; margin-bottom: 6px; }
 .lg-row:last-child { margin-bottom: 0; }
-.lg-key { color: #888; width: 70px; flex-shrink: 0; }
-.lg-copy { color: #5b8def; cursor: pointer; }
+.lg-key { color: #595959; width: 70px; flex-shrink: 0; }
+.lg-copy { color: #2a69d4; cursor: pointer; }
 .lg-copy:hover { opacity: 0.8; }
 
 .lg-timeline { max-height: 320px; overflow-y: auto; padding: 4px 0 0 8px; }
 .lg-node { position: relative; padding: 0 0 18px 18px; border-left: 1px solid #e3e6ea; }
 .lg-node:last-child { border-left-color: transparent; padding-bottom: 4px; }
 .lg-dot { position: absolute; left: -5px; top: 3px; width: 9px; height: 9px; border-radius: 50%; background: #cfd4da; }
-.lg-node.on .lg-dot { background: #5b8def; box-shadow: 0 0 0 3px #e7eefc; }
+.lg-node.on .lg-dot { background: #2a69d4; box-shadow: 0 0 0 3px #e7eefc; }
 .lg-text { font-size: 13px; color: #666; line-height: 1.5; }
 .lg-node.on .lg-text { color: #333; font-weight: 600; }
 .lg-time { font-size: 12px; color: #aaa; margin-top: 3px; }
 
-.lg-empty { text-align: center; color: #888; padding: 30px 0; font-size: 13px; }
+.lg-empty { text-align: center; color: #595959; padding: 30px 0; font-size: 13px; }
 .lg-tip { margin-top: 10px; font-size: 12px; color: #bbb; text-align: right; }
 </style>

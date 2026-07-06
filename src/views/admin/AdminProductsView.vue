@@ -4,12 +4,12 @@
     <div class="card row center wrap gap8" style="padding:12px 16px; margin-bottom: 20px;">
           <span class="small muted">商品名</span>
           <div class="input-wrap" style="width:160px">
-            <input v-model="query.name" placeholder="搜索" @keyup.enter="doSearch"/>
+            <input aria-label="input" v-model="query.name" placeholder="搜索" @keyup.enter="doSearch"/>
           </div>
           
           <span class="small muted">门店</span>
           <div class="input-wrap select-wrap" style="width:130px">
-            <select v-model="query.shopId" @change="doSearch">
+            <select aria-label="select" v-model="query.shopId" @change="doSearch">
               <option value="">全部</option>
               <option v-for="s in shopOptions" :key="s.id" :value="s.id">{{ s.name }}</option>
             </select>
@@ -17,7 +17,7 @@
           
           <span class="small muted">分类</span>
           <div class="input-wrap select-wrap" style="width:120px">
-            <select v-model="query.categoryId" @change="doSearch">
+            <select aria-label="select" v-model="query.categoryId" @change="doSearch">
               <option value="">全部</option>
               <template v-for="g in categoryTreeData">
                 <optgroup v-if="g.children && g.children.length > 0" :key="'qg-'+g.id" :label="g.name">
@@ -30,7 +30,7 @@
           
           <span class="small muted">类型</span>
           <div class="input-wrap select-wrap" style="width:110px">
-            <select v-model="query.type" @change="doSearch">
+            <select aria-label="select" v-model="query.type" @change="doSearch">
               <option value="">全部</option>
               <option :value="1">宠物活体</option>
               <option :value="2">周边用品</option>
@@ -86,7 +86,7 @@
                 </td>
               </tr>
               <tr v-if="products.length === 0">
-                <td colspan="8" class="text-center" style="padding: 40px; color: #888;">暂无商品</td>
+                <td colspan="8" class="text-center" style="padding: 40px; color: #595959;">暂无商品</td>
               </tr>
             </tbody>
           </table>
@@ -113,16 +113,16 @@
               <div class="field col flex1">
                 <label><span class="req">*</span> 所属门店</label>
                 <div class="input-wrap select-wrap">
-                  <select v-model="formData.shopId">
+                  <select aria-label="select" v-model="formData.shopId">
                     <option v-for="s in shopOptions" :key="s.id" :value="s.id">{{ s.name }}</option>
                   </select>
                 </div>
-                <div v-if="formErrors.shopId" style="color:#d9534f; font-size:12px; margin-top:4px;">{{formErrors.shopId}}</div>
+                <div v-if="formErrors.shopId" style="color:#c0392b; font-size:12px; margin-top:4px;">{{formErrors.shopId}}</div>
               </div>
               <div class="field col flex1">
                 <label><span class="req">*</span> 商品分类</label>
                 <div class="input-wrap select-wrap">
-                  <select v-model="formData.categoryId">
+                  <select aria-label="select" v-model="formData.categoryId">
                     <template v-for="g in categoryTreeData">
                       <optgroup v-if="g.children && g.children.length > 0" :key="'g-'+g.id" :label="g.name">
                         <option v-for="c in g.children" :key="c.id" :value="c.id">{{ c.name }}</option>
@@ -131,12 +131,12 @@
                     </template>
                   </select>
                 </div>
-                <div v-if="formErrors.categoryId" style="color:#d9534f; font-size:12px; margin-top:4px;">{{formErrors.categoryId}}</div>
+                <div v-if="formErrors.categoryId" style="color:#c0392b; font-size:12px; margin-top:4px;">{{formErrors.categoryId}}</div>
               </div>
               <div class="field col flex1">
                 <label><span class="req">*</span> 商品类型</label>
                 <div class="input-wrap select-wrap">
-                  <select v-model="formData.type">
+                  <select aria-label="select" v-model="formData.type">
                     <option :value="1">1 宠物（唯一）</option>
                     <option :value="2">2 周边</option>
                   </select>
@@ -147,29 +147,29 @@
             <div class="field mb16">
               <label><span class="req">*</span> 商品名称</label>
               <div class="input-wrap">
-                <input v-model="formData.name" placeholder="如：英国短毛猫 蓝猫 纯种健康" />
+                <input aria-label="input" v-model="formData.name" placeholder="如：英国短毛猫 蓝猫 纯种健康" />
               </div>
-              <div v-if="formErrors.name" style="color:#d9534f; font-size:12px; margin-top:4px;">{{formErrors.name}}</div>
+              <div v-if="formErrors.name" style="color:#c0392b; font-size:12px; margin-top:4px;">{{formErrors.name}}</div>
             </div>
 
             <div class="row gap16 mb16">
               <div class="field col flex1">
                 <label><span class="req">*</span> 售价</label>
                 <div class="input-wrap">
-                  <input type="number" v-model.number="formData.price" placeholder="¥2500" />
+                  <input aria-label="input" type="number" v-model.number="formData.price" placeholder="¥2500" />
                 </div>
-                <div v-if="formErrors.price" style="color:#d9534f; font-size:12px; margin-top:4px;">{{formErrors.price}}</div>
+                <div v-if="formErrors.price" style="color:#c0392b; font-size:12px; margin-top:4px;">{{formErrors.price}}</div>
               </div>
               <div class="field col flex1">
                 <label>原价</label>
                 <div class="input-wrap">
-                  <input type="number" v-model.number="formData.originalPrice" placeholder="¥3000" />
+                  <input aria-label="input" type="number" v-model.number="formData.originalPrice" placeholder="¥3000" />
                 </div>
               </div>
               <div class="field col flex1">
-                <label>库存（宠物锁定为1）</label>
+                <div style="font-size:13px; font-weight:600; margin-bottom:8px">库存(宠物锁定为1)</div>
                 <div class="input-wrap">
-                  <input type="number" v-model.number="formData.stock" placeholder="1" :disabled="formData.type === 1" />
+                  <input aria-label="input" type="number" v-model.number="formData.stock" placeholder="1" :disabled="formData.type === 1" />
                 </div>
               </div>
             </div>
@@ -198,7 +198,7 @@
             <div class="field mb16">
               <label>商品描述</label>
               <div class="input-wrap" style="height:auto">
-                <textarea v-model="formData.description" placeholder="详情图文..." style="height: 64px; width: 100%; resize: none; border:none; outline:none; padding: 8px;"></textarea>
+                <textarea aria-label="textarea" v-model="formData.description" placeholder="详情图文..." style="height: 64px; width: 100%; resize: none; border:none; outline:none; padding: 8px;"></textarea>
               </div>
             </div>
 
@@ -219,17 +219,17 @@
                   <tr v-for="(sku, index) in formData.skus" :key="index">
                     <td>
                       <div class="input-wrap" style="height: 28px;">
-                        <input v-model="sku.specName" placeholder="规格名称" />
+                        <input aria-label="input" v-model="sku.specName" placeholder="规格名称" />
                       </div>
                     </td>
                     <td>
                       <div class="input-wrap" style="height: 28px;">
-                        <input type="number" v-model.number="sku.price" placeholder="价格" />
+                        <input aria-label="input" type="number" v-model.number="sku.price" placeholder="价格" />
                       </div>
                     </td>
                     <td>
                       <div class="input-wrap" style="height: 28px;">
-                        <input type="number" v-model.number="sku.stock" placeholder="库存" />
+                        <input aria-label="input" type="number" v-model.number="sku.stock" placeholder="库存" />
                       </div>
                     </td>
                     <td>
@@ -272,14 +272,14 @@
           </div>
           <div class="modal-footer row gap8" style="justify-content: flex-end;">
             <div class="btn" @click="deleteModalVisible = false">取消</div>
-            <div class="btn primary danger" style="background:#d9534f; border-color:#d9534f; color:#fff;" @click="confirmDelete">确定删除</div>
+            <div class="btn primary danger" style="background:#c0392b; border-color:#c0392b; color:#fff;" @click="confirmDelete">确定删除</div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- 隐藏的文件上传控件 -->
-    <input type="file" ref="fileInput" style="display: none;" @change="onFileSelected" accept="image/*" />
+    <input aria-label="input" type="file" ref="fileInput" style="display: none;" @change="onFileSelected" accept="image/*" />
   </div>
 </template>
 
@@ -594,7 +594,7 @@ export default {
 .flex1 { flex: 1; }
 .spacer { flex: 1; }
 .small { font-size: 13px; }
-.muted { color: #888; }
+.muted { color: #595959; }
 .text-center { text-align: center; }
 .card { background: #fff; border: 1px solid #e6e8eb; border-radius: 8px; }
 
@@ -606,7 +606,7 @@ export default {
 /* 按钮 */
 .btn { display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 16px; border-radius: 4px; border: 1px solid #d6dbe3; background: #fff; cursor: pointer; transition: 0.2s; user-select: none; }
 .btn:hover { background: #f8f9fb; }
-.btn.primary { background: #5b8def; border-color: #5b8def; color: #fff; }
+.btn.primary { background: #2a69d4; border-color: #2a69d4; color: #fff; }
 .btn.primary:hover { background: #4a7ce0; }
 .btn.sm { height: 28px; padding: 0 12px; font-size: 13px; }
 
@@ -620,22 +620,22 @@ export default {
 
 /* 标签 */
 .tag-sm { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
-.tag-sm.ok { background: #eef4fe; color: #5b8def; }
+.tag-sm.ok { background: #eef4fe; color: #2a69d4; }
 .tag-sm.stopped { background: #f5f5f5; color: #aaa; }
 
 /* 操作按钮 */
-.action-btn { color: #5b8def; cursor: pointer; }
+.action-btn { color: #2a69d4; cursor: pointer; }
 .action-btn:hover { text-decoration: underline; }
-.action-btn.danger { color: #d9534f; }
+.action-btn.danger { color: #c0392b; }
 .action-divider { margin: 0 6px; color: #ccc; }
 
 /* 分页 */
 .pager { display: flex; justify-content: flex-end; align-items: center; gap: 8px; padding: 16px; }
 .pager span { display: flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; padding: 0 8px; background: #fff; border: 1px solid #d6dbe3; border-radius: 4px; cursor: pointer; color: #555; user-select: none; }
-.pager span:hover:not(.on):not(.disabled):not(.total-text) { background: #f8f9fb; border-color: #5b8def; color: #5b8def; }
-.pager .on { background: #5b8def; color: #fff; border-color: #5b8def; }
+.pager span:hover:not(.on):not(.disabled):not(.total-text) { background: #f8f9fb; border-color: #2a69d4; color: #2a69d4; }
+.pager .on { background: #2a69d4; color: #fff; border-color: #2a69d4; }
 .pager .disabled { opacity: 0.4; cursor: not-allowed; }
-.pager .total-text { border: none; background: transparent; color: #888; cursor: default; }
+.pager .total-text { border: none; background: transparent; color: #595959; cursor: default; }
 
 /* 弹窗 */
 .modal-mask { position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; }
@@ -648,11 +648,11 @@ export default {
 .modal-body { padding: 24px; overflow-y: auto; }
 .modal-footer { padding: 16px 24px; border-top: 1px solid #eee; display: flex; }
 .field label { display: block; margin-bottom: 6px; font-size: 13px; color: #555; }
-.field .req { color: #d9534f; margin-right: 2px; }
+.field .req { color: #c0392b; margin-right: 2px; }
 
 /* 图片上传框 */
 .img-upload-box { width: 70px; height: 70px; background-color: #f8f9fb; border: 1px dashed #d6dbe3; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 13px; cursor: pointer; position: relative; background-size: cover; background-position: center; }
-.img-upload-box:hover { border-color: #5b8def; color: #5b8def; }
+.img-upload-box:hover { border-color: #2a69d4; color: #2a69d4; }
 .img-upload-box.small { width: 60px; height: 60px; }
 .img-upload-box.tiny { width: 34px; height: 34px; font-size: 12px; }
 .img-preview { width: 100%; height: 100%; background-size: cover; background-position: center; border-radius: 4px; }

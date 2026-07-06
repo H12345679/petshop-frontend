@@ -281,8 +281,8 @@ export default {
 .page-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
 .page-title { font-size: 24px; font-weight: 700; color: #2c3e50; margin: 0; }
 
-.loading-wrap { text-align: center; padding: 80px; color: #999; font-size: 16px; }
-.empty-state { text-align: center; padding: 80px 20px; color: #999; font-size: 16px; }
+.loading-wrap { text-align: center; padding: 80px; color: #595959; font-size: 16px; }
+.empty-state { text-align: center; padding: 80px 20px; color: #595959; font-size: 16px; }
 
 .address-list { display: flex; flex-direction: column; gap: 12px; }
 
@@ -306,6 +306,6 @@ export default {
 .btn { padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: opacity 0.2s; }
 .btn-primary { background: linear-gradient(135deg, #6b8dd6, #8e37d7); color: #fff; }
 .btn-text { background: transparent; color: #6b8dd6; padding: 6px 12px; }
-.btn-danger-text { color: #e74c3c; }
+.btn-danger-text { color: #c0392b; }
 .btn:hover { opacity: 0.8; }
 </style>

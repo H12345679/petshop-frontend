@@ -123,7 +123,7 @@ export default {
 .container { width: 900px; max-width: 100%; margin: 0 auto; padding: 24px 16px 60px; flex: 1; }
 .page-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .page-head h2 { font-size: 20px; font-weight: 700; color: #2c3e50; }
-.loading-wrap, .empty-state { text-align: center; padding: 80px 0; color: #999; font-size: 15px; }
+.loading-wrap, .empty-state { text-align: center; padding: 80px 0; color: #595959; font-size: 15px; }
 
 .msg-list { display: flex; flex-direction: column; gap: 10px; }
 .msg-item {
@@ -132,17 +132,17 @@ export default {
   border-left: 4px solid transparent; transition: all 0.2s;
 }
 .msg-item:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
-.msg-item.unread { border-left-color: #5b8def; background: #f8faff; }
+.msg-item.unread { border-left-color: #2a69d4; background: #f8faff; }
 .msg-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 .msg-type {
   font-size: 11px; padding: 2px 8px; border-radius: 100px; font-weight: 600;
-  background: #eef4fe; color: #5b8def; flex-shrink: 0;
+  background: #eef4fe; color: #2a69d4; flex-shrink: 0;
 }
 .msg-type.type-2 { background: #fef3e2; color: #e5a452; }
-.msg-type.type-3 { background: #fde8e8; color: #e74c3c; }
+.msg-type.type-3 { background: #fde8e8; color: #c0392b; }
 .msg-type.type-4 { background: #e8f5e9; color: #2e7d32; }
 .msg-title { font-weight: 600; font-size: 14px; color: #333; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.msg-dot { color: #e74c3c; font-size: 12px; flex-shrink: 0; }
+.msg-dot { color: #c0392b; font-size: 12px; flex-shrink: 0; }
 .msg-time { font-size: 12px; color: #bbb; flex-shrink: 0; }
 .msg-body { font-size: 13px; color: #666; line-height: 1.6; padding-left: 4px; }
 </style>

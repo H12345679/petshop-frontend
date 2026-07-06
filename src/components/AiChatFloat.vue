@@ -119,9 +119,9 @@ export default {
       let html = text
         // 0. 防御 XSS：转义 < 和 >
         .replaceAll("<", "&lt;").replaceAll(">", "&gt;")
-        .replace(/\*\*\[([^\[\]\n]+)\]\(([^()\n]+)\)\*\*/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
-        .replace(/\[([^\[\]\n]+)\]\(([^()\n]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
-        .replace(/(【[^【】\n]+】)[ \t]*[（(][ \t]*(\/product\/\d+)[ \t]*[）)]/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/\*\*\[([^\[\]\n]+)\]\(([^()\n]+)\)\*\*/g, '<a data-link="$2" class="ai-product-link" style="color:#2a69d4;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/\[([^\[\]\n]+)\]\(([^()\n]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#2a69d4;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/(【[^【】\n]+】)[ \t]*[（(][ \t]*(\/product\/\d+)[ \t]*[）)]/g, '<a data-link="$2" class="ai-product-link" style="color:#2a69d4;cursor:pointer;text-decoration:underline;">$1</a>')
         .replace(/\*\*([^*<>\n]+)\*\*/g, '<strong>$1</strong>')
         .replaceAll("\n", "<br/>");
       return html;
@@ -236,7 +236,7 @@ export default {
 .float-btn {
   width: 56px;
   height: 56px;
-  background: linear-gradient(135deg, #5b8def, #7a6fdf);
+  background: linear-gradient(135deg, #2a69d4, #7a6fdf);
   border-radius: 50%;
   box-shadow: 0 4px 16px rgba(91, 141, 239, 0.45);
   cursor: pointer;
@@ -268,7 +268,7 @@ export default {
 
 .chat-header {
   height: 50px;
-  background: linear-gradient(135deg, #5b8def, #7a6fdf);
+  background: linear-gradient(135deg, #2a69d4, #7a6fdf);
   color: white;
   display: flex;
   align-items: center;
@@ -295,7 +295,7 @@ export default {
 .avatar {
   width: 30px; height: 30px; border-radius: 50%;
   background: linear-gradient(135deg, #dbe4f0, #c8d5ee);
-  color: #5b8def;
+  color: #2a69d4;
   display: flex; align-items: center; justify-content: center;
   font-size: 11px; font-weight: bold; flex-shrink: 0; margin: 0 8px;
 }
@@ -310,10 +310,10 @@ export default {
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
 .msg-row.is-user .bubble {
-  background: linear-gradient(135deg, #5b8def, #7a6fdf);
+  background: linear-gradient(135deg, #2a69d4, #7a6fdf);
   color: #fff; border-top-right-radius: 2px;
 }
-.bubble.typing { color: #999; font-style: italic; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+.bubble.typing { color: #595959; font-style: italic; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
 
 .chat-footer {
   padding: 12px; background: #fff;

@@ -246,7 +246,7 @@ export default {
 .u-name { font-weight: 700; font-size: 16px; color: #222; margin-bottom: 4px; }
 .u-bal { font-size: 12px; color: #595959; }
 .u-bal span { color: #FF4757; font-weight: 600; font-size: 14px; }
-.recharge-link { margin-left: 8px; font-size: 12px; color: #5b8def; font-weight: 600; text-decoration: none; }
+.recharge-link { margin-left: 8px; font-size: 12px; color: #2a69d4; font-weight: 600; text-decoration: none; }
 .recharge-link:hover { opacity: 0.8; }
 .u-login-btn {
   display: inline-block; background: #ffece8; color: #cc0014;
@@ -289,9 +289,9 @@ export default {
 .price .cur { font-size: 13px; margin-right: 2px; }
 .del { color: #a0aec0; text-decoration: line-through; font-size: 12px; margin-left: 8px; font-weight: 400; }
 .sales { color: #94a3b8; font-size: 12px; }
-.empty { grid-column: 1 / -1; color: #888; font-size: 15px; padding: 40px 0; text-align: center; background: #fff; border-radius: 16px; box-shadow: 0 4px 16px rgba(149, 157, 165, 0.05); }
+.empty { grid-column: 1 / -1; color: #595959; font-size: 15px; padding: 40px 0; text-align: center; background: #fff; border-radius: 16px; box-shadow: 0 4px 16px rgba(149, 157, 165, 0.05); }
 
-.muted { color: #999; }
+.muted { color: #595959; }
 .small { font-size: 12px; }
 .link { color: #6B8DD6; cursor: pointer; text-decoration: none; font-weight: 600; transition: opacity 0.2s; }
 .link:hover { opacity: 0.8; }

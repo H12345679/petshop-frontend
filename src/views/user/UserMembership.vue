@@ -71,7 +71,7 @@ export default {
       }
     },
     levelColor(level) {
-      const colors = ["#9aa1b2", "#9aa1b2", "#8f9bb3", "#c9a96e", "#d9534f"];
+      const colors = ["#9aa1b2", "#9aa1b2", "#8f9bb3", "#c9a96e", "#c0392b"];
       return colors[level] || "#9aa1b2";
     }
   }
@@ -94,8 +94,8 @@ export default {
   display: inline-block; padding: 4px 16px; border-radius: 14px; color: #fff; font-size: 13px; font-weight: 600; margin-bottom: 12px;
 }
 .ml-discount { font-size: 14px; color: #333; margin-bottom: 6px; }
-.ml-threshold { font-size: 12px; color: #888; margin-bottom: 6px; }
-.ml-desc { font-size: 12px; color: #999; line-height: 1.5; }
+.ml-threshold { font-size: 12px; color: #595959; margin-bottom: 6px; }
+.ml-desc { font-size: 12px; color: #595959; line-height: 1.5; }
 .ml-current-tag { margin-top: 10px; font-size: 11px; color: #b8860b; font-weight: 600; }
 .member-status { display: flex; align-items: center; gap: 20px; }
 .member-status p { font-size: 14px; color: #555; margin: 0; }
@@ -105,7 +105,7 @@ export default {
   color: #444; cursor: pointer; transition: .12s;
 }
 .btn:hover { border-color: #bbb; }
-.btn.primary { background: #5b8def; color: #fff; border-color: #5b8def; }
+.btn.primary { background: #2a69d4; color: #fff; border-color: #2a69d4; }
 .btn.primary:hover { background: #4a7de0; }
 .btn.primary:disabled { background: #9dbef5; border-color: #9dbef5; cursor: not-allowed; }
 </style>

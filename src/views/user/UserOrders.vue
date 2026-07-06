@@ -114,8 +114,8 @@ export default {
       return map[String(s)] || '未知';
     },
     orderStatusColor(s) {
-      const map = { '0':'#f0ad4e','1':'#5bc0de','2':'#5b8def','3':'#8f7cf0','4':'#5cb85c','-1':'#999','-2':'#d9534f','-3':'#999','-4':'#999' };
-      return map[String(s)] || '#999';
+      const map = { '0':'#f0ad4e','1':'#5bc0de','2':'#2a69d4','3':'#8f7cf0','4':'#5cb85c','-1':'#595959','-2':'#c0392b','-3':'#595959','-4':'#595959' };
+      return map[String(s)] || '#595959';
     },
   }
 };
@@ -134,11 +134,11 @@ export default {
   padding: 4px 12px; border-radius: 14px; font-size: 12px; background: #f0f1f3; color: #666; cursor: pointer; transition: .12s;
 }
 .filter-tag:hover { background: #e3e7ef; }
-.filter-tag.on { background: #5b8def; color: #fff; }
+.filter-tag.on { background: #2a69d4; color: #fff; }
 
 /* 分页 */
 .pager { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 16px; }
-.pager-info { font-size: 13px; color: #888; }
+.pager-info { font-size: 13px; color: #595959; }
 .btn {
   padding: 9px 22px; border-radius: 6px; font-size: 13px; border: 1px solid #d6dbe3; background: #fff;
   color: #444; cursor: pointer; transition: .12s;
@@ -153,7 +153,7 @@ export default {
   display: flex; justify-content: space-between; align-items: center;
   padding: 10px 14px; background: #fafbfc; border-bottom: 1px solid #eef0f3;
 }
-.oc-no { font-size: 13px; color: #888; }
+.oc-no { font-size: 13px; color: #595959; }
 .oc-status { font-size: 13px; font-weight: 600; }
 .oc-items { padding: 8px 14px; }
 .oc-item { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px solid #f4f5f7; }
@@ -161,17 +161,17 @@ export default {
 .oci-img {
   width: 60px; height: 60px; border-radius: 6px; background: #e3e6ec;
   background-size: cover; background-position: center; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center; font-size: 11px; color: #999;
+  display: flex; align-items: center; justify-content: center; font-size: 11px; color: #595959;
 }
 .oci-info { flex: 1; min-width: 0; }
 .oci-name { font-size: 13px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .oci-spec { font-size: 11px; color: #aaa; margin-top: 2px; }
-.oci-price { font-size: 12px; color: #888; margin-top: 4px; }
+.oci-price { font-size: 12px; color: #595959; margin-top: 4px; }
 .oc-foot {
   padding: 8px 14px; background: #fafbfc; border-top: 1px solid #eef0f3;
   text-align: right; font-size: 13px; color: #666;
 }
-.oc-foot b { color: #d9534f; }
+.oc-foot b { color: #c0392b; }
 
-.empty { padding: 24px 0; text-align: center; color: #999; font-size: 13px; }
+.empty { padding: 24px 0; text-align: center; color: #595959; font-size: 13px; }
 </style>

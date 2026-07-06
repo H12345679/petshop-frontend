@@ -158,7 +158,7 @@ export default {
   padding: 4px 12px; border-radius: 14px; font-size: 12px; background: #f0f1f3; color: #666; cursor: pointer; transition: .12s;
 }
 .filter-tag:hover { background: #e3e7ef; }
-.filter-tag.on { background: #5b8def; color: #fff; }
+.filter-tag.on { background: #2a69d4; color: #fff; }
 
 /* 优惠券 */
 .coupon-list { display: flex; flex-direction: column; gap: 10px; }
@@ -173,16 +173,16 @@ export default {
   background: #fdf3e1; color: #b8860b; border-right: 1px dashed #e6d5b3;
 }
 .cp-left.highlight { background: #e7f5ec; color: #1a7a3a; border-right-color: #b8dfc8; }
-.coupon-card.used .cp-left, .coupon-card.expired .cp-left { background: #f0f1f3; color: #999; border-right-color: #d6dbe3; }
+.coupon-card.used .cp-left, .coupon-card.expired .cp-left { background: #f0f1f3; color: #595959; border-right-color: #d6dbe3; }
 .cp-amount { font-size: 24px; font-weight: 700; }
 .cp-yen { font-size: 13px; font-weight: 400; }
 .cp-right { flex: 1; padding: 12px 14px; min-width: 0; }
 .cp-name { font-size: 14px; font-weight: 600; color: #333; }
-.cp-desc { font-size: 12px; color: #888; margin-top: 4px; }
+.cp-desc { font-size: 12px; color: #595959; margin-top: 4px; }
 .cp-time { font-size: 11px; color: #aaa; margin-top: 4px; }
 .cp-badge {
   position: absolute; top: 0; right: 0; padding: 2px 10px; font-size: 10px;
-  background: #d6dbe3; color: #888; border-radius: 0 8px 0 6px;
+  background: #d6dbe3; color: #595959; border-radius: 0 8px 0 6px;
 }
 .cp-badge.expired { background: #f5c6cb; color: #b71c1c; }
 .coupon-card > .btn { margin-right: 14px; flex-shrink: 0; }
@@ -192,10 +192,10 @@ export default {
   color: #444; cursor: pointer; transition: .12s;
 }
 .btn:hover { border-color: #bbb; }
-.btn.primary { background: #5b8def; color: #fff; border-color: #5b8def; }
+.btn.primary { background: #2a69d4; color: #fff; border-color: #2a69d4; }
 .btn.primary:hover { background: #4a7de0; }
 .btn.primary:disabled { background: #9dbef5; border-color: #9dbef5; cursor: not-allowed; }
 .btn.sm { padding: 5px 14px; font-size: 12px; }
 
-.empty { padding: 24px 0; text-align: center; color: #999; font-size: 13px; }
+.empty { padding: 24px 0; text-align: center; color: #595959; font-size: 13px; }
 </style>

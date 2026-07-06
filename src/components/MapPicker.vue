@@ -214,7 +214,7 @@ export default {
         position: [lng, lat],
         content: `<div style="
           width:32px;height:32px;border-radius:50% 50% 50% 0;
-          background:linear-gradient(135deg,#5b8def,#3a6bd5);
+          background:linear-gradient(135deg,#2a69d4,#3a6bd5);
           transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;
           border:3px solid #fff;box-shadow:0 3px 12px rgba(59,107,213,.5);
         "><span style="transform:rotate(45deg);font-size:14px;">📍</span></div>`,

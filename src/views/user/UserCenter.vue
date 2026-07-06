@@ -333,7 +333,7 @@ export default {
 }
 .side-avatar { text-align: center; padding: 0 16px 16px; border-bottom: 1px solid #e6e8eb; margin-bottom: 8px; }
 .avatar-ring {
-  width: 64px; height: 64px; border-radius: 50%; background: #e3e6ec; color: #999;
+  width: 64px; height: 64px; border-radius: 50%; background: #e3e6ec; color: #595959;
   display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;
   overflow: hidden; border: 2px solid #e6e8eb;
 }
@@ -348,16 +348,16 @@ export default {
 }
 .side-tag.gold { background: #fdf3e1; color: #b8860b; }
 .side-tag.silver { background: #eef0f3; color: #5c6b82; }
-.muted { color: #999; }
+.muted { color: #595959; }
 
 .side-nav { padding: 0; }
 .side-item {
   padding: 10px 24px; font-size: 14px; color: #444; cursor: pointer;
   display: flex; align-items: center; gap: 8px; transition: .12s;
 }
-.side-item:hover { background: #f4f5f7; color: #5b8def; }
-.side-item.active { background: #e7eefc; color: #5b8def; font-weight: 600; border-right: 3px solid #5b8def; }
-.side-item.danger { color: #d9534f; }
+.side-item:hover { background: #f4f5f7; color: #2a69d4; }
+.side-item.active { background: #e7eefc; color: #2a69d4; font-weight: 600; border-right: 3px solid #2a69d4; }
+.side-item.danger { color: #c0392b; }
 .side-item.danger:hover { background: #fdecea; }
 .side-icon { width: 20px; text-align: center; }
 
@@ -374,16 +374,16 @@ export default {
   background: #fff; border: 1px solid #e6e8eb; border-radius: 10px; padding: 16px; cursor: pointer; transition: .15s;
 }
 .kpi-card:hover { box-shadow: 0 4px 14px rgba(60,90,160,.1); transform: translateY(-1px); }
-.kpi-label { font-size: 12px; color: #888; margin-bottom: 8px; }
+.kpi-label { font-size: 12px; color: #595959; margin-bottom: 8px; }
 .kpi-val { font-size: 22px; font-weight: 700; color: #333; margin-bottom: 6px; }
-.kpi-act { font-size: 12px; color: #5b8def; }
+.kpi-act { font-size: 12px; color: #2a69d4; }
 
 .order-bar {
   background: #fff; border: 1px solid #e6e8eb; border-radius: 10px; padding: 16px; margin-bottom: 16px;
 }
 .order-head { display: flex; align-items: center; margin-bottom: 14px; }
 .section-title { font-size: 15px; font-weight: 600; }
-.more { margin-left: auto; font-size: 12px; color: #5b8def; cursor: pointer; }
+.more { margin-left: auto; font-size: 12px; color: #2a69d4; cursor: pointer; }
 .order-icons { display: flex; justify-content: space-around; }
 .order-item { text-align: center; cursor: pointer; padding: 8px 12px; border-radius: 8px; transition: .12s; }
 .order-item:hover { background: #f4f5f7; }
@@ -396,7 +396,7 @@ export default {
   .uc-sidebar { width: 100%; position: static; }
   .side-nav { display: flex; flex-wrap: wrap; justify-content: center; }
   .side-item { padding: 8px 14px; font-size: 12px; border-right: none; border-bottom: 2px solid transparent; }
-  .side-item.active { border-right: none; border-bottom-color: #5b8def; }
+  .side-item.active { border-right: none; border-bottom-color: #2a69d4; }
   .kpi-row { grid-template-columns: repeat(2, 1fr); }
 }
 </style>

@@ -184,9 +184,9 @@ export default {
 .review-wrap { max-width: 700px; width: 100%; margin: 0 auto; padding: 24px 20px 40px; flex: 1; }
 
 .section-title { font-size: 22px; font-weight: 700; color: #2c3e50; margin-bottom: 20px; }
-.loading-wrap { text-align: center; padding: 80px; color: #888; }
-.empty-state { text-align: center; padding: 80px; color: #888; }
-.back-link { font-size: 14px; color: #5b8def; text-decoration: none; }
+.loading-wrap { text-align: center; padding: 80px; color: #595959; }
+.empty-state { text-align: center; padding: 80px; color: #595959; }
+.back-link { font-size: 14px; color: #2a69d4; text-decoration: none; }
 
 /* 卡片 */
 .card { background: #fff; border: 1px solid #cfd4da; border-radius: 8px; padding: 20px 24px; }
@@ -196,8 +196,8 @@ export default {
 .prod-img { width: 60px; height: 60px; border-radius: 8px; overflow: hidden; background: #f5f5f5; flex-shrink: 0; }
 .prod-img img { width: 100%; height: 100%; object-fit: cover; }
 .prod-name { font-size: 14px; font-weight: 600; color: #2c3e50; }
-.prod-spec { font-size: 12px; color: #888; margin-top: 2px; }
-.prod-order { font-size: 12px; color: #888; margin-top: 2px; }
+.prod-spec { font-size: 12px; color: #595959; margin-top: 2px; }
+.prod-order { font-size: 12px; color: #595959; margin-top: 2px; }
 
 /* 表单 */
 .field { margin-bottom: 18px; }
@@ -207,7 +207,7 @@ export default {
 .star-row { display: flex; align-items: center; gap: 2px; font-size: 28px; }
 .star { color: #ddd; cursor: pointer; transition: .15s; }
 .star.on { color: #f5a623; }
-.star-text { font-size: 14px; color: #888; margin-left: 10px; }
+.star-text { font-size: 14px; color: #595959; margin-left: 10px; }
 
 /* 上传 */
 .upload-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -216,9 +216,9 @@ export default {
 .upload-add {
   width: 72px; height: 72px; border: 1px dashed #9aa1aa; border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px; color: #888; cursor: pointer; transition: .15s;
+  font-size: 12px; color: #595959; cursor: pointer; transition: .15s;
 }
-.upload-add:hover { border-color: #5b8def; color: #5b8def; }
+.upload-add:hover { border-color: #2a69d4; color: #2a69d4; }
 
 /* 按钮 */
 .btn-row { display: flex; gap: 10px; margin-top: 8px; }

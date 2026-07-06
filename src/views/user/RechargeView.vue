@@ -136,8 +136,8 @@ export default {
 .recharge-card h2 { font-size: 22px; font-weight: 700; color: #2c3e50; margin-bottom: 24px; }
 
 .balance-row { text-align: center; padding: 20px 0; border-bottom: 1px solid #f0f0f0; margin-bottom: 24px; }
-.bal-label { font-size: 14px; color: #999; display: block; margin-bottom: 8px; }
-.bal-value { font-size: 36px; font-weight: 700; color: #e74c3c; }
+.bal-label { font-size: 14px; color: #595959; display: block; margin-bottom: 8px; }
+.bal-value { font-size: 36px; font-weight: 700; color: #c0392b; }
 
 .quick-amounts { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
 .amount-tag {
@@ -145,15 +145,15 @@ export default {
   cursor: pointer; font-size: 16px; font-weight: 600; color: #555;
   transition: all 0.2s; background: #fff;
 }
-.amount-tag:hover { border-color: #5b8def; color: #5b8def; }
-.amount-tag.active { border-color: #5b8def; background: #eef4fe; color: #5b8def; }
+.amount-tag:hover { border-color: #2a69d4; color: #2a69d4; }
+.amount-tag.active { border-color: #2a69d4; background: #eef4fe; color: #2a69d4; }
 
 .custom-row { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 24px; }
-.custom-row .muted { font-size: 13px; color: #999; }
+.custom-row .muted { font-size: 13px; color: #595959; }
 
 .action-row { text-align: center; margin-bottom: 20px; }
 .action-row .el-button { padding: 12px 48px; font-size: 16px; }
 
-.notice { background: #f9fafb; border-radius: 8px; padding: 16px; font-size: 13px; color: #999; line-height: 1.8; }
+.notice { background: #f9fafb; border-radius: 8px; padding: 16px; font-size: 13px; color: #595959; line-height: 1.8; }
 .notice p { margin: 0; }
 </style>

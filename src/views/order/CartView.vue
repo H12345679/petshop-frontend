@@ -38,7 +38,7 @@
             >
               <!-- 勾选 -->
               <td>
-                <input
+                <input aria-label="input"
                   type="checkbox"
                   :checked="item.selected === 1"
                   :disabled="!item.valid"
@@ -97,7 +97,7 @@
         <div class="settle-bar">
           <div class="settle-left">
             <label class="check-all-label">
-              <input type="checkbox" :checked="allSelected" @change="toggleAll" />
+              <input aria-label="input" type="checkbox" :checked="allSelected" @change="toggleAll" />
               <span>全选</span>
             </label>
             <span class="settle-link" @click="deleteSelected">删除选中</span>
@@ -161,7 +161,7 @@ export default {
   methods: {
     // 购物车展示会员折后价（memberPrice）；结算时仍按原价(i.price)传递，保证结算/订单口径一致
     unitPrice(item) {
-      const p = item.memberPrice != null ? item.memberPrice : item.price;
+      const p = item.memberPrice === null ? item.price : item.memberPrice;
       return Number(p || 0);
     },
     async loadCart() {
@@ -315,7 +315,7 @@ export default {
 }
 .home-link {
   font-size: 13px;
-  color: #5b8def;
+  color: #2a69d4;
   text-decoration: none;
 }
 .home-link:hover { opacity: 0.8; }
@@ -323,7 +323,7 @@ export default {
 /* 空购物车 */
 .empty-cart { text-align: center; padding: 100px 20px; }
 .empty-icon { font-size: 64px; margin-bottom: 16px; }
-.empty-text { font-size: 18px; color: #999; margin-bottom: 24px; }
+.empty-text { font-size: 18px; color: #595959; margin-bottom: 24px; }
 .go-shop-btn {
   display: inline-block; padding: 12px 36px;
   background: linear-gradient(135deg, #6b8dd6, #8e37d7); color: #fff;
@@ -331,7 +331,7 @@ export default {
 }
 .go-shop-btn:hover { opacity: 0.9; }
 
-.loading-wrap { text-align: center; padding: 80px 0; font-size: 16px; color: #999; }
+.loading-wrap { text-align: center; padding: 80px 0; font-size: 16px; color: #595959; }
 
 /* 面板 */
 .cart-panel { }
@@ -365,19 +365,19 @@ export default {
 .prod-img img { width: 100%; height: 100%; object-fit: cover; }
 .prod-info { min-width: 0; }
 .prod-name { font-size: 13px; color: #333; }
-.prod-spec { font-size: 12px; color: #888; margin-top: 2px; }
-.invalid-reason { font-size: 12px; color: #888; margin-top: 2px; }
+.prod-spec { font-size: 12px; color: #595959; margin-top: 2px; }
+.invalid-reason { font-size: 12px; color: #595959; margin-top: 2px; }
 
 /* 标签 */
 .tag {
   display: inline-block; background: #e9ecf1; border: 1px solid #cfd4da; border-radius: 4px;
   padding: 1px 8px; font-size: 12px; color: #555;
 }
-.tag.danger { background: #fbe7e6; border-color: #f0c2c0; color: #d9534f; }
+.tag.danger { background: #fbe7e6; border-color: #f0c2c0; color: #c0392b; }
 
 /* 文本 */
-.price { color: #d9534f; font-weight: 700; }
-.muted { color: #888; }
+.price { color: #c0392b; font-weight: 700; }
+.muted { color: #595959; }
 .small { font-size: 12px; }
 
 /* 数量 */
@@ -393,7 +393,7 @@ export default {
 }
 
 /* 删除 */
-.del-link { font-size: 13px; color: #5b8def; cursor: pointer; }
+.del-link { font-size: 13px; color: #2a69d4; cursor: pointer; }
 .del-link:hover { opacity: 0.8; }
 
 /* 结算栏 */
@@ -411,20 +411,20 @@ export default {
 }
 .check-all-label input { width: 16px; height: 16px; cursor: pointer; }
 
-.settle-link { font-size: 12px; color: #5b8def; cursor: pointer; }
+.settle-link { font-size: 12px; color: #2a69d4; cursor: pointer; }
 .settle-link:hover { opacity: 0.8; }
-.settle-link.danger { color: #d9534f; }
+.settle-link.danger { color: #c0392b; }
 
-.settle-info { font-size: 12px; color: #888; }
+.settle-info { font-size: 12px; color: #595959; }
 .settle-info b { color: #333; }
 
-.settle-total { font-size: 24px; color: #d9534f; font-weight: 700; }
+.settle-total { font-size: 24px; color: #c0392b; font-weight: 700; }
 
-.settle-note { font-size: 12px; color: #888; }
+.settle-note { font-size: 12px; color: #595959; }
 
 .checkout-btn {
   display: inline-flex; align-items: center; justify-content: center;
-  padding: 11px 22px; background: #5b8def; border: 1px solid #5b8def;
+  padding: 11px 22px; background: #2a69d4; border: 1px solid #2a69d4;
   color: #fff; border-radius: 6px; font-size: 15px; font-weight: 600;
   cursor: pointer; white-space: nowrap; transition: opacity 0.2s;
   margin-left: 8px;

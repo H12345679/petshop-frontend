@@ -193,11 +193,11 @@ export default {
         // 0. 防御 XSS：转义 < 和 >
         .replaceAll("<", "&lt;").replaceAll(">", "&gt;")
         // 1. 处理 **[text](url)** 格式（加粗包裹的标准链接）
-        .replace(/\*\*\[([^\[\]\n]+)\]\(([^()\n]+)\)\*\*/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/\*\*\[([^[\]\n]+)\]\(([^()\n]+)\)\*\*/g, '<a data-link="$2" class="ai-product-link" style="color:#2a69d4;cursor:pointer;text-decoration:underline;">$1</a>')
         // 2. 处理普通标准 [text](url) 格式
-        .replace(/\[([^\[\]\n]+)\]\(([^()\n]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/\[([^[\]\n]+)\]\(([^()\n]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#2a69d4;cursor:pointer;text-decoration:underline;">$1</a>')
         // 3. 兜底：【name】（ /product/123 ）或 【name】( /product/123 ) — 全角/半角括号带空格
-        .replace(/(【[^【】\n]+】)[ \t]*[（(][ \t]*(\/product\/\d+)[ \t]*[）)]/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/(【[^【】\n]+】)[ \t]*[（(][ \t]*(\/product\/\d+)[ \t]*[）)]/g, '<a data-link="$2" class="ai-product-link" style="color:#2a69d4;cursor:pointer;text-decoration:underline;">$1</a>')
         // 4. 处理 **文字** 加粗（排除已转换的 <a> 标签内容）
         .replace(/\*\*([^*<>\n]+)\*\*/g, '<strong>$1</strong>')
         // 5. 换行
@@ -347,7 +347,7 @@ export default {
 .brand {
   font-size: 18px;
   font-weight: bold;
-  color: #5b8def;
+  color: #2a69d4;
   margin-bottom: 24px;
   display: flex;
   align-items: center;
@@ -357,7 +357,7 @@ export default {
   font-size: 24px;
 }
 .new-chat-btn {
-  background: #5b8def;
+  background: #2a69d4;
   color: #fff;
   text-align: center;
   padding: 10px 0;
@@ -394,8 +394,8 @@ export default {
   transition: all 0.2s;
 }
 .history-item:hover {
-  border-color: #5b8def;
-  color: #5b8def;
+  border-color: #2a69d4;
+  color: #2a69d4;
 }
 .history-item.active {
   border-color: #164082;
@@ -454,7 +454,7 @@ export default {
   height: 40px;
   border-radius: 50%;
   background: #dbe4f0;
-  color: #5b8def;
+  color: #2a69d4;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -479,7 +479,7 @@ export default {
   border-top-left-radius: 2px;
 }
 .msg-row.is-user .bubble {
-  background: #5b8def;
+  background: #2a69d4;
   color: #fff;
   border-top-right-radius: 2px;
 }

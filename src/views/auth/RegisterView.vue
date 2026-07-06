@@ -15,20 +15,20 @@
           <div class="field">
             <label><i class="req">*</i> 用户名</label>
             <div class="input-wrap">
-              <input v-model.trim="form.username" type="text" placeholder="4-16 位字母 / 数字，唯一" />
+              <input aria-label="input" v-model.trim="form.username" type="text" placeholder="4-16 位字母 / 数字，唯一" />
             </div>
           </div>
           <div class="field">
             <label><i class="req">*</i> 密码</label>
             <div class="input-wrap">
-              <input v-model="form.password" :type="showPassword ? 'text' : 'password'" placeholder="至少 6 位" autocomplete="new-password" />
+              <input aria-label="input" v-model="form.password" :type="showPassword ? 'text' : 'password'" placeholder="至少 6 位" autocomplete="new-password" />
               <span class="muted small" style="cursor:pointer; margin-left: 8px;" @click="showPassword = !showPassword">👁</span>
             </div>
           </div>
           <div class="field">
             <label><i class="req">*</i> 确认密码</label>
             <div class="input-wrap">
-              <input v-model="confirm" :type="showConfirm ? 'text' : 'password'" placeholder="再次输入密码" autocomplete="new-password" />
+              <input aria-label="input" v-model="confirm" :type="showConfirm ? 'text' : 'password'" placeholder="再次输入密码" autocomplete="new-password" />
               <span class="muted small" style="cursor:pointer; margin-left: 8px;" @click="showConfirm = !showConfirm">👁</span>
             </div>
           </div>
@@ -36,26 +36,26 @@
             <div class="field col flex1">
               <label>昵称（选填）</label>
               <div class="input-wrap">
-                <input v-model.trim="form.nickname" type="text" placeholder="如：旺财主人" />
+                <input aria-label="input" v-model.trim="form.nickname" type="text" placeholder="如：旺财主人" />
               </div>
             </div>
             <div class="field col flex1">
               <label>手机号（选填）</label>
               <div class="input-wrap">
-                <input v-model.trim="form.phone" type="text" placeholder="13800138000" />
+                <input aria-label="input" v-model.trim="form.phone" type="text" placeholder="13800138000" />
               </div>
             </div>
           </div>
           <div class="field mt16">
             <label>邮箱（选填）</label>
             <div class="input-wrap">
-              <input v-model.trim="form.email" type="text" placeholder="user@example.com" />
+              <input aria-label="input" v-model.trim="form.email" type="text" placeholder="user@example.com" />
             </div>
           </div>
 
           <div class="small muted mb12 mt16 row center" style="justify-content:flex-start">
             <label style="cursor:pointer; display:flex; align-items:center; gap:6px;">
-              <input type="checkbox" checked /> 我已阅读并同意 <span class="link">《用户协议》</span> 与 <span class="link">《隐私政策》</span>
+              <input aria-label="input" type="checkbox" checked /> 我已阅读并同意 <span class="link">《用户协议》</span> 与 <span class="link">《隐私政策》</span>
             </label>
           </div>
 
@@ -133,7 +133,7 @@ export default {
 .logo {
   font-weight: 700;
   font-size: 20px;
-  color: #5b8def;
+  color: #2a69d4;
 }
 .paw { margin-right: 6px; }
 .spacer { flex: 1; }
@@ -152,11 +152,11 @@ export default {
   padding: 56px 64px;
 }
 
-.brand { font-size: 20px; font-weight: 700; color: #5b8def; text-align: center; }
+.brand { font-size: 20px; font-weight: 700; color: #2a69d4; text-align: center; }
 .brand .paw { margin-right: 4px; }
 .title { margin: 16px 0 4px; font-size: 22px; color: #222; }
-.sub { margin: 0 0 20px; font-size: 13px; color: #888; }
-.link { color: #5b8def; text-decoration: none; cursor: pointer; }
+.sub { margin: 0 0 20px; font-size: 13px; color: #595959; }
+.link { color: #2a69d4; text-decoration: none; cursor: pointer; }
 .link:hover { text-decoration: underline; }
 
 .row { display: flex; }
@@ -166,7 +166,7 @@ export default {
 .mt16 { margin-top: 16px; }
 .mb12 { margin-bottom: 12px; }
 .center { align-items: center; justify-content: center; }
-.muted { color: #888; }
+.muted { color: #595959; }
 .small { font-size: 13px; }
 
 /* 表单字段 */
@@ -180,7 +180,7 @@ export default {
   margin-bottom: 10px;
   font-weight: 500;
 }
-.field label .req { color: #d9534f; font-style: normal; margin-right: 4px; }
+.field label .req { color: #c0392b; font-style: normal; margin-right: 4px; }
 
 .input-wrap {
   display: flex;
@@ -192,7 +192,7 @@ export default {
   transition: all 0.2s ease;
 }
 .input-wrap:focus-within {
-  border-color: #5b8def;
+  border-color: #2a69d4;
   background: #fff;
   box-shadow: 0 0 0 3px rgba(91, 141, 239, 0.1);
 }
@@ -209,7 +209,7 @@ export default {
   color: #aaa;
 }
 
-.error { color: #d9534f; font-size: 13px; margin: 12px 0 0; }
+.error { color: #c0392b; font-size: 13px; margin: 12px 0 0; }
 
 /* 按钮 */
 .btn {
@@ -222,7 +222,7 @@ export default {
   outline: none;
 }
 .btn.primary {
-  background: #5b8def;
+  background: #2a69d4;
   color: #fff;
 }
 .btn.primary:hover:not(:disabled) {

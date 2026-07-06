@@ -315,28 +315,28 @@ export default {
 #detail-page { display: flex; flex-direction: column; min-height: 100vh; background: #f4f5f7; }
 .detail-wrap { max-width: 760px; width: 100%; margin: 0 auto; padding: 24px 20px 40px; flex: 1; }
 
-.loading-wrap { text-align: center; padding: 80px; color: #888; }
-.empty-state { text-align: center; padding: 80px; color: #888; }
-.empty-state .back-link { font-size: 14px; color: #5b8def; text-decoration: none; font-weight: 500; }
+.loading-wrap { text-align: center; padding: 80px; color: #595959; }
+.empty-state { text-align: center; padding: 80px; color: #595959; }
+.empty-state .back-link { font-size: 14px; color: #2a69d4; text-decoration: none; font-weight: 500; }
 
 /* 顶部返回 */
 .top-bar {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 16px;
 }
-.back-link { font-size: 14px; color: #5b8def; text-decoration: none; font-weight: 500; }
+.back-link { font-size: 14px; color: #2a69d4; text-decoration: none; font-weight: 500; }
 .back-link:hover { opacity: 0.8; }
-.top-order-no { font-size: 12px; color: #999; }
+.top-order-no { font-size: 12px; color: #595959; }
 
 /* 状态横幅 */
 .banner {
   display: flex; align-items: center; gap: 16px;
   padding: 20px 24px; border-radius: 8px; color: #fff; margin-bottom: 16px;
-  background: linear-gradient(90deg, #5b8def, #7aa5f5);
+  background: linear-gradient(90deg, #2a69d4, #7aa5f5);
 }
-.banner.b-pending { background: linear-gradient(90deg, #5b8def, #7aa5f5); }
+.banner.b-pending { background: linear-gradient(90deg, #2a69d4, #7aa5f5); }
 .banner.b-done { background: #aaa; }
-.banner.b-cancel { background: linear-gradient(90deg, #d9534f, #e88583); }
+.banner.b-cancel { background: linear-gradient(90deg, #c0392b, #e88583); }
 .banner.b-refund, .banner.b-refunded { background: linear-gradient(90deg, #e6914e, #f0b880); }
 .banner-icon { font-size: 32px; }
 .banner-title { font-size: 18px; font-weight: 700; }
@@ -348,13 +348,13 @@ export default {
 
 /* 步骤条 */
 .steps { display: flex; align-items: center; justify-content: center; }
-.step { display: flex; align-items: center; color: #888; font-size: 13px; }
+.step { display: flex; align-items: center; color: #595959; font-size: 13px; }
 .step .dot { width: 22px; height: 22px; border-radius: 50%; background: #dfe3e9; color: #777; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 4px; }
-.step.on { color: #5b8def; }
-.step.on .dot { background: #5b8def; color: #fff; }
+.step.on { color: #2a69d4; }
+.step.on .dot { background: #2a69d4; color: #fff; }
 .step + .step { margin-left: 10px; position: relative; }
 .step + .step::before { content: ''; display: inline-block; width: 46px; height: 2px; background: #cfd4da; margin-right: 10px; }
-.step.on::before, .step.on + .step::before { background: #5b8def; }
+.step.on::before, .step.on + .step::before { background: #2a69d4; }
 
 /* 商品表格 */
 .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -366,16 +366,16 @@ export default {
 .prod-img { width: 40px; height: 40px; border-radius: 6px; overflow: hidden; background: #f5f5f5; flex-shrink: 0; }
 .prod-img img { width: 100%; height: 100%; object-fit: cover; }
 
-.price { color: #d9534f; font-weight: 700; }
+.price { color: #c0392b; font-weight: 700; }
 .small { font-size: 12px; }
-.muted { color: #888; }
+.muted { color: #595959; }
 .mt8 { margin-top: 8px; }
 .mb8 { margin-bottom: 8px; }
 
 /* 金额 */
 .price-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; color: #555; }
 .total-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #cfd4da; padding-top: 10px; }
-.total-price { font-size: 22px; color: #d9534f; font-weight: 700; }
+.total-price { font-size: 22px; color: #c0392b; font-weight: 700; }
 .discount { color: #4caf7d; }
 
 /* 操作栏 */
@@ -387,11 +387,11 @@ export default {
 
 /* 按钮 */
 .btn { display: inline-flex; align-items: center; justify-content: center; border: 1px solid #9aa1aa; background: #fff; color: #444; border-radius: 6px; padding: 7px 16px; font-size: 13px; cursor: pointer; white-space: nowrap; }
-.btn.primary { background: #5b8def; border-color: #5b8def; color: #fff; }
+.btn.primary { background: #2a69d4; border-color: #2a69d4; color: #fff; }
 .btn.lg { padding: 11px 22px; font-size: 15px; }
 .btn:hover { opacity: 0.85; }
 .btn.disabled { opacity: 0.4; cursor: not-allowed; }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-.copy-link { color: #5b8def; cursor: pointer; }
+.copy-link { color: #2a69d4; cursor: pointer; }
 </style>

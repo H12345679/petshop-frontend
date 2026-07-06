@@ -13,7 +13,7 @@
 
       <template v-if="!loading && !loadError && orders.length > 0">
         <!-- 状态横幅（卡片包裹 + 渐变背景，与 wireframe 一致） -->
-        <div class="card" style="background:linear-gradient(90deg,#5b8def,#7aa5f5);color:#fff">
+        <div class="card" style="background:linear-gradient(90deg,#2a69d4,#7aa5f5);color:#fff">
           <div style="font-size:18px;font-weight:700">💳 合并支付 · 待付款</div>
           <div class="small mt8" style="opacity:.9">共 {{ orders.length }} 个订单，{{ totalQty }} 件商品，请尽快完成支付</div>
         </div>
@@ -238,19 +238,19 @@ export default {
 #payment-page { display: flex; flex-direction: column; min-height: 100vh; background: #f4f5f7; }
 .payment-wrap { max-width: 760px; width: 100%; margin: 0 auto; padding: 24px 20px 40px; flex: 1; }
 
-.loading-wrap { text-align: center; padding: 80px; color: #999; }
-.empty-state { text-align: center; padding: 80px; color: #888; }
-.empty-state .back-link { font-size: 14px; color: #5b8def; text-decoration: none; font-weight: 500; }
+.loading-wrap { text-align: center; padding: 80px; color: #595959; }
+.empty-state { text-align: center; padding: 80px; color: #595959; }
+.empty-state .back-link { font-size: 14px; color: #2a69d4; text-decoration: none; font-weight: 500; }
 
 /* 步骤条 */
 .steps { display: flex; align-items: center; justify-content: center; }
-.step { display: flex; align-items: center; color: #888; font-size: 13px; }
+.step { display: flex; align-items: center; color: #595959; font-size: 13px; }
 .step .dot { width: 22px; height: 22px; border-radius: 50%; background: #dfe3e9; color: #777; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 4px; }
-.step.on { color: #5b8def; }
-.step.on .dot { background: #5b8def; color: #fff; }
+.step.on { color: #2a69d4; }
+.step.on .dot { background: #2a69d4; color: #fff; }
 .step + .step { margin-left: 10px; position: relative; }
 .step + .step::before { content: ''; display: inline-block; width: 46px; height: 2px; background: #cfd4da; margin-right: 10px; }
-.step.on::before, .step.on + .step::before { background: #5b8def; }
+.step.on::before, .step.on + .step::before { background: #2a69d4; }
 
 /* 卡片 */
 .card { background: #fff; border: 1px solid #cfd4da; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
@@ -267,13 +267,13 @@ export default {
 .prod-img img { width: 100%; height: 100%; object-fit: cover; }
 
 /* 金额 */
-.price { color: #d9534f; font-weight: 700; }
+.price { color: #c0392b; font-weight: 700; }
 .small { font-size: 12px; }
-.muted { color: #888; }
+.muted { color: #595959; }
 .mt8 { margin-top: 8px; }
 .price-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; color: #555; }
 .total-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #cfd4da; margin: 10px 0; padding-top: 10px; }
-.total-price { font-size: 26px; color: #d9534f; font-weight: 700; }
+.total-price { font-size: 26px; color: #c0392b; font-weight: 700; }
 .discount { color: #4caf7d; }
 
 /* 底部操作栏（卡片样式） */
@@ -285,7 +285,7 @@ export default {
 
 /* 按钮 */
 .btn { display: inline-flex; align-items: center; justify-content: center; border: 1px solid #9aa1aa; background: #fff; color: #444; border-radius: 6px; padding: 7px 16px; font-size: 13px; cursor: pointer; white-space: nowrap; }
-.btn.primary { background: #5b8def; border-color: #5b8def; color: #fff; }
+.btn.primary { background: #2a69d4; border-color: #2a69d4; color: #fff; }
 .btn.lg { padding: 11px 22px; font-size: 15px; }
 .btn:hover { opacity: 0.85; }
 .btn.disabled { opacity: 0.4; cursor: not-allowed; }

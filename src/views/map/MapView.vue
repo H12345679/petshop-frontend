@@ -384,7 +384,7 @@ export default {
         if (res.data) {
           const shop = res.data;
           // 计算用户当前位置到店铺的直线距离 (公里数)
-          const AMap = window.AMap;
+          const AMap = globalThis.AMap;
           const p1 = new AMap.LngLat(userLng, userLat);
           const p2 = new AMap.LngLat(shop.longitude, shop.latitude);
           const distanceMeters = p1.distance(p2);
@@ -441,7 +441,7 @@ export default {
 
       this._shopMarkers = this.shops.map((shop, i) => {
         const isTop = i === 0; // 最近的一家突出显示
-        const color = isTop ? "#ff6b35" : "#5b8def";
+        const color = isTop ? "#ff6b35" : "#2a69d4";
         const size = isTop ? 32 : 26;
         const marker = new AMap.Marker({
           position: [shop.longitude, shop.latitude],
@@ -704,7 +704,7 @@ export default {
   transition: all 0.2s;
 }
 .search-inner:focus-within {
-  border-color: #5b8def;
+  border-color: #2a69d4;
   background: #fff;
   box-shadow: 0 0 0 3px rgba(91, 141, 239, 0.12);
 }
@@ -728,7 +728,7 @@ export default {
   transition: color 0.15s;
   flex-shrink: 0;
 }
-.search-clear:hover { color: #5b8def; }
+.search-clear:hover { color: #2a69d4; }
 
 /* -- 自动补全下拉 -- */
 .autocomplete-dropdown {
@@ -784,7 +784,7 @@ export default {
   gap: 8px;
   flex-wrap: wrap;
 }
-.filter-label { font-size: 12px; color: #888; font-weight: 500; }
+.filter-label { font-size: 12px; color: #595959; font-weight: 500; }
 .radius-tags { display: flex; gap: 6px; }
 .radius-tag {
   padding: 3px 10px;
@@ -796,16 +796,16 @@ export default {
   cursor: pointer;
   transition: all 0.15s;
 }
-.radius-tag:hover { border-color: #5b8def; color: #5b8def; }
+.radius-tag:hover { border-color: #2a69d4; color: #2a69d4; }
 .radius-tag.active {
-  background: #5b8def;
-  border-color: #5b8def;
+  background: #2a69d4;
+  border-color: #2a69d4;
   color: #fff;
 }
 .relocate-btn {
   margin-left: auto;
   font-size: 12px;
-  color: #5b8def;
+  color: #2a69d4;
   cursor: pointer;
   font-weight: 600;
   white-space: nowrap;
@@ -821,13 +821,13 @@ export default {
   flex-shrink: 0;
   min-height: 38px;
 }
-.status-text { font-size: 12px; color: #888; flex: 1; }
-.status-text strong { color: #5b8def; font-size: 15px; }
+.status-text { font-size: 12px; color: #595959; flex: 1; }
+.status-text strong { color: #2a69d4; font-size: 15px; }
 .status-loading { font-size: 12px; color: #aab; flex: 1; display: flex; align-items: center; gap: 5px; }
 .status-hint { font-size: 12px; color: #ffa940; flex: 1; }
 .list-mode-btn {
   font-size: 12px;
-  color: #5b8def;
+  color: #2a69d4;
   cursor: pointer;
   font-weight: 600;
   white-space: nowrap;
@@ -909,7 +909,7 @@ export default {
   top: 0;
   bottom: 0;
   width: 3px;
-  background: #5b8def;
+  background: #2a69d4;
   border-radius: 0 2px 2px 0;
 }
 
@@ -917,7 +917,7 @@ export default {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #5b8def;
+  background: #2a69d4;
   color: #fff;
   font-size: 13px;
   font-weight: 700;
@@ -949,7 +949,7 @@ export default {
   white-space: nowrap;
 }
 .shop-meta { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
-.shop-dist { font-size: 12px; color: #5b8def; font-weight: 600; }
+.shop-dist { font-size: 12px; color: #2a69d4; font-weight: 600; }
 .shop-status { font-size: 11px; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
 .shop-status.open { background: #f0fff4; color: #52c41a; }
 
@@ -968,8 +968,8 @@ export default {
   transition: all 0.12s;
   padding: 0;
 }
-.action-btn:hover { border-color: #5b8def; background: #f0f4ff; transform: scale(1.05); }
-.nav-btn:hover { border-color: #5b8def; }
+.action-btn:hover { border-color: #2a69d4; background: #f0f4ff; transform: scale(1.05); }
+.nav-btn:hover { border-color: #2a69d4; }
 .enter-btn:hover { border-color: #52c41a; background: #f0fff4; }
 
 /* -- 空态 -- */
@@ -1011,14 +1011,14 @@ export default {
   align-items: center;
   gap: 14px;
   font-size: 15px;
-  color: #5b8def;
+  color: #2a69d4;
   font-weight: 500;
 }
 .loading-spinner {
   width: 20px;
   height: 20px;
   border: 2.5px solid #d0ddf8;
-  border-top-color: #5b8def;
+  border-top-color: #2a69d4;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -1050,8 +1050,8 @@ export default {
   padding: 0;
 }
 .fab-btn:hover {
-  background: #5b8def;
-  border-color: #5b8def;
+  background: #2a69d4;
+  border-color: #2a69d4;
   transform: scale(1.06);
   box-shadow: 0 6px 20px rgba(91, 141, 239, 0.3);
 }
@@ -1100,7 +1100,7 @@ export default {
 .card-title h4 { margin: 0 0 4px; font-size: 16px; color: #1a1a2e; font-weight: 700; }
 .card-status { font-size: 11px; padding: 1px 8px; border-radius: 4px; font-weight: 600; }
 .card-status.open { background: #f0fff4; color: #52c41a; }
-.card-dist { font-size: 14px; color: #5b8def; font-weight: 700; flex-shrink: 0; }
+.card-dist { font-size: 14px; color: #2a69d4; font-weight: 700; flex-shrink: 0; }
 .card-body p {
   margin: 4px 0;
   font-size: 13px;
@@ -1123,9 +1123,9 @@ export default {
   color: #444;
   transition: all 0.15s;
 }
-.card-btn:hover { border-color: #5b8def; background: #f0f4ff; color: #5b8def; }
+.card-btn:hover { border-color: #2a69d4; background: #f0f4ff; color: #2a69d4; }
 .card-btn.primary {
-  background: linear-gradient(135deg, #5b8def 0%, #3d6dd8 100%);
+  background: linear-gradient(135deg, #2a69d4 0%, #3d6dd8 100%);
   border-color: transparent;
   color: #fff;
 }

@@ -114,10 +114,10 @@ export default {
 }
 .msg-card:hover { background: #fafbfc; }
 .msg-card.unread { background: #f7faff; border-color: #d6e3f5; }
-.msg-dot { width: 8px; height: 8px; border-radius: 50%; background: #5b8def; flex-shrink: 0; }
+.msg-dot { width: 8px; height: 8px; border-radius: 50%; background: #2a69d4; flex-shrink: 0; }
 .msg-body { flex: 1; min-width: 0; }
 .msg-title { font-size: 14px; font-weight: 600; color: #333; }
-.msg-preview { font-size: 12px; color: #888; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.msg-preview { font-size: 12px; color: #595959; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .msg-time { font-size: 11px; color: #aaa; margin-top: 4px; }
 .msg-type-tag {
   font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #f0f3fa; color: #6a7c9c; flex-shrink: 0;
@@ -138,15 +138,15 @@ export default {
 
 /* 分页 */
 .pager { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 16px; }
-.pager-info { font-size: 13px; color: #888; }
+.pager-info { font-size: 13px; color: #595959; }
 .btn {
   padding: 9px 22px; border-radius: 6px; font-size: 13px; border: 1px solid #d6dbe3; background: #fff;
   color: #444; cursor: pointer; transition: .12s;
 }
 .btn:hover { border-color: #bbb; }
 .btn.sm { padding: 5px 14px; font-size: 12px; }
-.btn.outline { border-color: #5b8def; color: #5b8def; }
+.btn.outline { border-color: #2a69d4; color: #2a69d4; }
 .btn.outline:hover { background: #e7eefc; }
 
-.empty { padding: 24px 0; text-align: center; color: #999; font-size: 13px; }
+.empty { padding: 24px 0; text-align: center; color: #595959; font-size: 13px; }
 </style>

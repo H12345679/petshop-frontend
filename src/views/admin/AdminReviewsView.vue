@@ -322,10 +322,10 @@ export default {
 /* ====== KPI 统计卡 ====== */
 .kpi-row { display: flex; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
 .kpi-card { flex: 1; min-width: 130px; background: #fff; border: 1px solid #cfd4da; border-radius: 8px; padding: 16px; }
-.kpi-label { font-size: 12px; color: #888; margin-bottom: 6px; }
+.kpi-label { font-size: 12px; color: #595959; margin-bottom: 6px; }
 .kpi-value { font-size: 26px; font-weight: 700; color: #2c3e50; }
 .kpi-value small { font-size: 13px; color: #4caf7d; font-weight: 400; margin-left: 4px; }
-.kpi-value.warn { color: #d9534f; }
+.kpi-value.warn { color: #c0392b; }
 
 /* ====== 状态 Tab ====== */
 .status-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
@@ -333,7 +333,7 @@ export default {
   padding: 6px 16px; border-radius: 100px; font-size: 13px; cursor: pointer;
   color: #666; background: #f0f2f5; font-weight: 500; transition: all 0.2s;
 }
-.status-tab.active { background: #5b8def; color: #fff; }
+.status-tab.active { background: #2a69d4; color: #fff; }
 .status-tab:hover:not(.active) { background: #e4e8ee; }
 
 /* ====== 评价卡片 ====== */
@@ -342,7 +342,7 @@ export default {
 
 .avatar {
   width: 44px; height: 44px; border-radius: 50%; background: #dfe3e9; border: 1px solid #cfd4da;
-  display: flex; align-items: center; justify-content: center; color: #888; font-size: 15px;
+  display: flex; align-items: center; justify-content: center; color: #595959; font-size: 15px;
   flex-shrink: 0;
 }
 .review-user-info { flex: 1; min-width: 0; }
@@ -360,13 +360,13 @@ export default {
 .tag.warn { background: #fcefe2; border-color: #f0cda6; color: #e6914e; }
 .tag.ok { background: #e6f4ec; border-color: #b6dcc6; color: #4caf7d; }
 
-.reply-link { font-size: 12px; color: #5b8def; cursor: pointer; margin-left: 12px; font-weight: 600; }
+.reply-link { font-size: 12px; color: #2a69d4; cursor: pointer; margin-left: 12px; font-weight: 600; }
 .reply-link:hover { opacity: .8; }
 
-.delete-link { font-size: 12px; color: #d9534f; cursor: pointer; margin-left: 12px; }
+.delete-link { font-size: 12px; color: #c0392b; cursor: pointer; margin-left: 12px; }
 .delete-link:hover { opacity: .8; }
 
-.restore-link { font-size: 12px; color: #5b8def; cursor: pointer; margin-left: 12px; font-weight: 600; }
+.restore-link { font-size: 12px; color: #2a69d4; cursor: pointer; margin-left: 12px; font-weight: 600; }
 .restore-link:hover { opacity: .8; }
 
 .review-content { font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 8px; }
@@ -382,16 +382,16 @@ export default {
   background: #f4f5f7; border-radius: 6px; padding: 8px 12px; font-size: 13px;
   color: #666; line-height: 1.5;
 }
-.review-reply b { color: #5b8def; }
+.review-reply b { color: #2a69d4; }
 
 .review-reply-input { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
 
-.loading-wrap { text-align: center; padding: 60px; color: #888; }
-.empty-state { text-align: center; padding: 60px; color: #888; }
+.loading-wrap { text-align: center; padding: 60px; color: #595959; }
+.empty-state { text-align: center; padding: 60px; color: #595959; }
 
 .spacer { flex: 1; }
 .small { font-size: 12px; }
-.muted { color: #888; }
+.muted { color: #595959; }
 
 .pager { display: flex; gap: 6px; justify-content: flex-end; margin-top: 14px; align-items: center; }
 .pager span {
@@ -399,8 +399,8 @@ export default {
   display: flex; align-items: center; justify-content: center; font-size: 13px;
   color: #555; background: #fff; padding: 0 8px; cursor: pointer;
 }
-.pager span:hover { border-color: #5b8def; color: #5b8def; }
-.pager span.on { background: #5b8def; border-color: #5b8def; color: #fff; }
+.pager span:hover { border-color: #2a69d4; color: #2a69d4; }
+.pager span.on { background: #2a69d4; border-color: #2a69d4; color: #fff; }
 .pager span.disabled { opacity: .3; cursor: not-allowed; }
-.total-hint { border: none !important; background: transparent !important; color: #888; font-size: 12px; cursor: default !important; }
+.total-hint { border: none !important; background: transparent !important; color: #595959; font-size: 12px; cursor: default !important; }
 </style>

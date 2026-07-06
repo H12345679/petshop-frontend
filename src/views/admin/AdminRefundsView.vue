@@ -14,7 +14,7 @@
       <span v-for="t in statusTabs" :key="t.value"
         :class="['tab', { on: activeTab === t.value }]"
         @click="activeTab = t.value; loadData()"
-      >{{ t.label }} <b v-if="t.count !== null" style="color:#d9534f">{{ t.count }}</b></span>
+      >{{ t.label }} <b v-if="t.count !== null" style="color:#c0392b">{{ t.count }}</b></span>
     </div>
 
     <!-- ====== 退单列表 ====== -->
@@ -184,7 +184,7 @@
       <span slot="footer" v-if="detailRefund">
         <template v-if="detailRefund.status === 0">
           <el-button @click="showDetailDialog = false">取消</el-button>
-          <el-button style="border-color:#d9534f;color:#d9534f" @click="doAudit(detailRefund, 2)" :loading="auditLoading">驳回（恢复原状态）</el-button>
+          <el-button style="border-color:#c0392b;color:#c0392b" @click="doAudit(detailRefund, 2)" :loading="auditLoading">驳回（恢复原状态）</el-button>
           <el-button type="primary" style="background:#4caf7d;border-color:#4caf7d" @click="doAudit(detailRefund, 1)" :loading="auditLoading">
             {{ detailRefund.received === 0 ? '确认退货退款' : (detailRefund.refundType === 2 ? '同意退货' : '通过退款') }}
           </el-button>
@@ -418,8 +418,8 @@ export default {
   padding: 8px 16px; font-size: 13px; color: #666; border-bottom: 2px solid transparent;
   cursor: pointer; white-space: nowrap; transition: color .15s;
 }
-.tab:hover { color: #5b8def; }
-.tab.on { color: #5b8def; border-bottom-color: #5b8def; font-weight: 600; }
+.tab:hover { color: #2a69d4; }
+.tab.on { color: #2a69d4; border-bottom-color: #2a69d4; font-weight: 600; }
 .tab b { margin-left: 4px; }
 
 /* ====== 卡片 ====== */
@@ -464,8 +464,8 @@ export default {
   display: flex; align-items: center; justify-content: center; font-size: 13px;
   color: #555; background: #fff; padding: 0 8px; cursor: pointer;
 }
-.pager span:hover { border-color: #5b8def; color: #5b8def; }
-.pager span.on { background: #5b8def; border-color: #5b8def; color: #fff; }
+.pager span:hover { border-color: #2a69d4; color: #2a69d4; }
+.pager span.on { background: #2a69d4; border-color: #2a69d4; color: #fff; }
 .pager span.disabled { opacity: .3; cursor: not-allowed; }
 
 /* ====== 直退卡片 ====== */

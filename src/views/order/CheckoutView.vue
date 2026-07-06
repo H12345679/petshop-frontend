@@ -120,7 +120,7 @@
 
     <!-- 优惠券弹窗 -->
     <el-dialog title="选择优惠券" :visible.sync="showCouponDialog" width="480px">
-      <div v-if="userCoupons.length === 0" style="text-align:center;padding:30px;color:#999">暂无可用优惠券</div>
+      <div v-if="userCoupons.length === 0" style="text-align:center;padding:30px;color:#595959">暂无可用优惠券</div>
       <div v-else class="dialog-coupons">
         <div
           v-for="c in userCoupons"
@@ -303,14 +303,14 @@ export default {
 #checkout-page { display: flex; flex-direction: column; min-height: 100vh; background: #f4f5f7; }
 .checkout-wrap { max-width: 1080px; width: 100%; margin: 0 auto; padding: 24px 20px 40px; flex: 1; }
 
-.loading-wrap { text-align: center; padding: 80px; color: #999; }
+.loading-wrap { text-align: center; padding: 80px; color: #595959; }
 
 /* 步骤条 */
 .steps { display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
-.step { display: flex; align-items: center; color: #888; font-size: 13px; }
+.step { display: flex; align-items: center; color: #595959; font-size: 13px; }
 .step .dot { width: 22px; height: 22px; border-radius: 50%; background: #dfe3e9; color: #777; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 6px; }
-.step.on { color: #5b8def; }
-.step.on .dot { background: #5b8def; color: #fff; }
+.step.on { color: #2a69d4; }
+.step.on .dot { background: #2a69d4; color: #fff; }
 .bar { width: 46px; height: 2px; background: #cfd4da; margin: 0 10px; }
 
 /* 两栏 */
@@ -321,18 +321,18 @@ export default {
 /* 卡片 */
 .card { background: #fff; border: 1px solid #cfd4da; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
 .card h3 { margin: 0 0 12px; font-size: 15px; }
-.more { float: right; font-size: 12px; color: #5b8def; font-weight: 400; text-decoration: none; }
+.more { float: right; font-size: 12px; color: #2a69d4; font-weight: 400; text-decoration: none; }
 .more:hover { opacity: 0.8; }
 
 /* 地址 */
 .addr-grid { display: flex; gap: 8px; flex-wrap: wrap; }
 .addr-card { flex: 1; min-width: 200px; border: 2px solid #cfd4da; border-radius: 6px; padding: 10px; cursor: pointer; transition: .15s; }
-.addr-card:hover { border-color: #5b8def; }
-.addr-card.selected { border-color: #5b8def; background: #e7eefc; }
+.addr-card:hover { border-color: #2a69d4; }
+.addr-card.selected { border-color: #2a69d4; background: #e7eefc; }
 .addr-top { margin-bottom: 4px; font-size: 13px; }
-.addr-detail { font-size: 12px; color: #888; }
-.addr-add { min-width: 90px; height: 70px; border: 1px dashed #cfd4da; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #888; font-size: 12px; cursor: pointer; }
-.addr-add:hover { border-color: #5b8def; color: #5b8def; }
+.addr-detail { font-size: 12px; color: #595959; }
+.addr-add { min-width: 90px; height: 70px; border: 1px dashed #cfd4da; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #595959; font-size: 12px; cursor: pointer; }
+.addr-add:hover { border-color: #2a69d4; color: #2a69d4; }
 
 /* 商品表格 */
 .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -343,7 +343,7 @@ export default {
 .prod-cell { display: flex; align-items: center; gap: 8px; }
 .prod-img { width: 44px; height: 44px; border-radius: 6px; overflow: hidden; background: #f5f5f5; flex-shrink: 0; }
 .prod-img img { width: 100%; height: 100%; object-fit: cover; }
-.price { color: #d9534f; font-weight: 700; }
+.price { color: #c0392b; font-weight: 700; }
 
 /* 优惠券 */
 .coupon-chips { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -351,13 +351,13 @@ export default {
   padding: 8px 14px; border: 1px solid #cfd4da; border-radius: 6px; font-size: 13px;
   cursor: pointer; transition: .15s; background: #fff;
 }
-.coupon-chip:hover { border-color: #5b8def; }
-.coupon-chip.on { border-color: #5b8def; background: #e7eefc; }
+.coupon-chip:hover { border-color: #2a69d4; }
+.coupon-chip.on { border-color: #2a69d4; background: #e7eefc; }
 .coupon-chip.block { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.coupon-more { padding: 8px 14px; border: 1px dashed #cfd4da; border-radius: 6px; font-size: 13px; color: #5b8def; cursor: pointer; }
+.coupon-more { padding: 8px 14px; border: 1px dashed #cfd4da; border-radius: 6px; font-size: 13px; color: #2a69d4; cursor: pointer; }
 .coupon-more:hover { background: #f7faff; }
 .c-type { padding: 2px 10px; border-radius: 4px; color: #fff; font-weight: 700; font-size: 12px; }
-.c-type.reduce { background: #e74c3c; }
+.c-type.reduce { background: #c0392b; }
 .c-type.discount { background: #e67e22; }
 .dialog-coupons { max-height: 400px; overflow-y: auto; }
 
@@ -365,24 +365,24 @@ export default {
 .settle-card { position: sticky; top: 80px; }
 .price-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; color: #555; }
 .total-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #cfd4da; margin: 10px 0; padding-top: 10px; }
-.total-price { font-size: 26px; color: #d9534f; font-weight: 700; }
+.total-price { font-size: 26px; color: #c0392b; font-weight: 700; }
 .discount { color: #4caf7d; }
 .mb12 { margin-bottom: 12px; }
 .mt8 { margin-top: 8px; }
 
 /* 按钮 */
 .btn { display: inline-flex; align-items: center; justify-content: center; border: 1px solid #9aa1aa; background: #fff; color: #444; border-radius: 6px; padding: 7px 16px; font-size: 13px; cursor: pointer; }
-.btn.primary { background: #5b8def; border-color: #5b8def; color: #fff; }
+.btn.primary { background: #2a69d4; border-color: #2a69d4; color: #fff; }
 .btn.block { display: flex; width: 100%; }
 .btn.lg { padding: 11px 22px; font-size: 15px; }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* 标签 */
 .tag { display: inline-block; background: #e9ecf1; border: 1px solid #cfd4da; border-radius: 4px; padding: 1px 8px; font-size: 12px; color: #555; }
-.tag.accent { background: #e7eefc; border-color: #bcd0f6; color: #5b8def; }
+.tag.accent { background: #e7eefc; border-color: #bcd0f6; color: #2a69d4; }
 
 .small { font-size: 12px; }
-.muted { color: #888; }
+.muted { color: #595959; }
 
 @media (max-width: 768px) {
   .row { flex-direction: column; }

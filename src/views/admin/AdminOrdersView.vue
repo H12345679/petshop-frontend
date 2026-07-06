@@ -31,7 +31,7 @@
         @click="switchTab(t.value)"
       >
         {{ t.label }}
-        <b v-if="t.count !== null" :style="{ color: t.countColor || '#d9534f' }">{{ t.count }}</b>
+        <b v-if="t.count !== null" :style="{ color: t.countColor || '#c0392b' }">{{ t.count }}</b>
       </span>
     </div>
 
@@ -181,7 +181,7 @@ export default {
       tabs: [
         { label: "全部", value: null, count: null, countColor: null },
         { label: "待支付", value: 0, count: null, countColor: null },
-        { label: "待发货", value: 1, count: null, countColor: "#d9534f" },
+        { label: "待发货", value: 1, count: null, countColor: "#c0392b" },
         { label: "待收货", value: 2, count: null, countColor: null },
         { label: "待评价", value: 3, count: null, countColor: null },
         { label: "已完成", value: 4, count: null, countColor: null },
@@ -389,8 +389,8 @@ export default {
   padding: 8px 16px; font-size: 13px; color: #666; border-bottom: 2px solid transparent;
   cursor: pointer; white-space: nowrap; transition: color .15s;
 }
-.tab:hover { color: #5b8def; }
-.tab.on { color: #5b8def; border-bottom-color: #5b8def; font-weight: 600; }
+.tab:hover { color: #2a69d4; }
+.tab.on { color: #2a69d4; border-bottom-color: #2a69d4; font-weight: 600; }
 .tab b { margin-left: 4px; font-weight: 700; }
 
 /* ====== 表格（对齐 wireframe.css .tbl） ====== */
@@ -402,26 +402,26 @@ export default {
 .tbl td { padding: 10px; border-bottom: 1px solid #eef0f3; color: #555; vertical-align: middle; }
 .tbl tr:hover td { background: #fafbfc; }
 .tbl tr:last-child td { border-bottom: none; }
-.empty-td { text-align: center; padding: 40px !important; color: #888; }
+.empty-td { text-align: center; padding: 40px !important; color: #595959; }
 
-.price { color: #d9534f; font-weight: 700; }
+.price { color: #c0392b; font-weight: 700; }
 .small { font-size: 12px; }
-.muted { color: #888; }
+.muted { color: #595959; }
 
 /* ====== 状态标签（对齐 wireframe.css .tag） ====== */
 .tag {
   display: inline-block; background: #e9ecf1; border: 1px solid #cfd4da; border-radius: 4px;
   padding: 1px 8px; font-size: 12px; color: #555;
 }
-.tag.accent { background: #e7eefc; border-color: #bcd0f6; color: #5b8def; }
+.tag.accent { background: #e7eefc; border-color: #bcd0f6; color: #2a69d4; }
 .tag.warn { background: #fcefe2; border-color: #f0cda6; color: #e6914e; }
 .tag.ok { background: #e6f4ec; border-color: #b6dcc6; color: #4caf7d; }
-.tag.danger { background: #fbe7e6; border-color: #f0c2c0; color: #d9534f; }
+.tag.danger { background: #fbe7e6; border-color: #f0c2c0; color: #c0392b; }
 
 /* ====== 操作链接 ====== */
-.action-link { cursor: pointer; color: #5b8def; }
+.action-link { cursor: pointer; color: #2a69d4; }
 .action-link:hover { opacity: .8; }
-.action-link.accent { color: #5b8def; }
+.action-link.accent { color: #2a69d4; }
 
 /* ====== 分页（对齐 wireframe.css .pager） ====== */
 .pager { display: flex; gap: 6px; justify-content: flex-end; margin-top: 14px; align-items: center; }
@@ -430,10 +430,10 @@ export default {
   display: flex; align-items: center; justify-content: center; font-size: 13px;
   color: #555; background: #fff; padding: 0 8px; cursor: pointer;
 }
-.pager span:hover { border-color: #5b8def; color: #5b8def; }
-.pager span.on { background: #5b8def; border-color: #5b8def; color: #fff; }
+.pager span:hover { border-color: #2a69d4; color: #2a69d4; }
+.pager span.on { background: #2a69d4; border-color: #2a69d4; color: #fff; }
 .pager span.disabled { opacity: .3; cursor: not-allowed; }
-.total-hint { border: none !important; background: transparent !important; color: #888; font-size: 12px; cursor: default !important; }
+.total-hint { border: none !important; background: transparent !important; color: #595959; font-size: 12px; cursor: default !important; }
 
 /* ====== 表单 ====== */
 .field { margin-bottom: 14px; }
@@ -450,7 +450,7 @@ export default {
 .ds-1 { background: #e3f2fd; color: #1976d2; }
 .ds-2 { background: #e8f5e9; color: #388e3c; }
 .ds-3 { background: #f3e5f5; color: #7b1fa2; }
-.ds-4 { background: #f5f5f5; color: #888; }
+.ds-4 { background: #f5f5f5; color: #595959; }
 .ds--1 { background: #fbe9e7; color: #d84315; }
 .ds--2 { background: #fff3e0; color: #e65100; }
 .ds--3, .ds--4 { background: #e8f5e9; color: #2e7d32; }
@@ -462,12 +462,12 @@ export default {
 .di-img { width: 36px; height: 36px; object-fit: cover; border-radius: 6px; background: #f5f5f5; }
 .di-info { flex: 1; min-width: 0; }
 .di-name { font-size: 13px; font-weight: 500; }
-.di-spec { font-size: 11px; color: #999; }
+.di-spec { font-size: 11px; color: #595959; }
 .di-price { font-size: 13px; color: #666; white-space: nowrap; }
 .di-row { display: flex; padding: 4px 0; font-size: 13px; }
-.di-key { width: 80px; color: #999; flex-shrink: 0; }
+.di-key { width: 80px; color: #595959; flex-shrink: 0; }
 .di-val { color: #555; }
 .di-row.total { border-top: 1px solid #eee; padding-top: 8px; margin-top: 4px; }
 .di-val.discount { color: #27ae60; }
-.di-val.pay { font-size: 16px; font-weight: 700; color: #e74c3c; }
+.di-val.pay { font-size: 16px; font-weight: 700; color: #c0392b; }
 </style>

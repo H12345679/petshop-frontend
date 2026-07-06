@@ -165,11 +165,11 @@
     </div>
 
     <div class="container text-center" v-else-if="loading">
-      <div style="padding: 100px; color: #5b8def;">加载中...</div>
+      <div style="padding: 100px; color: #2a69d4;">加载中...</div>
     </div>
     
     <div class="container text-center" v-else>
-      <div class="card" style="padding: 100px; color: #888;">
+      <div class="card" style="padding: 100px; color: #595959;">
         商品不存在或已下架
         <div class="mt16"><router-link to="/products" class="btn primary-btn" style="display:inline-block">返回列表</router-link></div>
       </div>
@@ -269,24 +269,20 @@ export default {
           const imgs = JSON.parse(this.product.images);
           if (Array.isArray(imgs)) {
             imgs.forEach(img => {
-              if (img && !mList.find(m => m.url === img)) mList.push({ type: 'image', url: img });
+              if (img && !mList.some(m => m.url === img)) mList.push({ type: 'image', url: img });
             });
           }
         } catch (e) { /* ignore */ }
       }
       if (this.product.skus && this.product.skus.length > 0) {
         this.product.skus.forEach(sku => {
-          if (sku.image && !mList.find(m => m.url === sku.image)) {
+          if (sku.image && !mList.some(m => m.url === sku.image)) {
             mList.push({ type: 'image', url: sku.image });
           }
         });
       }
       this.mediaList = mList;
-      if (this.mediaList.length > 0) {
-        this.activeMedia = this.mediaList[0];
-      } else {
-        this.activeMedia = null;
-      }
+      this.activeMedia = this.mediaList.length > 0 ? this.mediaList[0] : null;
       
       this.currentSku = null;
       
@@ -470,7 +466,7 @@ export default {
 <style scoped>
 .play-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.6); color: #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 14px; pointer-events: none; }
 .bc-link { color: inherit; text-decoration: none; cursor: pointer; transition: color 0.2s; }
-.bc-link:hover { color: #5b8def; }
+.bc-link:hover { color: #2a69d4; }
 .product-detail-page { background: #f4f5f7; min-height: 100vh; display: flex; flex-direction: column; }
 
 /* 布局 */
@@ -487,7 +483,7 @@ export default {
 .mt8 { margin-top: 8px; }
 .mt16 { margin-top: 16px; }
 .small { font-size: 13px; }
-.muted { color: #888; }
+.muted { color: #595959; }
 .warn { color: #fff; background: #e5a452; }
 .warn-text { color: #e5a452; }
 .text-center { text-align: center; }
@@ -499,22 +495,22 @@ export default {
 /* 左侧图册 */
 .main-img { width: 100%; height: 380px; background-color: #f0f0f0; border-radius: 10px; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
 .thumb-img { width: 64px; height: 64px; background-color: #f0f0f0; border-radius: 6px; cursor: pointer; border: 2px solid transparent; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #ccc;}
-.thumb-img.active { border-color: #5b8def; }
+.thumb-img.active { border-color: #2a69d4; }
 
 /* 右侧信息 */
 .info-card { padding: 24px; margin-left: 20px; flex: 1; }
 .p-title { font-size: 20px; font-weight: 700; color: #333; margin-bottom: 8px; }
 .price-box { background: #fdf5f6; border-radius: 8px; padding: 16px; margin-bottom: 20px; border: 1px solid #fae8e9; }
-.price { color: #d9534f; font-weight: 700; font-size: 28px; }
+.price { color: #c0392b; font-weight: 700; font-size: 28px; }
 .price .cur { font-size: 16px; margin-right: 2px; }
 .del { color: #aaa; text-decoration: line-through; font-size: 13px; margin-left: 8px; }
 .tag { margin: 0; padding: 4px 12px; cursor: pointer; border-radius: 4px; transition: 0.2s; color: #555; border: 1px solid #e6e8eb; background: #fff;}
-.tag.accent { background: #eef4fe; color: #5b8def; border-color: #cce0ff; font-weight: 600; }
+.tag.accent { background: #eef4fe; color: #2a69d4; border-color: #cce0ff; font-weight: 600; }
 .tag.disabled { background: #f5f5f5; color: #bbb; cursor: not-allowed; border-style: dashed; }
 .tag.warn { border: none; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
 
 .field { margin-bottom: 16px; }
-.field label { display: block; font-size: 13px; color: #888; margin-bottom: 8px; }
+.field label { display: block; font-size: 13px; color: #595959; margin-bottom: 8px; }
 .btn { display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; user-select: none; transition: 0.2s; }
 .btn.sm { width: 32px; height: 32px; background: #f0f3fa; color: #555; }
 .btn.sm:hover:not(.disabled) { background: #e2e8f5; }
@@ -525,18 +521,18 @@ export default {
 .btn.lg.disabled { opacity: 0.6; cursor: not-allowed; }
 .add-cart-btn { background: #ffb96b !important; border-color: #ffb96b !important; color: #fff; }
 .add-cart-btn:hover:not(.disabled) { background: #ffa84a !important; }
-.primary-btn { background: #5b8def !important; border-color: #5b8def !important; color: #fff; }
+.primary-btn { background: #2a69d4 !important; border-color: #2a69d4 !important; color: #fff; }
 .primary-btn:hover:not(.disabled) { background: #4a7ce0 !important; }
 .fav-btn { color: #555; }
 .fav-btn:hover { background: #f8f9fb; }
-.fav-btn.fav-active { color: #e74c3c; border-color: #e74c3c; background: #fef2f2; }
+.fav-btn.fav-active { color: #c0392b; border-color: #c0392b; background: #fef2f2; }
 .fav-btn.fav-active:hover { background: #fde8e8; }
 
 /* 底部 Tabs */
 .tabs { display: flex; border-bottom: 2px solid #e6e8eb; margin-bottom: 20px; }
 .tab { padding: 12px 24px; font-size: 15px; cursor: pointer; position: relative; color: #555; font-weight: 500; }
-.tab.on { color: #5b8def; font-weight: 600; }
-.tab.on::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background: #5b8def; }
+.tab.on { color: #2a69d4; font-weight: 600; }
+.tab.on::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background: #2a69d4; }
 
 .pcard { display: flex; gap: 12px; }
 .pimg { width: 80px; height: 80px; background: #f0f0f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #aaa; flex-shrink: 0; }
@@ -552,7 +548,7 @@ export default {
 .review-time { font-size: 12px; color: #bbb; margin-left: auto; }
 .review-content { font-size: 14px; color: #555; line-height: 1.6; }
 .review-reply { margin-top: 12px; padding: 12px; background: #f8f9fa; border-radius: 4px; font-size: 13px; color: #555; }
-.reply-label { color: #5b8def; font-weight: bold; }
+.reply-label { color: #2a69d4; font-weight: bold; }
 .review-images { display: flex; flex-wrap: wrap; }
 .r-img { width: 80px; height: 80px; border-radius: 4px; background-size: cover; background-position: center; border: 1px solid #eee; cursor: pointer; }
 </style>

@@ -13,8 +13,8 @@
           </span>
         </div>
         <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-          <input v-model.trim="keyword" placeholder="搜索视频标题..." @keyup.enter="onSearch" style="padding: 6px 12px; border: 1px solid #d6dbe3; border-radius: 4px; outline: none; font-size: 13px;" />
-          <button class="btn sm primary" style="background:#5b8def; color:#fff; border: none; padding: 0 16px; cursor: pointer; border-radius: 4px;" @click="onSearch">搜索</button>
+          <input aria-label="input" v-model.trim="keyword" placeholder="搜索视频标题..." @keyup.enter="onSearch" style="padding: 6px 12px; border: 1px solid #d6dbe3; border-radius: 4px; outline: none; font-size: 13px;" />
+          <button class="btn sm primary" style="background:#2a69d4; color:#fff; border: none; padding: 0 16px; cursor: pointer; border-radius: 4px;" @click="onSearch">搜索</button>
         </div>
       </div>
 
@@ -179,9 +179,9 @@ export default {
 
 .tabs { display: flex; gap: 24px; margin-bottom: 20px; border-bottom: 1px solid #e6e8eb; padding-bottom: 10px; }
 .tab { font-size: 15px; color: #666; cursor: pointer; padding: 4px 0; position: relative; }
-.tab:hover { color: #5b8def; }
-.tab.on { color: #5b8def; font-weight: bold; }
-.tab.on::after { content: ''; position: absolute; bottom: -11px; left: 0; width: 100%; height: 2px; background: #5b8def; }
+.tab:hover { color: #2a69d4; }
+.tab.on { color: #2a69d4; font-weight: bold; }
+.tab.on::after { content: ''; position: absolute; bottom: -11px; left: 0; width: 100%; height: 2px; background: #2a69d4; }
 
 .grid.c4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .pcard { background: #fff; border: 1px solid #e6e8eb; border-radius: 10px; overflow: hidden; cursor: pointer; transition: .15s; }
@@ -193,17 +193,17 @@ export default {
   display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; font-weight: 500; }
 .row { display: flex; align-items: center; }
 .between { justify-content: space-between; }
-.muted { color: #999; }
+.muted { color: #595959; }
 .small { font-size: 12px; }
 .mt8 { margin-top: 8px; }
-.tag.accent { color: #d9534f; border: 1px solid #d9534f; padding: 1px 6px; border-radius: 4px; font-size: 11px; }
+.tag.accent { color: #c0392b; border: 1px solid #c0392b; padding: 1px 6px; border-radius: 4px; font-size: 11px; }
 
 .pager { display: flex; justify-content: center; gap: 8px; margin-top: 30px; }
 .pager span { display: inline-block; width: 32px; height: 32px; line-height: 32px; text-align: center; background: #fff; border: 1px solid #e6e8eb; border-radius: 4px; cursor: pointer; font-size: 14px; color: #555; }
-.pager span:hover { border-color: #5b8def; color: #5b8def; }
-.pager span.on { background: #5b8def; color: #fff; border-color: #5b8def; }
+.pager span:hover { border-color: #2a69d4; color: #2a69d4; }
+.pager span.on { background: #2a69d4; color: #fff; border-color: #2a69d4; }
 .pager span.disabled { opacity: 0.5; cursor: not-allowed; }
 
-.empty { color: #999; font-size: 14px; padding: 40px 0; text-align: center; }
-.link { color: #5b8def; cursor: pointer; text-decoration: none; }
+.empty { color: #595959; font-size: 14px; padding: 40px 0; text-align: center; }
+.link { color: #2a69d4; cursor: pointer; text-decoration: none; }
 </style>

@@ -173,16 +173,16 @@ export default {
   padding: 12px 24px; background: #fff; border-bottom: 1px solid #e6e8eb;
   position: sticky; top: 0; z-index: 10;
 }
-.logo { font-weight: 700; font-size: 18px; color: #5b8def; white-space: nowrap; }
+.logo { font-weight: 700; font-size: 18px; color: #2a69d4; white-space: nowrap; }
 .logo .paw { margin-right: 4px; }
 .nav { display: flex; gap: 18px; font-size: 14px; }
 .nav a, .nav span { color: #555; text-decoration: none; cursor: pointer; }
-.nav .active { color: #5b8def; font-weight: 600; }
+.nav .active { color: #2a69d4; font-weight: 600; }
 .search { flex: 1; max-width: 420px; display: flex; border: 1px solid #d6dbe3; border-radius: 20px; overflow: hidden; }
 .search input { flex: 1; border: 0; padding: 8px 14px; outline: none; font-size: 13px; background: #fafbfc; }
-.search .go { border: 0; background: #5b8def; color: #fff; padding: 0 18px; cursor: pointer; }
+.search .go { border: 0; background: #2a69d4; color: #fff; padding: 0 18px; cursor: pointer; }
 .right { display: flex; align-items: center; gap: 14px; font-size: 13px; color: #555; white-space: nowrap; margin-left: auto; }
-.link { color: #5b8def; cursor: pointer; text-decoration: none; }
+.link { color: #2a69d4; cursor: pointer; text-decoration: none; }
 
 /* 页面内容区 */
 .container {
@@ -208,7 +208,7 @@ export default {
   outline: none;
 }
 .player-placeholder {
-  color: #999;
+  color: #595959;
   display: flex;
   align-items: center;
   justify-content: center;
