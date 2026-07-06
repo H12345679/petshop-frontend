@@ -100,6 +100,7 @@ export default {
         this.myCoupons = res.data || [];
         this.$emit('update-count', this.myCoupons.length ? this.myCoupons.filter(c => c.status === 0).length : 0);
       } catch (e) {
+        console.warn("ignored", e);
         this.myCoupons = [];
       } finally {
         this.loadingCoupons = false;
@@ -121,6 +122,7 @@ export default {
           received: claimedIds.has(String(c.id)),
         }));
       } catch (e) {
+        console.warn("ignored", e);
         this.availableCoupons = [];
       } finally {
         this.loadingAvailCoupons = false;

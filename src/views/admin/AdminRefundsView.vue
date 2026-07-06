@@ -262,7 +262,7 @@ export default {
   created() {
     const raw = getStore("userInfo");
     if (raw) {
-      try { this.isAdmin = JSON.parse(raw).role === "ADMIN"; } catch (e) {}
+      try { this.isAdmin = JSON.parse(raw).role === "ADMIN"; } catch (e) { console.warn("ignored", e); }
     }
     this.loadData();
   },
@@ -434,27 +434,27 @@ export default {
 .tbl td { padding: 10px; border-bottom: 1px solid #eef0f3; color: #555; vertical-align: middle; }
 .tbl tr:hover td { background: #fafbfc; }
 .tbl tr:last-child td { border-bottom: none; }
-.empty-td { text-align: center; padding: 40px !important; color: #888; }
+.empty-td { text-align: center; padding: 40px !important; color: #595959; }
 
-.price { color: #d9534f; font-weight: 700; }
+.price { color: #c0392b; font-weight: 700; }
 .small { font-size: 12px; }
-.muted { color: #888; }
+.muted { color: #595959; }
 
 /* ====== 状态标签（对齐 wireframe.css .tag） ====== */
 .tag {
   display: inline-block; background: #e9ecf1; border: 1px solid #cfd4da; border-radius: 4px;
   padding: 1px 8px; font-size: 12px; color: #555;
 }
-.tag.warn { background: #fcefe2; border-color: #f0cda6; color: #e6914e; }
-.tag.ok { background: #e6f4ec; border-color: #b6dcc6; color: #4caf7d; }
-.tag.cancel { background: #fbe7e6; border-color: #f0c2c0; color: #d9534f; }
-.tag.done { background: #f0f0f0; border-color: #d0d0d0; color: #767676; }
+.tag.warn { background: #fcefe2; border-color: #f0cda6; color: #c86a20; }
+.tag.ok { background: #e6f4ec; border-color: #b6dcc6; color: #328859; }
+.tag.cancel { background: #fbe7e6; border-color: #f0c2c0; color: #c0392b; }
+.tag.done { background: #f0f0f0; border-color: #d0d0d0; color: #595959; }
 .tag.accent { background: #e7eefc; border-color: #bcd0f6; color: #164082; }
 
 /* ====== 操作链接 ====== */
 .actions .action-link { cursor: pointer; }
-.actions .action-link.ok { color: #4caf7d; }
-.actions .action-link.danger { color: #d9534f; }
+.actions .action-link.ok { color: #328859; }
+.actions .action-link.danger { color: #c0392b; }
 .actions .action-link:hover { opacity: .8; }
 
 /* ====== 分页（对齐 wireframe.css .pager） ====== */
@@ -485,7 +485,7 @@ export default {
 /* ====== 审核弹窗 ====== */
 .audit-box { background: #fafbfc; border: 1px solid #eef0f3; border-radius: 6px; padding: 12px; }
 .audit-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
-.audit-row .muted { color: #888; }
+.audit-row .muted { color: #595959; }
 
 /* ====== 特别提示（已评价须退货 / 快递退款） ====== */
 .special-tip { border-radius: 6px; padding: 10px 12px; font-size: 13px; line-height: 1.6; margin-bottom: 10px; }
@@ -498,15 +498,15 @@ export default {
   display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-radius: 10px;
   margin-bottom: 16px; font-size: 16px; font-weight: 600;
 }
-.ds-0, .ds-3, .ds-4 { background: #fff8e1; color: #e65100; }
+.ds-0, .ds-3, .ds-4 { background: #fff8e1; color: #cc4400; }
 .ds-1 { background: #e8f5e9; color: #0d4212; }
 .ds-2 { background: #fbe9e7; color: #bf360c; }
 .di-section { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
 .di-section:last-child { border-bottom: none; }
 .di-label { font-size: 14px; font-weight: 600; color: #2c3e50; margin-bottom: 8px; }
 .di-row { display: flex; padding: 4px 0; font-size: 13px; }
-.di-key { width: 80px; color: #999; flex-shrink: 0; }
+.di-key { width: 80px; color: #595959; flex-shrink: 0; }
 .di-val { color: #555; }
 .di-row.total { border-top: 1px solid #eee; padding-top: 8px; margin-top: 4px; }
-.di-val.pay { font-size: 16px; font-weight: 700; color: #e74c3c; }
+.di-val.pay { font-size: 16px; font-weight: 700; color: #c0392b; }
 </style>

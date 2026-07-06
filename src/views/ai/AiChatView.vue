@@ -193,13 +193,13 @@ export default {
         // 0. 防御 XSS：转义 < 和 >
         .replaceAll("<", "&lt;").replaceAll(">", "&gt;")
         // 1. 处理 **[text](url)** 格式（加粗包裹的标准链接）
-        .replace(/\*\*\[([^\]\n]+)\]\(([^)\n]+)\)\*\*/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/\*\*\[([^\[\]\n]+)\]\(([^()\n]+)\)\*\*/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
         // 2. 处理普通标准 [text](url) 格式
-        .replace(/\[([^\]\n]+)\]\(([^)\n]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/\[([^\[\]\n]+)\]\(([^()\n]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
         // 3. 兜底：【name】（ /product/123 ）或 【name】( /product/123 ) — 全角/半角括号带空格
-        .replace(/(【[^】\n]+】)\s*[（(]\s*(\/product\/\d+)\s*[）)]/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/(【[^【】\n]+】)[ \t]*[（(][ \t]*(\/product\/\d+)[ \t]*[）)]/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
         // 4. 处理 **文字** 加粗（排除已转换的 <a> 标签内容）
-        .replace(/\*\*([^*<>]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*\*([^*<>\n]+)\*\*/g, '<strong>$1</strong>')
         // 5. 换行
         .replaceAll("\n", "<br/>");
       return html;

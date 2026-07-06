@@ -255,7 +255,7 @@ export default {
   created() {
     try {
       this.userInfo = JSON.parse(getStore("userInfo") || "null");
-    } catch(e) {}
+    } catch(e) { console.warn("ignored", e); }
     this.loadData();
     this.fetchShops();
   },

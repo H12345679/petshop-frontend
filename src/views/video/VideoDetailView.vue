@@ -110,7 +110,9 @@ export default {
   created() {
     const u = getStore("userInfo");
     if (u) {
-      try { this.userInfo = JSON.parse(u); } catch (e) {}
+      try { this.userInfo = JSON.parse(u); } catch (e) { 
+        console.warn("ignored", e); 
+      }
     }
   },
   methods: {

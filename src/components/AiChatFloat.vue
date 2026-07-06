@@ -119,10 +119,10 @@ export default {
       let html = text
         // 0. 防御 XSS：转义 < 和 >
         .replaceAll("<", "&lt;").replaceAll(">", "&gt;")
-        .replace(/\*\*\[([^\]\n]+)\]\(([^)\n]+)\)\*\*/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
-        .replace(/\[([^\]\n]+)\]\(([^)\n]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
-        .replace(/(【[^】\n]+】)\s*[（(]\s*(\/product\/\d+)\s*[）)]/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
-        .replace(/\*\*([^*<>]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*\*\[([^\[\]\n]+)\]\(([^()\n]+)\)\*\*/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/\[([^\[\]\n]+)\]\(([^()\n]+)\)/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/(【[^【】\n]+】)[ \t]*[（(][ \t]*(\/product\/\d+)[ \t]*[）)]/g, '<a data-link="$2" class="ai-product-link" style="color:#5b8def;cursor:pointer;text-decoration:underline;">$1</a>')
+        .replace(/\*\*([^*<>\n]+)\*\*/g, '<strong>$1</strong>')
         .replaceAll("\n", "<br/>");
       return html;
     },

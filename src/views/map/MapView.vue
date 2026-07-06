@@ -277,7 +277,7 @@ export default {
       AMap.plugin(
         ["AMap.Scale", "AMap.AutoComplete", "AMap.Geocoder", "AMap.Geolocation", "AMap.Driving"],
         () => {
-          try { this.map.addControl(new AMap.Scale({ position: "LB" })); } catch (_) {}
+          try { this.map.addControl(new AMap.Scale({ position: "LB" })); } catch (e) { console.warn(e); }
           // 搜索自动补全（城市范围）
           this._autoComplete = new AMap.AutoComplete({ city: DEFAULT_CITY });
           // 创建信息窗体（单例复用）
@@ -377,7 +377,7 @@ export default {
     async loadTargetShopAndNavigate(shopId, userLng, userLat) {
       this.loadingShops = true;
       this.selectedShop = null;
-      if (this._drivingInstance) { try { this._drivingInstance.clear(); } catch (_) {} }
+      if (this._drivingInstance) { try { this._drivingInstance.clear(); } catch (e) { console.warn(e); } }
       if (this._infoWindow) this.map && this.map.clearInfoWindow();
       try {
         const res = await getShopLocation(shopId);
@@ -412,7 +412,7 @@ export default {
     async fetchShops(params, isSearchMode) {
       this.loadingShops = true;
       this.selectedShop = null;
-      if (this._drivingInstance) { try { this._drivingInstance.clear(); } catch (_) {} }
+      if (this._drivingInstance) { try { this._drivingInstance.clear(); } catch (e) { console.warn(e); } }
       if (this._infoWindow) this.map && this.map.clearInfoWindow();
       try {
         const res = await searchNearbyShops(params);
@@ -557,7 +557,7 @@ export default {
         return;
       }
       const AMap = window.AMap;
-      if (this._drivingInstance) { try { this._drivingInstance.clear(); } catch (_) {} }
+      if (this._drivingInstance) { try { this._drivingInstance.clear(); } catch (e) { console.warn(e); } }
       this._drivingInstance = new AMap.Driving({ map: this.map, panel: null });
       this._drivingInstance.search(
         [this.startPoint.lng, this.startPoint.lat],
