@@ -9,7 +9,8 @@
         style="text-decoration:none">萌宠视频</router-link>
     </nav>
     <div class="search">
-      <input v-model.trim="keyword" placeholder="搜索宠物 / 用品..." @keyup.enter="onSearch" />
+      <label for="globalSearchInput" class="sr-only">搜索</label>
+      <input id="globalSearchInput" v-model.trim="keyword" placeholder="搜索宠物 / 用品..." @keyup.enter="onSearch" />
       <button class="go" @click="onSearch">搜索</button>
     </div>
     <div class="right">
@@ -57,6 +58,7 @@ export default {
     try {
       this.userInfo = u ? JSON.parse(u) : null;
     } catch (e) {
+      console.warn(e);
       this.userInfo = null;
     }
   },
@@ -73,10 +75,10 @@ export default {
       removestore("userInfo");
       this.userInfo = null;
       // 登出后跳转回首页或刷新
-      if (this.$route.path !== '/') {
-        this.$router.push('/');
+      if (this.$route.path === '/') {
+        globalThis.location.reload();
       } else {
-        window.location.reload();
+        this.$router.push('/');
       }
     },
   },
@@ -85,6 +87,10 @@ export default {
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
 
 /* 顶栏 (毛玻璃化) */
 .topbar {
@@ -228,6 +234,6 @@ export default {
 }
 
 .muted {
-  color: #999;
+  color: #595959;
 }
 </style>

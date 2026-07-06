@@ -6,7 +6,6 @@
 </template>
 
 <script>
-import { getStore } from "@/libs/storage.js";
 import AiChatFloat from "@/components/AiChatFloat.vue";
 
 export default {

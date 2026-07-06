@@ -1,4 +1,4 @@
-import { get, postJson } from "../axios";
+import { get } from "../axios";
 
 /** 
  * 获取历史会话列表：GET /api/ai/chat/sessions 

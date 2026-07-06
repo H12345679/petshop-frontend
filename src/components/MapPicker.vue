@@ -12,7 +12,9 @@
       <div class="map-picker-search">
         <div class="search-inner">
           <span class="search-icon">🔍</span>
+          <label for="mapSearchInput" class="sr-only">搜索地址</label>
           <input
+            id="mapSearchInput"
             v-model="keyword"
             class="search-input"
             placeholder="输入地址搜索..."
@@ -77,8 +79,8 @@ import { getMapConfig } from "@/api/modules/config.js";
 /** 动态加载高德地图脚本（全局复用，不重复加载） */
 function loadAMapScript(key, securityJsCode) {
   return new Promise((resolve, reject) => {
-    if (window.AMap) return resolve();
-    window._AMapSecurityConfig = { securityJsCode: securityJsCode };
+    if (globalThis.AMap) return resolve();
+    globalThis._AMapSecurityConfig = { securityJsCode: securityJsCode };
     const existing = document.getElementById("amap-script");
     if (existing) {
       // 脚本已挂载但还在加载中
@@ -141,7 +143,7 @@ export default {
   beforeDestroy() {
     this.destroyMap();
     if (this.$el && this.$el.parentNode) {
-      this.$el.parentNode.removeChild(this.$el);
+      this.$el.remove();
     }
   },
   methods: {
@@ -156,7 +158,7 @@ export default {
         console.error("加载高德地图配置失败:", err);
         return;
       }
-      const AMap = window.AMap;
+      const AMap = globalThis.AMap;
       const el = this.$refs.mapEl;
       if (!el) return;
 
@@ -204,7 +206,7 @@ export default {
 
     /* ===== 在地图上放置标记 ===== */
     placeMarker(lng, lat) {
-      const AMap = window.AMap;
+      const AMap = globalThis.AMap;
       if (this._marker && this._map) {
         this._map.remove(this._marker);
       }
@@ -307,6 +309,9 @@ export default {
 </script>
 
 <style scoped>
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
 /* ===== 遮罩层 (现代高阶磨砂玻璃背板) ===== */
 .map-picker-mask {
   position: fixed;
@@ -359,7 +364,7 @@ export default {
 }
 .close-btn {
   font-size: 20px;
-  color: #94a3b8;
+  color: #475569;
   cursor: pointer;
   line-height: 1;
   width: 32px; height: 32px;
@@ -402,9 +407,9 @@ export default {
   padding: 11px 10px; font-size: 14px; color: #0f172a;
   font-weight: 500;
 }
-.search-input::placeholder { color: #94a3b8; }
+.search-input::placeholder { color: #595959; }
 .search-clear {
-  cursor: pointer; color: #94a3b8; font-size: 12px;
+  cursor: pointer; color: #595959; font-size: 12px;
   padding: 3px; border-radius: 50%; transition: all .15s;
 }
 .search-clear:hover { color: #3b82f6; background: #eff6ff; }
@@ -481,7 +486,7 @@ export default {
   background: #f8fafc;
   border-color: #f1f5f9;
 }
-.selected-info.placeholder .selected-text { color: #94a3b8; }
+.selected-info.placeholder .selected-text { color: #595959; }
 .selected-icon { font-size: 15px; flex-shrink: 0; }
 .selected-text {
   font-size: 13.5px; color: #1e293b;
@@ -508,7 +513,7 @@ export default {
 }
 .confirm-btn:disabled {
   background: #e2e8f0;
-  color: #94a3b8;
+  color: #595959;
   box-shadow: none;
   cursor: not-allowed;
   transform: none;
