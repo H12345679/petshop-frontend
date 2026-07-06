@@ -187,7 +187,9 @@
     <!-- 视频在线预览弹窗 -->
     <el-dialog :title="previewData.title || '视频在线预览'" :visible.sync="previewModalVisible" width="680px" custom-class="video-preview-dialog" @close="closePreviewModal" :append-to-body="true">
       <div class="video-preview-wrapper" v-if="previewModalVisible && previewData.url">
-        <video :src="previewData.url" :poster="previewData.cover" controls autoplay class="preview-video-player"></video>
+        <video :src="previewData.url" :poster="previewData.cover" controls autoplay class="preview-video-player">
+          <track kind="captions" src="" label="中文字幕" srclang="zh" />
+        </video>
       </div>
       <div v-else class="preview-empty">暂无有效视频链接</div>
     </el-dialog>

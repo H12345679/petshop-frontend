@@ -29,15 +29,15 @@ const HOUR = 3600 * 1000;
 /** 后端时间可能是 "yyyy-MM-dd HH:mm:ss" 或 ISO 的 "yyyy-MM-ddTHH:mm:ss"，统一转 Date */
 function parseTime(s) {
   if (!s) return null;
-  const d = new Date(String(s).replace("T", " ").replace(/-/g, "/"));
-  return isNaN(d.getTime()) ? null : d;
+  const d = new Date(String(s).replaceAll("T", " ").replaceAll("-", "/"));
+  return Number.isNaN(d.getTime()) ? null : d;
 }
 
 /** 简单字符串哈希，同一单号每次生成同样的轨迹 */
 function hashCode(s) {
   let h = 0;
   s = String(s || "");
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.codePointAt(i)) >>> 0;
   return h;
 }
 

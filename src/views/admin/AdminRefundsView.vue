@@ -97,8 +97,8 @@
           <div class="audit-row"><span class="muted">退款金额</span><span class="price">¥{{ (confirmTarget.amount || 0).toFixed(2) }}</span></div>
         </div>
         <div class="field mt12">
-          <label>备注（选填）</label>
-          <el-input v-model="confirmRemark" type="textarea" :rows="2" placeholder="退货已验收无误" />
+          <label for="confirmRemark">备注（选填）</label>
+          <el-input id="confirmRemark" v-model="confirmRemark" type="textarea" :rows="2" placeholder="退货已验收无误" />
         </div>
         <div class="small muted mt8">⚠ 确认后立即退款到用户余额，订单转为「已退款」，库存回滚。</div>
       </template>
@@ -172,8 +172,8 @@
             请先核实物流确已退回，点击「确认退货退款」即直接退款。
           </div>
           <div class="field">
-            <label>审核意见</label>
-            <el-input v-model="auditRemark" type="textarea" :rows="2" placeholder="同意退款 / 拒绝退款的理由…" />
+            <label for="auditRemarkInput">审核意见</label>
+            <el-input id="auditRemarkInput" v-model="auditRemark" type="textarea" :rows="2" placeholder="同意退款 / 拒绝退款的理由…" />
           </div>
           <div class="small muted mt8">
             <template v-if="detailRefund.refundType === 2 && detailRefund.received !== 0">⚠ 同意退货后暂不打款，待用户填写退货单号、您确认收货后再退款。</template>
@@ -379,6 +379,7 @@ export default {
       try {
         return JSON.parse(imgStr);
       } catch (e) {
+        console.warn("Failed to parse images", e);
         return [];
       }
     },
@@ -447,8 +448,8 @@ export default {
 .tag.warn { background: #fcefe2; border-color: #f0cda6; color: #e6914e; }
 .tag.ok { background: #e6f4ec; border-color: #b6dcc6; color: #4caf7d; }
 .tag.cancel { background: #fbe7e6; border-color: #f0c2c0; color: #d9534f; }
-.tag.done { background: #f0f0f0; border-color: #d0d0d0; color: #888; }
-.tag.accent { background: #e7eefc; border-color: #bcd0f6; color: #5b8def; }
+.tag.done { background: #f0f0f0; border-color: #d0d0d0; color: #767676; }
+.tag.accent { background: #e7eefc; border-color: #bcd0f6; color: #2b65c2; }
 
 /* ====== 操作链接 ====== */
 .actions .action-link { cursor: pointer; }
@@ -488,8 +489,8 @@ export default {
 
 /* ====== 特别提示（已评价须退货 / 快递退款） ====== */
 .special-tip { border-radius: 6px; padding: 10px 12px; font-size: 13px; line-height: 1.6; margin-bottom: 10px; }
-.special-tip.danger { background: #fbe7e6; border: 1px solid #f0c2c0; color: #c9302c; }
-.special-tip.warn { background: #fcefe2; border: 1px solid #f0cda6; color: #b5722e; }
+.special-tip.danger { background: #fbe7e6; border: 1px solid #f0c2c0; color: #a92522; }
+.special-tip.warn { background: #fcefe2; border: 1px solid #f0cda6; color: #9b5a1b; }
 
 /* ====== 详情弹窗 ====== */
 .detail-body { max-height: 70vh; overflow-y: auto; }
@@ -497,9 +498,9 @@ export default {
   display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-radius: 10px;
   margin-bottom: 16px; font-size: 16px; font-weight: 600;
 }
-.ds-0, .ds-3, .ds-4 { background: #fff8e1; color: #f57c00; }
-.ds-1 { background: #e8f5e9; color: #388e3c; }
-.ds-2 { background: #fbe9e7; color: #d84315; }
+.ds-0, .ds-3, .ds-4 { background: #fff8e1; color: #e65100; }
+.ds-1 { background: #e8f5e9; color: #1b5e20; }
+.ds-2 { background: #fbe9e7; color: #bf360c; }
 .di-section { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
 .di-section:last-child { border-bottom: none; }
 .di-label { font-size: 14px; font-weight: 600; color: #2c3e50; margin-bottom: 8px; }

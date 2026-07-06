@@ -99,7 +99,7 @@ export default {
 .fav-card:hover { box-shadow: 0 4px 14px rgba(60,90,160,.1); }
 .fav-img {
   width: 100%; aspect-ratio: 1 / 1; background-size: cover; background-position: center;
-  display: flex; align-items: center; justify-content: center; color: #aab0b8; font-size: 16px;
+  display: flex; align-items: center; justify-content: center; color: #666f7a; font-size: 16px;
   background-color: #eef0f3;
 }
 .fav-body { padding: 8px 10px; }
@@ -124,10 +124,10 @@ export default {
 }
 .status-ok {
   background: #e1f3d8;
-  color: #67c23a;
+  color: #2e7d32;
 }
 .status-stopped {
   background: #f4f4f5;
-  color: #909399;
+  color: #595959;
 }
 </style>

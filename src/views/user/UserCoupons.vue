@@ -114,7 +114,7 @@ export default {
         try {
           const mineRes = await getMyCoupons({});
           claimedIds = new Set((mineRes.data || []).map(uc => String(uc.couponId)));
-        } catch (e) { /* 未登录/失败则都按未领取处理 */ }
+        } catch (e) { console.warn("ignored", e); /* 未登录/失败则都按未领取处理 */ }
         this.availableCoupons = (res.data || []).map(c => ({
           ...c,
           claiming: false,

@@ -122,14 +122,14 @@
     <!-- 退货快递单号弹窗（商家同意退货后填写） -->
     <el-dialog title="填写退货快递单号" :visible.sync="returnDialog.show" width="420px">
       <div class="rd-field">
-        <label>快递公司</label>
-        <el-select v-model="returnDialog.courierCompany" style="width:100%">
+        <label for="courierCompanySelect">快递公司</label>
+        <el-select id="courierCompanySelect" v-model="returnDialog.courierCompany" style="width:100%">
           <el-option v-for="c in courierOptions" :key="c" :label="c" :value="c" />
         </el-select>
       </div>
       <div class="rd-field">
-        <label><span style="color:#d9534f">*</span> 快递单号</label>
-        <el-input v-model="returnDialog.trackingNumber" placeholder="请输入退货快递单号" maxlength="50" />
+        <label for="trackingNumberInput"><span style="color:#d9534f">*</span> 快递单号</label>
+        <el-input id="trackingNumberInput" v-model="returnDialog.trackingNumber" placeholder="请输入退货快递单号" maxlength="50" />
       </div>
       <div class="small muted">提交后商家将根据单号验收退货，确认收货后退款原路退回余额</div>
       <span slot="footer">

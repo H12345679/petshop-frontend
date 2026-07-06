@@ -249,20 +249,20 @@ export default {
   methods: {
     restoreLocal() {
       const u = getStore("userInfo");
-      try { this.userInfo = u ? JSON.parse(u) : null; } catch (e) { this.userInfo = null; }
+      try { this.userInfo = u ? JSON.parse(u) : null; } catch (e) { console.warn("ignored", e); this.userInfo = null; }
     },
     async loadUserInfo() {
       try {
         const res = await getUserInfo();
         this.userInfo = res.data;
         setStore("userInfo", JSON.stringify(res.data));
-      } catch (e) { /* 本地兜底 */ } finally { this.loading = false; }
+      } catch (e) { console.warn("ignored", e); /* 本地兜底 */ } finally { this.loading = false; }
     },
     async loadMembershipLevels() {
       try {
         const res = await getMembershipLevels();
         this.membershipLevels = res.data || [];
-      } catch (e) { /* ignore */ }
+      } catch (e) { console.warn("ignored", e); /* ignore */ }
     },
     async loadFavoriteCount() {
       try {
@@ -270,13 +270,13 @@ export default {
         if (res && res.data && res.data.total !== undefined) {
           this.favoriteTotal = res.data.total;
         }
-      } catch (e) { /* ignore */ }
+      } catch (e) { console.warn("ignored", e); /* ignore */ }
     },
     async loadCouponCount() {
       try {
         const res = await getMyCoupons({ status: 0 });
         this.couponCount = res.data ? res.data.length : 0;
-      } catch (e) { /* ignore */ }
+      } catch (e) { console.warn("ignored", e); /* ignore */ }
     },
 
     // ========== 菜单切换 ==========

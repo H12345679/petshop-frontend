@@ -5,9 +5,10 @@
       class="card row center wrap gap8"
       style="padding: 12px 16px; margin-bottom: 20px"
     >
-      <span class="small muted">门店名称</span>
+      <label for="searchInput" class="small muted">门店名称</label>
       <div class="input-wrap" style="width: 180px">
         <input
+          id="searchInput"
           v-model="query.name"
           placeholder="模糊搜索"
           @keyup.enter="doSearch"
@@ -127,9 +128,10 @@
           <div class="modal-body">
             <div class="row gap16 mb16">
               <div class="field col flex1">
-                <label><span class="req">*</span> 门店名称</label>
+                <label for="shopNameInput"><span class="req">*</span> 门店名称</label>
                 <div class="input-wrap">
                   <input
+                    id="shopNameInput"
                     v-model="formData.name"
                     placeholder="如：极客宠物南山店"
                   />

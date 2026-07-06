@@ -39,7 +39,7 @@
         <div class="card">
           <!-- 是否收到货：仅待收货(2)订单需要声明 -->
           <div class="field" v-if="orderStatus === 2">
-            <label>货物状态</label>
+            <div class="mock-label">货物状态</div>
             <div class="chip-row">
               <span :class="['chip', { on: form.received === 1 }]" @click="setReceived(1)">已收到货</span>
               <span :class="['chip', { on: form.received === 0 }]" @click="setReceived(0)">未收到货（快递退回/丢件）</span>
@@ -50,7 +50,7 @@
           </div>
 
           <div class="field">
-            <label>退款类型</label>
+            <div class="mock-label">退款类型</div>
             <div class="chip-row">
               <span :class="['chip', { on: form.type === 1, disabled: orderStatus === 4 }]" @click="setType(1)">仅退款</span>
               <span :class="['chip', { on: form.type === 2, disabled: form.received === 0 }]" @click="setType(2)">退货退款</span>
@@ -64,10 +64,11 @@
           </div>
 
           <div class="field">
-            <label><span class="req">*</span> 退款金额</label>
+            <label for="refundAmountInput"><span class="req">*</span> 退款金额</label>
             <div class="amount-row">
               <span class="currency">¥</span>
               <input
+                id="refundAmountInput"
                 type="number"
                 v-model.number="form.amount"
                 :max="maxRefund"
@@ -80,8 +81,8 @@
           </div>
 
           <div class="field">
-            <label><span class="req">*</span> 退款原因</label>
-            <el-select v-model="form.reason" placeholder="请选择：商品有瑕疵 / 不想要了 / 商家发错货 ..." style="width:100%">
+            <label for="refundReasonSelect"><span class="req">*</span> 退款原因</label>
+            <el-select id="refundReasonSelect" v-model="form.reason" placeholder="请选择：商品有瑕疵 / 不想要了 / 商家发错货 ..." style="width:100%">
               <el-option label="商品有瑕疵" value="商品有瑕疵" />
               <el-option label="不想要了" value="不想要了" />
               <el-option label="商家发错货" value="商家发错货" />
@@ -91,8 +92,9 @@
           </div>
 
           <div class="field">
-            <label>问题描述（选填）</label>
+            <label for="refundDescInput">问题描述（选填）</label>
             <el-input
+              id="refundDescInput"
               v-model="form.description"
               type="textarea"
               :rows="3"
@@ -103,7 +105,7 @@
           </div>
 
           <div class="field">
-            <label>上传凭证（选填）</label>
+            <div class="mock-label">上传凭证（选填）</div>
             <div class="upload-row">
               <div v-for="(img, idx) in form.images" :key="idx" class="upload-item">
                 <img :src="img" />
@@ -277,7 +279,7 @@ export default {
 
 /* 表单 */
 .field { margin-bottom: 18px; }
-.field label { display: block; font-size: 14px; color: #333; font-weight: 500; margin-bottom: 8px; }
+.field label, .mock-label { display: block; font-size: 14px; color: #333; font-weight: 500; margin-bottom: 8px; }
 .req { color: #d9534f; }
 
 /* 类型选择 */
