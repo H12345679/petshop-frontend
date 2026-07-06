@@ -449,7 +449,7 @@ export default {
 .tag.ok { background: #e6f4ec; border-color: #b6dcc6; color: #4caf7d; }
 .tag.cancel { background: #fbe7e6; border-color: #f0c2c0; color: #d9534f; }
 .tag.done { background: #f0f0f0; border-color: #d0d0d0; color: #767676; }
-.tag.accent { background: #e7eefc; border-color: #bcd0f6; color: #2b65c2; }
+.tag.accent { background: #e7eefc; border-color: #bcd0f6; color: #164082; }
 
 /* ====== 操作链接 ====== */
 .actions .action-link { cursor: pointer; }
@@ -499,7 +499,7 @@ export default {
   margin-bottom: 16px; font-size: 16px; font-weight: 600;
 }
 .ds-0, .ds-3, .ds-4 { background: #fff8e1; color: #e65100; }
-.ds-1 { background: #e8f5e9; color: #1b5e20; }
+.ds-1 { background: #e8f5e9; color: #0d4212; }
 .ds-2 { background: #fbe9e7; color: #bf360c; }
 .di-section { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
 .di-section:last-child { border-bottom: none; }
