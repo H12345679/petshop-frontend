@@ -272,7 +272,7 @@ export default {
       if (!this.selectedAddressId) return this.$message.warning("请选择收货地址");
       this.submitting = true;
       try {
-        const requestId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.trunc(Math.random()*16); return (c==='x'?r:(r&0x3|0x8)).toString(16); });
+        const requestId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.trunc((window.crypto.getRandomValues(new Uint8Array(1))[0] / 256) * 16); return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); });
         const items = this.checkoutItems.map(i => ({ cartId: i.cartId, productId: i.productId, skuId: i.skuId || 0, quantity: i.quantity }));
         const res = await createOrder({ requestId, couponId: this.selectedCouponId || 0, addressId: this.selectedAddressId, items });
         const d = res.data || {};

@@ -126,7 +126,7 @@ export default {
       // 1. 获取本地记录的当前会话（悬浮窗可能创建了）
       let sid = localStorage.getItem("ai_current_session");
       if (!sid) {
-        sid = 'session_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+        sid = 'session_' + Date.now() + '_' + (window.crypto.getRandomValues(new Uint32Array(1))[0] % 1000);
         localStorage.setItem("ai_current_session", sid);
       }
       this.currentSessionId = sid;
