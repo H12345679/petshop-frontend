@@ -47,6 +47,13 @@
 
         <!-- 右信息 -->
         <div class="col card info-card">
+          <!-- 商家信息栏 -->
+          <div class="shop-bar" v-if="product.shopId">
+            <span class="shop-icon">🏪</span>
+            <span class="shop-bar-name">{{ product.shopName || '宠物商城自营' }}</span>
+            <button class="shop-enter-btn" @click="$router.push('/shop/' + product.shopId)">进店看看 →</button>
+          </div>
+
           <h3 class="p-title">{{ product.name }}</h3>
           <div class="small muted mb12">{{ product.description || '暂无商品描述' }} · 商品编号 #{{ product.id }}</div>
 
@@ -64,7 +71,6 @@
             <div class="row gap8 small muted mt8">
               <span>总销量 {{ product.sales || 0 }}</span>
               <span>库存 {{ currentStock }}</span>
-              <span>{{ product.shopName || '宠物商城自营' }}</span>
             </div>
           </div>
 
@@ -93,7 +99,7 @@
             </div>
           </div>
 
-          <div class="row gap8 mt16">
+          <div class="row gap8 mt8">
             <div class="btn lg add-cart-btn" :class="{ disabled: currentStock === 0 }" @click="handleAddToCart">加入购物车</div>
             <div class="btn lg primary-btn" :class="{ disabled: currentStock === 0 }" @click="handleBuyNow">立即购买</div>
             <div class="btn lg fav-btn" :class="{ 'fav-active': isFavorited }" @click="handleFavorite">{{ isFavorited ? '♥' : '♡' }} 收藏</div>
@@ -499,7 +505,20 @@ export default {
 /* 右侧信息 */
 .info-card { padding: 24px; margin-left: 20px; flex: 1; }
 .p-title { font-size: 20px; font-weight: 700; color: #333; margin-bottom: 8px; }
-.price-box { background: #fdf5f6; border-radius: 8px; padding: 16px; margin-bottom: 20px; border: 1px solid #fae8e9; }
+/* 商家信息栏 */
+.shop-bar {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-bottom: 2px; font-size: 13px;
+}
+.shop-icon { font-size: 14px; }
+.shop-bar-name { color: #555; }
+.shop-enter-btn {
+  margin-left: 6px; padding: 2px 10px; border: 1px solid #2a69d4;
+  border-radius: 4px; background: #fff; color: #2a69d4;
+  font-size: 12px; cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.shop-enter-btn:hover { background: #2a69d4; color: #fff; }
+.price-box { background: #fdf5f6; border-radius: 8px; padding: 16px; margin-bottom: 12px; border: 1px solid #fae8e9; }
 .price { color: #c0392b; font-weight: 700; font-size: 28px; }
 .price .cur { font-size: 16px; margin-right: 2px; }
 .del { color: #aaa; text-decoration: line-through; font-size: 13px; margin-left: 8px; }
@@ -508,7 +527,7 @@ export default {
 .tag.disabled { background: #f5f5f5; color: #bbb; cursor: not-allowed; border-style: dashed; }
 .tag.warn { border: none; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
 
-.field { margin-bottom: 16px; }
+.field { margin-bottom: 10px; }
 .field label { display: block; font-size: 13px; color: #595959; margin-bottom: 8px; }
 .btn { display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; user-select: none; transition: 0.2s; }
 .btn.sm { width: 32px; height: 32px; background: #f0f3fa; color: #555; }
