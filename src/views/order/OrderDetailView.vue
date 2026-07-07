@@ -66,7 +66,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in activeItems" :key="item.id" :class="{ 'row-refunding': item.refundStatus === 1 }">
+              <tr v-for="item in items" :key="item.id" :class="{ 'row-refunding': item.refundStatus === 1, 'row-refunded': item.refundStatus === 2 || item.cancelStatus === 1 }">
                 <td>
                   <div class="prod-cell">
                     <div class="prod-img"><img :src="item.productImage || '/logo.png'" :alt="item.productName" /></div>
@@ -79,7 +79,13 @@
                 <td>¥{{ ((item.price || 0) * item.quantity).toFixed(2) }}</td>
                 <td class="price">¥{{ (item.realPayAmount || 0).toFixed(2) }}</td>
                 <td>
-                  <template v-if="item.refundStatus === 1">
+                  <template v-if="item.cancelStatus === 1">
+                    <span class="item-refund-status" style="color: #999;">已取消</span>
+                  </template>
+                  <template v-else-if="item.refundStatus === 2">
+                    <span class="item-refund-status" style="color: #999;">已退款</span>
+                  </template>
+                  <template v-else-if="item.refundStatus === 1">
                     <span class="item-refund-status">{{ itemRefundLabel(item) }}</span>
                     <span v-if="itemRefundObj(item) && itemRefundObj(item).status === 3"
                           class="btn-inline primary" @click="openItemReturnDialog(item)">填写退货单号</span>
@@ -91,20 +97,6 @@
               </tr>
             </tbody>
           </table>
-          <div v-if="cancelledItems.length" class="refunded-note">
-            <span class="small muted">已取消商品（{{ cancelledItems.length }}件）：</span>
-            <span v-for="ci in cancelledItems" :key="ci.id" class="refunded-tag">
-              {{ ci.productName }} ¥{{ (ci.realPayAmount || 0).toFixed(2) }}（已取消）
-            </span>
-          </div>
-          <div v-if="refundedItems.length" class="refunded-note">
-            <span class="small muted">已退款商品（{{ refundedItems.length }}件）：</span>
-            <span v-for="ri in refundedItems" :key="ri.id" class="refunded-tag">
-              {{ ri.productName }} ¥{{ (ri.realPayAmount || 0).toFixed(2) }}
-              <template v-if="ri.refundStatus === 1">（退款中）</template>
-              <template v-else>（已退款）</template>
-            </span>
-          </div>
         </div>
 
         <!-- 付款信息 -->
@@ -512,7 +504,7 @@ export default {
   background: linear-gradient(90deg, #2a69d4, #7aa5f5);
 }
 .banner.b-pending { background: linear-gradient(90deg, #2a69d4, #7aa5f5); }
-.banner.b-done { background: #aaa; }
+.banner.b-done { background: linear-gradient(90deg, #37a36c, #7bce9f); }
 .banner.b-cancel { background: linear-gradient(90deg, #c0392b, #e88583); }
 .banner.b-refund, .banner.b-refunded { background: linear-gradient(90deg, #e6914e, #f0b880); }
 .banner-icon { font-size: 32px; }
@@ -589,6 +581,7 @@ export default {
 }
 .cancel-whole-btn:hover { background: #fbe7e6; }
 .row-refunding td { background: #fffbf0 !important; }
+.row-refunded td { opacity: 0.6; }
 .item-refund-status { display: block; font-size: 12px; color: #e6914e; font-weight: 600; margin-bottom: 4px; }
 .btn-inline {
   display: inline-block; font-size: 11px; padding: 2px 8px; border: 1px solid #9aa1aa;
