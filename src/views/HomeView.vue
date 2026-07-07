@@ -117,10 +117,10 @@ export default {
       categories: [],
       userInfo: null,
       sections: [
+        { key: "cf", title: "🛍️ 大家都在买", tag: "CF", list: [], loading: true },
         { key: "rec", title: "💡 为你推荐", tag: "RECOMMEND", list: [], loading: true },
         { key: "hot", title: "🔥 热销榜单", tag: "HOT", list: [], loading: true },
         { key: "new", title: "✨ 新鲜上架", tag: "NEW", list: [], loading: true },
-        { key: "cf", title: "🛍️ 大家都在买", tag: "CF", list: [], loading: true },
       ],
       banners: [
         '/img/banners/banner1.jpg',

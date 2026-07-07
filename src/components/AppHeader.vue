@@ -21,7 +21,7 @@
         <router-link to="/user/center" style="text-decoration: none; color: inherit; cursor: pointer;">
           <span>👤 {{ userInfo.nickname || userInfo.username }}</span>
         </router-link>
-        <router-link v-if="userInfo.role === 'ADMIN' || userInfo.role === 'MERCHANT'" to="/admin/shops" class="link"
+        <router-link v-if="userInfo.role === 'ADMIN' || userInfo.role === 'MERCHANT'" to="/admin/dashboard" class="link"
           style="color: #ff5000; font-weight: 600;">管理后台</router-link>
         <span class="link" @click="logout">退出</span>
       </template>
