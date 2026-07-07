@@ -51,13 +51,20 @@
       </div>
 
       <el-table :data="orderData" v-loading="orderLoading" border stripe style="width: 100%; margin-top: 20px;">
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="orderId" label="订单ID" width="110" />
-        <el-table-column label="状态变更" width="180">
+        <el-table-column prop="id" label="ID" width="180" />
+        <el-table-column prop="orderId" label="订单ID" width="180" />
+        <el-table-column label="状态变更" width="220">
           <template slot-scope="scope">
-            <span class="tag">{{ statusText(scope.row.fromStatus) }}</span>
-            <span style="margin: 0 4px;">→</span>
-            <span class="tag accent">{{ statusText(scope.row.toStatus) }}</span>
+            <template v-if="scope.row.fromStatus === scope.row.toStatus">
+              <span class="tag accent" style="background: #f0f0f0; color: #666; border-color: #dcdcdc;">
+                {{ statusText(scope.row.toStatus) }} (操作)
+              </span>
+            </template>
+            <template v-else>
+              <span class="tag">{{ statusText(scope.row.fromStatus) }}</span>
+              <span style="margin: 0 4px;">→</span>
+              <span class="tag accent">{{ statusText(scope.row.toStatus) }}</span>
+            </template>
           </template>
         </el-table-column>
         <el-table-column prop="operatorName" label="操作人" width="120" />
