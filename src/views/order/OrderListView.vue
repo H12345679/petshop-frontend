@@ -65,6 +65,22 @@
                     class="refund-hint reject">
                 ❌ 退款申请已驳回{{ order.refund.auditRemark ? '：' + order.refund.auditRemark : '' }}，可重新申请
               </span>
+              <!-- 部分退款中：订单未冻结但有明细在退款，展示per-item退款进度 -->
+              <template v-if="order.status > 0 && hasItemInRefund(order)">
+                <template v-for="rf in (order.refunds || [])">
+                  <template v-if="rf.status === 0">
+                    <span :key="'rh'+rf.id" class="refund-hint">⏳ {{ refundItemName(order, rf) }} 退款审核中</span>
+                  </template>
+                  <template v-else-if="rf.status === 3">
+                    <span :key="'rh'+rf.id" class="refund-hint warn">{{ refundItemName(order, rf) }} 待退货</span>
+                    <span :key="'rb'+rf.id" class="btn sm primary" @click="openReturnDialogForRefund(rf)">填写退货单号</span>
+                  </template>
+                  <template v-else-if="rf.status === 4">
+                    <span :key="'rh'+rf.id" class="refund-hint">🚚 {{ refundItemName(order, rf) }} 退货已寄出</span>
+                    <span :key="'rb'+rf.id" class="btn sm" @click="openReturnLogisticsForRefund(rf)">查看退货物流</span>
+                  </template>
+                </template>
+              </template>
               <!-- 状态0：待支付 -->
               <template v-if="order.status === 0">
                 <span class="btn sm" @click="cancelOrder(order)">取消订单</span>
@@ -91,28 +107,31 @@
                 <span class="btn sm" @click="deleteOrderConfirm(order)">删除订单</span>
                 <span class="btn sm" @click="buyAgain(order)">再次购买</span>
               </template>
-              <!-- 部分退款中：订单未冻结但有明细在退款，展示per-item退款进度 -->
-              <template v-if="order.status > 0 && hasItemInRefund(order)">
-                <template v-for="rf in (order.refunds || [])">
-                  <template v-if="rf.status === 0">
-                    <span :key="'rh'+rf.id" class="refund-hint">⏳ {{ refundItemName(order, rf) }} 退款审核中</span>
-                  </template>
-                  <template v-else-if="rf.status === 3">
-                    <span :key="'rh'+rf.id" class="refund-hint warn">{{ refundItemName(order, rf) }} 待退货</span>
-                    <span :key="'rb'+rf.id" class="btn sm primary" @click="openReturnDialogForRefund(rf)">填写退货单号</span>
-                  </template>
-                  <template v-else-if="rf.status === 4">
-                    <span :key="'rh'+rf.id" class="refund-hint">🚚 {{ refundItemName(order, rf) }} 退货已寄出</span>
-                    <span :key="'rb'+rf.id" class="btn sm" @click="openReturnLogisticsForRefund(rf)">查看退货物流</span>
-                  </template>
-                </template>
-              </template>
+
               <!-- 已取消 -->
               <template v-if="order.status === -1">
                 <span class="btn sm" @click="deleteOrderConfirm(order)">删除订单</span>
               </template>
-              <!-- 退款中(-2)：展示退款/退货进度 -->
-              <template v-if="order.status === -2 && order.refund">
+              <!-- 退款中(-2)：遍历所有活跃退款单，为每个退款商品展示独立进度和操作 -->
+              <template v-if="order.status === -2 && (order.refunds || []).length > 0">
+                <template v-for="rf in (order.refunds || [])">
+                  <template v-if="rf.status === 0">
+                    <span :key="'rh2-'+rf.id" class="refund-hint">⏳ {{ refundItemName(order, rf) }} 退款审核中</span>
+                  </template>
+                  <template v-else-if="rf.status === 3">
+                    <span :key="'rh2-'+rf.id" class="refund-hint warn">{{ refundItemName(order, rf) }} 商家已同意退货，请寄回商品</span>
+                    <span :key="'rb2-'+rf.id" class="btn sm primary" @click="openReturnDialogForRefund(rf)">填写退货单号</span>
+                  </template>
+                  <template v-else-if="rf.status === 4">
+                    <span :key="'rh2-'+rf.id" class="refund-hint">
+                      🚚 {{ refundItemName(order, rf) }} 退货已寄出（{{ rf.returnCourierCompany }} {{ rf.returnTrackingNumber }}），待商家确认收货
+                    </span>
+                    <span :key="'rb2-'+rf.id" class="btn sm" @click="openReturnLogisticsForRefund(rf)">查看退货物流</span>
+                  </template>
+                </template>
+              </template>
+              <!-- 兼容：整单只有一条退款单且没有 refunds 数组时，回退到 refund 单条展示 -->
+              <template v-else-if="order.status === -2 && order.refund">
                 <span v-if="order.refund.status === 0" class="refund-hint">⏳ 退款申请审核中</span>
                 <template v-else-if="order.refund.status === 3">
                   <span class="refund-hint warn">商家已同意退货，请寄回商品</span>

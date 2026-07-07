@@ -136,7 +136,9 @@
             <span v-if="order.status === 3 && activeItems.length" class="btn lg" @click="openRefund">申请退款</span>
             <span v-if="order.status === 3 && activeItems.length" class="btn primary lg" @click="goReview">去评价</span>
             <span v-if="order.status >= 4" class="btn lg" @click="buyAgain">再次购买</span>
-            <span v-if="order.status < 0 && order.status > -4" class="btn lg" disabled>已取消/已退款</span>
+            <span v-if="order.status === -1" class="btn lg" disabled>已取消</span>
+            <span v-if="order.status === -2" class="btn lg" disabled>退款处理中</span>
+            <span v-if="order.status === -3 || order.status === -4" class="btn lg" disabled>已退款</span>
           </div>
         </div>
       </template>
