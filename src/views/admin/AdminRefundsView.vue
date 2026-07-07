@@ -342,6 +342,7 @@ export default {
         await confirmReturnRefund(this.confirmTarget.id, { remark: this.confirmRemark || '' });
         this.$message.success('已确认收货，退款已退回用户余额');
         this.showConfirmReturn = false;
+        this.showDetailDialog = false;
         this.loadData();
       } catch (e) {
         this.$message.error(e.message || '操作失败');
