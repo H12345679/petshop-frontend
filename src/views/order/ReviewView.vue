@@ -102,6 +102,7 @@ export default {
       orderId: null,
       orderNo: "",
       orderItem: null,
+      remainingItems: [],
       form: { rating: 5, content: "", images: [], anonymous: false },
     };
   },
@@ -128,10 +129,11 @@ export default {
             this.orderId = o.id;
             this.orderNo = o.orderNo || "";
             const items = (o.orderItems || []).filter(i =>
-                (!i.refundStatus || i.refundStatus === 0) && (!i.cancelStatus || i.cancelStatus === 0));
+                (!i.refundStatus || i.refundStatus === 0) && (!i.cancelStatus || i.cancelStatus === 0) && !i.reviewed);
             this.orderItem = itemId
               ? items.find(i => String(i.id) === String(itemId))
               : items[0];
+            this.remainingItems = items.filter(i => !this.orderItem || String(i.id) !== String(this.orderItem.id));
             break;
           }
         }
@@ -168,8 +170,17 @@ export default {
           content: this.form.content,
           images: JSON.stringify(this.form.images),
         });
-        this.$message.success("评价成功！");
-        this.$router.push("/orders");
+        if (this.remainingItems.length > 0) {
+          const next = this.remainingItems[0];
+          this.$message.success("评价成功！继续评价下一件商品");
+          this.$router.replace(`/review?orderId=${this.orderId}&itemId=${next.id}`);
+          this.orderItem = next;
+          this.remainingItems = this.remainingItems.slice(1);
+          this.form = { rating: 5, content: "", images: [], anonymous: false };
+        } else {
+          this.$message.success("全部商品评价完成！");
+          this.$router.push("/orders");
+        }
       } catch (e) {
         this.$message.error(e.message || "提交失败");
       } finally {

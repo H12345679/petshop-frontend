@@ -62,10 +62,11 @@
                 <th style="width:50px">数量</th>
                 <th style="width:90px">小计</th>
                 <th style="width:100px">分摊实付</th>
+                <th style="width:120px">状态</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in activeItems" :key="item.id">
+              <tr v-for="item in activeItems" :key="item.id" :class="{ 'row-refunding': item.refundStatus === 1 }">
                 <td>
                   <div class="prod-cell">
                     <div class="prod-img"><img :src="item.productImage || '/logo.png'" :alt="item.productName" /></div>
@@ -77,6 +78,16 @@
                 <td>{{ item.quantity }}</td>
                 <td>¥{{ ((item.price || 0) * item.quantity).toFixed(2) }}</td>
                 <td class="price">¥{{ (item.realPayAmount || 0).toFixed(2) }}</td>
+                <td>
+                  <template v-if="item.refundStatus === 1">
+                    <span class="item-refund-status">{{ itemRefundLabel(item) }}</span>
+                    <span v-if="itemRefundObj(item) && itemRefundObj(item).status === 3"
+                          class="btn-inline primary" @click="openItemReturnDialog(item)">填写退货单号</span>
+                    <span v-else-if="itemRefundObj(item) && itemRefundObj(item).status === 4"
+                          class="btn-inline" @click="openItemReturnLogistics(item)">查看退货物流</span>
+                  </template>
+                  <span v-else class="small muted">—</span>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -145,6 +156,36 @@
       <div class="cancel-whole-btn" @click="cancelWholeOrder">取消整个订单</div>
     </el-dialog>
 
+    <!-- 选择评价商品弹窗 -->
+    <el-dialog title="选择要评价的商品" :visible.sync="showReviewSelect" width="460px">
+      <div v-for="item in reviewSelectItems" :key="item.id" class="cancel-select-item" @click="selectReviewItem(item)">
+        <div class="prod-img" style="width:44px;height:44px"><img :src="item.productImage || '/logo.png'" /></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600">{{ item.productName }}</div>
+          <div class="small muted" v-if="item.specName">{{ item.specName }}</div>
+        </div>
+        <div class="small">× {{ item.quantity }}</div>
+      </div>
+    </el-dialog>
+
+    <!-- 退货快递单号弹窗 -->
+    <el-dialog title="填写退货快递单号" :visible.sync="returnDialog.show" width="420px">
+      <div style="margin-bottom:12px">
+        <label class="small">快递公司</label>
+        <el-select v-model="returnDialog.courierCompany" style="width:100%" size="small">
+          <el-option v-for="c in courierOptions" :key="c" :label="c" :value="c" />
+        </el-select>
+      </div>
+      <div style="margin-bottom:12px">
+        <label class="small"><span style="color:#c0392b">*</span> 快递单号</label>
+        <el-input v-model="returnDialog.trackingNumber" placeholder="请输入退货快递单号" size="small" maxlength="50" />
+      </div>
+      <span slot="footer">
+        <el-button size="small" @click="returnDialog.show = false">取消</el-button>
+        <el-button type="primary" size="small" :loading="returnDialog.loading" @click="submitReturn">提交</el-button>
+      </span>
+    </el-dialog>
+
     <!-- 模拟物流轨迹弹窗 -->
     <LogisticsDialog ref="logisticsDialog" />
 
@@ -153,7 +194,7 @@
 </template>
 
 <script>
-import { getOrderById, payOrder, cancelOrder, receiveOrder, deleteOrder } from "@/api/modules/order.js";
+import { getOrderById, payOrder, cancelOrder, receiveOrder, deleteOrder, submitReturnShipping } from "@/api/modules/order.js";
 import { getUserInfo } from "@/api/modules/user.js";
 import { setStore } from "@/libs/storage.js";
 import AppHeader from "@/components/AppHeader.vue";
@@ -172,15 +213,18 @@ export default {
       paying: false,
       showCancelSelect: false,
       cancelSelectItems: [],
+      courierOptions: ["顺丰速运", "中通快递", "圆通速递", "韵达快递", "申通快递", "邮政EMS", "京东物流", "其他"],
+      returnDialog: { show: false, refundId: null, courierCompany: "顺丰速运", trackingNumber: "", loading: false },
+      showReviewSelect: false,
+      reviewSelectItems: [],
     };
   },
   computed: {
     activeItems() {
-      return this.items.filter(i =>
-          (!i.refundStatus || i.refundStatus === 0) && (!i.cancelStatus || i.cancelStatus === 0));
+      return this.items.filter(i => i.refundStatus !== 2 && (!i.cancelStatus || i.cancelStatus === 0));
     },
     refundedItems() {
-      return this.items.filter(i => i.refundStatus && i.refundStatus > 0);
+      return this.items.filter(i => i.refundStatus === 2);
     },
     cancelledItems() {
       return this.items.filter(i => i.cancelStatus && i.cancelStatus > 0);
@@ -371,7 +415,68 @@ export default {
         seed: this.order.trackingNumber || this.order.id,
       });
     },
-    goReview() { this.$router.push(`/review?orderId=${this.order.id}`); },
+    goReview() {
+      const reviewable = this.activeItems.filter(i =>
+          (!i.refundStatus || i.refundStatus === 0) && !i.reviewed);
+      if (reviewable.length === 0) return this.$message.warning("暂无可评价的商品");
+      if (reviewable.length === 1) {
+        this.$router.push(`/review?orderId=${this.order.id}&itemId=${reviewable[0].id}`);
+      } else {
+        this.reviewSelectItems = reviewable;
+        this.showReviewSelect = true;
+      }
+    },
+    selectReviewItem(item) {
+      this.showReviewSelect = false;
+      this.$router.push(`/review?orderId=${this.order.id}&itemId=${item.id}`);
+    },
+    itemRefundObj(item) {
+      const refunds = this.order?.refunds || [];
+      return refunds.find(r => String(r.orderItemId) === String(item.id));
+    },
+    itemRefundLabel(item) {
+      const rf = this.itemRefundObj(item);
+      if (!rf) return "退款中";
+      const labels = { 0: "审核中", 3: "待退货", 4: "退货已寄出" };
+      return labels[rf.status] || "退款中";
+    },
+    openItemReturnDialog(item) {
+      const rf = this.itemRefundObj(item);
+      if (!rf) return;
+      this.returnDialog.refundId = rf.id;
+      this.returnDialog.trackingNumber = "";
+      this.returnDialog.show = true;
+    },
+    openItemReturnLogistics(item) {
+      const rf = this.itemRefundObj(item);
+      if (!rf) return;
+      this.$refs.logisticsDialog.open({
+        title: "退货物流",
+        courierCompany: rf.returnCourierCompany,
+        trackingNumber: rf.returnTrackingNumber,
+        shipTime: rf.returnTime,
+        seed: rf.returnTrackingNumber || rf.id,
+        destName: "商家仓库",
+      });
+    },
+    async submitReturn() {
+      const d = this.returnDialog;
+      if (!d.trackingNumber.trim()) return this.$message.warning("请输入退货快递单号");
+      d.loading = true;
+      try {
+        await submitReturnShipping(d.refundId, {
+          courierCompany: d.courierCompany,
+          trackingNumber: d.trackingNumber.trim(),
+        });
+        this.$message.success("退货信息已提交");
+        d.show = false;
+        this.loadDetail();
+      } catch (e) {
+        this.$message.error(e.message || "提交失败");
+      } finally {
+        d.loading = false;
+      }
+    },
     buyAgain() {
       if (this.items && this.items.length > 0) {
         this.$router.push(`/product/${this.items[0].productId}`);
@@ -481,4 +586,12 @@ export default {
   border-radius: 8px; color: #c0392b; cursor: pointer; font-size: 13px; transition: .15s;
 }
 .cancel-whole-btn:hover { background: #fbe7e6; }
+.row-refunding td { background: #fffbf0 !important; }
+.item-refund-status { display: block; font-size: 12px; color: #e6914e; font-weight: 600; margin-bottom: 4px; }
+.btn-inline {
+  display: inline-block; font-size: 11px; padding: 2px 8px; border: 1px solid #9aa1aa;
+  border-radius: 4px; cursor: pointer; color: #555; background: #fff;
+}
+.btn-inline.primary { border-color: #2a69d4; color: #2a69d4; }
+.btn-inline:hover { opacity: .8; }
 </style>

@@ -91,9 +91,21 @@
                 <span class="btn sm" @click="deleteOrderConfirm(order)">删除订单</span>
                 <span class="btn sm" @click="buyAgain(order)">再次购买</span>
               </template>
-              <!-- 部分退款中：订单未冻结但有明细在退款 -->
+              <!-- 部分退款中：订单未冻结但有明细在退款，展示per-item退款进度 -->
               <template v-if="order.status > 0 && hasItemInRefund(order)">
-                <span class="refund-hint">部分商品退款中</span>
+                <template v-for="rf in (order.refunds || [])">
+                  <template v-if="rf.status === 0">
+                    <span :key="'rh'+rf.id" class="refund-hint">⏳ {{ refundItemName(order, rf) }} 退款审核中</span>
+                  </template>
+                  <template v-else-if="rf.status === 3">
+                    <span :key="'rh'+rf.id" class="refund-hint warn">{{ refundItemName(order, rf) }} 待退货</span>
+                    <span :key="'rb'+rf.id" class="btn sm primary" @click="openReturnDialogForRefund(rf)">填写退货单号</span>
+                  </template>
+                  <template v-else-if="rf.status === 4">
+                    <span :key="'rh'+rf.id" class="refund-hint">🚚 {{ refundItemName(order, rf) }} 退货已寄出</span>
+                    <span :key="'rb'+rf.id" class="btn sm" @click="openReturnLogisticsForRefund(rf)">查看退货物流</span>
+                  </template>
+                </template>
               </template>
               <!-- 已取消 -->
               <template v-if="order.status === -1">
@@ -172,6 +184,18 @@
       <div class="cancel-whole-btn" @click="cancelWholeOrder">取消整个订单</div>
     </el-dialog>
 
+    <!-- 选择评价商品弹窗（多商品订单） -->
+    <el-dialog title="选择要评价的商品" :visible.sync="showReviewSelect" width="460px">
+      <div v-for="item in reviewSelectItems" :key="item.id" class="refund-select-item" @click="selectReviewItem(item)">
+        <div class="oc-img" style="width:44px;height:44px"><img :src="item.productImage || '/logo.png'" /></div>
+        <div style="flex:1;min-width:0">
+          <div class="oc-name">{{ item.productName }}</div>
+          <div class="oc-spec" v-if="item.specName">{{ item.specName }}</div>
+        </div>
+        <div class="small">× {{ item.quantity }}</div>
+      </div>
+    </el-dialog>
+
     <!-- 模拟物流轨迹弹窗 -->
     <LogisticsDialog ref="logisticsDialog" />
 
@@ -215,6 +239,9 @@ export default {
       showCancelSelect: false,
       cancelSelectOrder: null,
       cancelSelectItems: [],
+      showReviewSelect: false,
+      reviewSelectOrder: null,
+      reviewSelectItems: [],
     };
   },
   computed: {
@@ -342,7 +369,7 @@ export default {
     },
     hasReviewableItems(order) {
       return (order.orderItems || []).some(i =>
-          (!i.refundStatus || i.refundStatus === 0) && (!i.cancelStatus || i.cancelStatus === 0));
+          (!i.refundStatus || i.refundStatus === 0) && (!i.cancelStatus || i.cancelStatus === 0) && !i.reviewed);
     },
     openLogistics(order) {
       this.$refs.logisticsDialog.open({
@@ -389,7 +416,43 @@ export default {
         d.loading = false;
       }
     },
-    goReview(order) { this.$router.push(`/review?orderId=${order.id}`); },
+    goReview(order) {
+      const reviewable = (order.orderItems || []).filter(i =>
+          (!i.refundStatus || i.refundStatus === 0)
+          && (!i.cancelStatus || i.cancelStatus === 0)
+          && !i.reviewed);
+      if (reviewable.length === 0) return this.$message.warning("暂无可评价的商品");
+      if (reviewable.length === 1) {
+        this.$router.push(`/review?orderId=${order.id}&itemId=${reviewable[0].id}`);
+      } else {
+        this.reviewSelectOrder = order;
+        this.reviewSelectItems = reviewable;
+        this.showReviewSelect = true;
+      }
+    },
+    selectReviewItem(item) {
+      this.showReviewSelect = false;
+      this.$router.push(`/review?orderId=${this.reviewSelectOrder.id}&itemId=${item.id}`);
+    },
+    refundItemName(order, rf) {
+      const item = (order.orderItems || []).find(i => String(i.id) === String(rf.orderItemId));
+      return item ? item.productName : "商品";
+    },
+    openReturnDialogForRefund(rf) {
+      this.returnDialog.refundId = rf.id;
+      this.returnDialog.trackingNumber = "";
+      this.returnDialog.show = true;
+    },
+    openReturnLogisticsForRefund(rf) {
+      this.$refs.logisticsDialog.open({
+        title: "退货物流",
+        courierCompany: rf.returnCourierCompany,
+        trackingNumber: rf.returnTrackingNumber,
+        shipTime: rf.returnTime,
+        seed: rf.returnTrackingNumber || rf.id,
+        destName: "商家仓库",
+      });
+    },
     buyAgain(order) {
       if (order.orderItems && order.orderItems.length > 0) {
         this.$router.push(`/product/${order.orderItems[0].productId}`);
