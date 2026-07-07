@@ -86,25 +86,31 @@
 
 
     <!-- ====== 确认收到退货弹窗 ====== -->
-    <el-dialog title="确认收到退货" :visible.sync="showConfirmReturn" width="440px">
+    <el-dialog :title="confirmTarget && confirmTarget.received === 0 ? '确认收到快递退回货物' : '确认收到退货'" :visible.sync="showConfirmReturn" width="440px">
       <template v-if="confirmTarget">
         <div class="small muted mb8">退单 {{ confirmTarget.refundNo }} · 订单 {{ truncateOrderNo(confirmTarget.orderNo) }}</div>
         <div class="audit-box">
-          <div class="audit-row"><span class="muted">退货快递</span>
-            <span>{{ confirmTarget.returnCourierCompany || '—' }} {{ confirmTarget.returnTrackingNumber }}</span>
-          </div>
-          <div class="audit-row"><span class="muted">寄回时间</span><span>{{ confirmTarget.returnTime || '—' }}</span></div>
+          <template v-if="confirmTarget.received !== 0">
+            <div class="audit-row"><span class="muted">退货快递</span>
+              <span>{{ confirmTarget.returnCourierCompany || '—' }} {{ confirmTarget.returnTrackingNumber }}</span>
+            </div>
+            <div class="audit-row"><span class="muted">寄回时间</span><span>{{ confirmTarget.returnTime || '—' }}</span></div>
+          </template>
+          <div v-else class="audit-row"><span class="muted">退款方式</span><span>快递退款（退款已到账）</span></div>
           <div class="audit-row"><span class="muted">退款金额</span><span class="price">¥{{ (confirmTarget.amount || 0).toFixed(2) }}</span></div>
         </div>
         <div class="field mt12">
           <label for="confirmRemark">备注（选填）</label>
-          <el-input id="confirmRemark" v-model="confirmRemark" type="textarea" :rows="2" placeholder="退货已验收无误" />
+          <el-input id="confirmRemark" v-model="confirmRemark" type="textarea" :rows="2" :placeholder="confirmTarget.received === 0 ? '已收到快递公司退回货物' : '退货已验收无误'" />
         </div>
-        <div class="small muted mt8">⚠ 确认后立即退款到用户余额，订单转为「已退款」，库存回滚。</div>
+        <div class="small muted mt8" v-if="confirmTarget.received === 0">⚠ 确认后库存恢复，订单转为「已退款」。退款已于审核通过时退回用户余额。</div>
+        <div class="small muted mt8" v-else>⚠ 确认后立即退款到用户余额，订单转为「已退款」，库存回滚。</div>
       </template>
       <span slot="footer">
         <el-button @click="showConfirmReturn = false">取消</el-button>
-        <el-button type="primary" style="background:#4caf7d;border-color:#4caf7d" :loading="confirmLoading" @click="doConfirmReturn">确认收货并退款</el-button>
+        <el-button type="primary" style="background:#4caf7d;border-color:#4caf7d" :loading="confirmLoading" @click="doConfirmReturn">
+          {{ confirmTarget && confirmTarget.received === 0 ? '确认收货并恢复库存' : '确认收货并退款' }}
+        </el-button>
       </span>
     </el-dialog>
 
@@ -169,7 +175,7 @@
           </div>
           <div v-if="detailRefund.received === 0" class="special-tip danger">
             <strong>特别提示：快递退货 / 丢件</strong><br />
-            请先核实物流确已退回，点击「确认退货退款」即直接退款。
+            买家未收到货。点击通过后退款立即到账，库存待确认快递退回后恢复。
           </div>
           <div class="field">
             <label for="auditRemarkInput">审核意见</label>
@@ -340,7 +346,8 @@ export default {
       this.confirmLoading = true;
       try {
         await confirmReturnRefund(this.confirmTarget.id, { remark: this.confirmRemark || '' });
-        this.$message.success('已确认收货，退款已退回用户余额');
+        const isCourier = this.confirmTarget.received === 0;
+        this.$message.success(isCourier ? '已确认收回货物，库存已恢复' : '已确认收货，退款已退回用户余额');
         this.showConfirmReturn = false;
         this.showDetailDialog = false;
         this.loadData();
