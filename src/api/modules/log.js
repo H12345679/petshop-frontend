@@ -7,3 +7,11 @@ export function getLogs(params) {
     params
   })
 }
+
+export function getOrderStatusLogs(params) {
+  return request({
+    url: '/sys/log/order-status/page',
+    method: 'get',
+    params
+  })
+}
