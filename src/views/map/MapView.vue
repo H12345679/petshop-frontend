@@ -251,6 +251,27 @@ export default {
   },
 
   methods: {
+    /* ==================== 经纬度安全解析辅助函数（兼容多种高德定位结构与防崩保底） ==================== */
+    safeGetLngLat(pos) {
+      if (!pos) return { lng: DEFAULT_LNG, lat: DEFAULT_LAT };
+      let lng, lat;
+      if (typeof pos.lng === 'number' && typeof pos.lat === 'number') {
+        lng = pos.lng; lat = pos.lat;
+      } else if (typeof pos.getLng === 'function' && typeof pos.getLat === 'function') {
+        lng = pos.getLng(); lat = pos.getLat();
+      } else if (Array.isArray(pos) && pos.length >= 2) {
+        lng = Number(pos[0]); lat = Number(pos[1]);
+      } else if (typeof pos.x === 'number' && typeof pos.y === 'number') {
+        lng = pos.x; lat = pos.y;
+      } else if (pos.lng !== undefined && pos.lat !== undefined) {
+        lng = Number(pos.lng); lat = Number(pos.lat);
+      }
+      if (isNaN(lng) || isNaN(lat) || !lng || !lat) {
+        return { lng: DEFAULT_LNG, lat: DEFAULT_LAT };
+      }
+      return { lng: Number(lng), lat: Number(lat) };
+    },
+
     /* ==================== 地图初始化 ==================== */
     async initMap() {
       try {
@@ -310,10 +331,11 @@ export default {
         let userLng = DEFAULT_LNG;
         let userLat = DEFAULT_LAT;
 
-        if (status === "complete" && result.position) {
-          userLng = result.position.lng;
-          userLat = result.position.lat;
-          this.map.setZoomAndCenter(14, result.position);
+        if (status === "complete" && (result.position || result.center || result.location)) {
+          const safeCoord = this.safeGetLngLat(result.position || result.center || result.location);
+          userLng = safeCoord.lng;
+          userLat = safeCoord.lat;
+          this.map.setZoomAndCenter(14, [userLng, userLat]);
           this.setStartMarker(userLng, userLat);
           this.startPoint = { lng: userLng, lat: userLat };
         } else {
@@ -347,9 +369,10 @@ export default {
       geo.getCurrentPosition((status, result) => {
         if (!this.map) return;
         this.locating = false;
-        if (status === "complete" && result.position) {
-          const { lng, lat } = result.position;
-          this.map.setZoomAndCenter(14, result.position);
+        if (status === "complete" && (result.position || result.center || result.location)) {
+          const safeCoord = this.safeGetLngLat(result.position || result.center || result.location);
+          const { lng, lat } = safeCoord;
+          this.map.setZoomAndCenter(14, [lng, lat]);
           this.setStartMarker(lng, lat);
           this.startPoint = { lng, lat };
           if (this.searchMode) {
@@ -386,8 +409,10 @@ export default {
           const shop = res.data;
           // 计算用户当前位置到店铺的直线距离 (公里数)
           const AMap = globalThis.AMap;
-          const p1 = new AMap.LngLat(userLng, userLat);
-          const p2 = new AMap.LngLat(shop.longitude, shop.latitude);
+          const safeUser = this.safeGetLngLat({ lng: userLng, lat: userLat });
+          const safeShop = this.safeGetLngLat({ lng: shop.longitude, lat: shop.latitude });
+          const p1 = new AMap.LngLat(safeUser.lng, safeUser.lat);
+          const p2 = new AMap.LngLat(safeShop.lng, safeShop.lat);
           const distanceMeters = p1.distance(p2);
           shop.distanceKm = (distanceMeters / 1000).toFixed(1);
 
@@ -441,11 +466,13 @@ export default {
       if (!this.shops.length) return;
 
       this._shopMarkers = this.shops.map((shop, i) => {
+        const safeCoord = this.safeGetLngLat({ lng: shop.longitude, lat: shop.latitude });
+        if (shop.longitude == null || shop.latitude == null || isNaN(safeCoord.lng) || isNaN(safeCoord.lat)) return null;
         const isTop = i === 0; // 最近的一家突出显示
         const color = isTop ? "#ff6b35" : "#2a69d4";
         const size = isTop ? 32 : 26;
         const marker = new AMap.Marker({
-          position: [shop.longitude, shop.latitude],
+          position: [safeCoord.lng, safeCoord.lat],
           content: `<div style="
             width:${size}px;height:${size}px;
             border-radius:50%;
@@ -465,7 +492,7 @@ export default {
         marker.on("click", () => this.previewShop(shop, i));
         marker.addTo(this.map);
         return marker;
-      });
+      }).filter(Boolean);
 
       // 自动调整视野包含所有标注（留出左侧面板空间）
       if (this._shopMarkers.length) {
@@ -483,6 +510,9 @@ export default {
     /* ==================== 用户位置标注（红色可拖拽标签） ==================== */
     setStartMarker(lng, lat, titleText) {
       const AMap = window.AMap;
+      const safeCoord = this.safeGetLngLat({ lng, lat });
+      lng = safeCoord.lng;
+      lat = safeCoord.lat;
       if (this._startMarker && this.map) this.map.remove(this._startMarker);
       this.startPoint = { lng, lat };
 
@@ -514,8 +544,9 @@ export default {
 
       // 监听拖拽结束事件
       this._startMarker.on("dragend", (e) => {
-        const newLng = e.lnglat.lng;
-        const newLat = e.lnglat.lat;
+        const safeCoord = this.safeGetLngLat(e.lnglat || e);
+        const newLng = safeCoord.lng;
+        const newLat = safeCoord.lat;
         this.startPoint = { lng: newLng, lat: newLat };
 
         const geocoder = new AMap.Geocoder({ city: DEFAULT_CITY });

@@ -206,12 +206,13 @@ export default {
 
     /* ===== 在地图上放置标记 ===== */
     placeMarker(lng, lat) {
+      if (isNaN(Number(lng)) || isNaN(Number(lat)) || !lng || !lat) return;
       const AMap = globalThis.AMap;
       if (this._marker && this._map) {
         this._map.remove(this._marker);
       }
       this._marker = new AMap.Marker({
-        position: [lng, lat],
+        position: [Number(lng), Number(lat)],
         content: `<div style="
           width:32px;height:32px;border-radius:50% 50% 50% 0;
           background:linear-gradient(135deg,#2a69d4,#3a6bd5);
