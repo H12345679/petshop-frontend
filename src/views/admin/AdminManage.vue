@@ -238,7 +238,7 @@ export default {
             getUserManageList({ current: 1, size: 1, memberLevelId: lv.id })
           );
           const memberResults = await Promise.all(memberRequests);
-          memberTotal = memberResults.reduce((sum, r) => sum + (r.data?.total || 0), 0);
+          memberTotal = memberResults.reduce((sum, r) => sum + Number(r.data?.total || 0), 0);
         }
         this.stats.memberCount = memberTotal;
         // 今日新增：从当前页数据推算
