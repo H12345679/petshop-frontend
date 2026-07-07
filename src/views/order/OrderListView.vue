@@ -42,8 +42,11 @@
               <div class="oc-info">
                 <div class="oc-name">{{ item.productName }}</div>
                 <div class="oc-spec" v-if="item.specName">{{ item.specName }}</div>
-                <div class="oc-status-hint" v-if="order.status === 3">已收货</div>
-                <div class="oc-status-hint" v-else-if="order.status >= 4">已评价</div>
+                <span v-if="item.cancelStatus === 1" class="tag cancel" style="font-size:11px">已取消</span>
+                <span v-else-if="item.refundStatus === 1" class="tag warn" style="font-size:11px">退款中</span>
+                <span v-else-if="item.refundStatus === 2" class="tag ok" style="font-size:11px">已退款</span>
+                <span v-else-if="order.status === 3" class="oc-status-hint">已收货</span>
+                <span v-else-if="order.status >= 4" class="oc-status-hint">已评价</span>
               </div>
               <div class="oc-qty">× {{ item.quantity }}</div>
               <div class="price">¥{{ (item.price || 0).toFixed(2) }}</div>
@@ -53,7 +56,7 @@
           <!-- 底栏 -->
           <div class="oc-foot">
             <span class="small muted">
-              共 {{ (order.orderItems || []).reduce((s,i)=>s+i.quantity,0) }} 件 实付
+              共 {{ (order.orderItems || []).filter(i => !i.cancelStatus).reduce((s,i)=>s+i.quantity,0) }} 件 实付
               <span class="price" style="font-size:16px">¥{{ (order.payAmount || 0).toFixed(2) }}</span>
             </span>
             <div class="oc-actions" @click.stop>
@@ -80,13 +83,17 @@
               <!-- 状态3：待评价 -->
               <template v-if="order.status === 3">
                 <span class="btn sm" @click="openRefund(order)">申请退款</span>
-                <span class="btn sm primary" @click="goReview(order)">去评价</span>
+                <span v-if="hasReviewableItems(order)" class="btn sm primary" @click="goReview(order)">去评价</span>
               </template>
               <!-- 状态4：已完成（已评价仍可申请退款，但必须退货退款） -->
               <template v-if="order.status === 4">
                 <span class="btn sm" @click="openRefund(order)">申请退款</span>
                 <span class="btn sm" @click="deleteOrderConfirm(order)">删除订单</span>
                 <span class="btn sm" @click="buyAgain(order)">再次购买</span>
+              </template>
+              <!-- 部分退款中：订单未冻结但有明细在退款 -->
+              <template v-if="order.status > 0 && hasItemInRefund(order)">
+                <span class="refund-hint">部分商品退款中</span>
               </template>
               <!-- 已取消 -->
               <template v-if="order.status === -1">
@@ -138,6 +145,33 @@
       </span>
     </el-dialog>
 
+    <!-- 选择退款商品弹窗（多商品订单） -->
+    <el-dialog title="选择要退款的商品" :visible.sync="showRefundSelect" width="460px">
+      <div v-for="item in refundSelectItems" :key="item.id" class="refund-select-item" @click="selectRefundItem(item)">
+        <div class="oc-img" style="width:44px;height:44px"><img :src="item.productImage || '/logo.png'" /></div>
+        <div style="flex:1;min-width:0">
+          <div class="oc-name">{{ item.productName }}</div>
+          <div class="oc-spec" v-if="item.specName">{{ item.specName }}</div>
+        </div>
+        <div class="small">× {{ item.quantity }}</div>
+        <div class="price" style="margin-left:8px">¥{{ (item.realPayAmount || item.price || 0).toFixed(2) }}</div>
+      </div>
+    </el-dialog>
+
+    <!-- 选择取消商品弹窗（多商品订单） -->
+    <el-dialog title="选择要取消的商品" :visible.sync="showCancelSelect" width="460px">
+      <div v-for="item in cancelSelectItems" :key="item.id" class="refund-select-item" @click="selectCancelItem(item)">
+        <div class="oc-img" style="width:44px;height:44px"><img :src="item.productImage || '/logo.png'" /></div>
+        <div style="flex:1;min-width:0">
+          <div class="oc-name">{{ item.productName }}</div>
+          <div class="oc-spec" v-if="item.specName">{{ item.specName }}</div>
+        </div>
+        <div class="small">× {{ item.quantity }}</div>
+        <div class="price" style="margin-left:8px">¥{{ (item.realPayAmount || item.price || 0).toFixed(2) }}</div>
+      </div>
+      <div class="cancel-whole-btn" @click="cancelWholeOrder">取消整个订单</div>
+    </el-dialog>
+
     <!-- 模拟物流轨迹弹窗 -->
     <LogisticsDialog ref="logisticsDialog" />
 
@@ -175,6 +209,12 @@ export default {
       loading: false,
       courierOptions: ["顺丰速运", "中通快递", "圆通速递", "韵达快递", "申通快递", "邮政EMS", "京东物流", "其他"],
       returnDialog: { show: false, refundId: null, courierCompany: "顺丰速运", trackingNumber: "", loading: false },
+      showRefundSelect: false,
+      refundSelectOrder: null,
+      refundSelectItems: [],
+      showCancelSelect: false,
+      cancelSelectOrder: null,
+      cancelSelectItems: [],
     };
   },
   computed: {
@@ -203,7 +243,10 @@ export default {
         let recs = res.data?.records || [];
         this.total = res.data?.total || 0;
         // 退款/售后含被驳回的（订单已恢复原状态，但退款单 status=2）
-        if (isRefund) recs = recs.filter(o => [-2, -3, -4].includes(o.status) || (o.refund && o.refund.status === 2));
+        if (isRefund) recs = recs.filter(o =>
+          [-2, -3, -4].includes(o.status)
+          || (o.refund && o.refund.status === 2)
+          || (o.orderItems || []).some(i => i.refundStatus > 0));
         this.orders = recs;
       } catch (e) { this.$message.error("加载失败"); }
       finally { this.loading = false; }
@@ -217,7 +260,10 @@ export default {
         if (this.activeStatus !== null && !isRefund) params.status = this.activeStatus;
         const res = await myOrders(params);
         let recs = res.data?.records || [];
-        if (isRefund) recs = recs.filter(o => [-2, -3, -4].includes(o.status) || (o.refund && o.refund.status === 2));
+        if (isRefund) recs = recs.filter(o =>
+          [-2, -3, -4].includes(o.status)
+          || (o.refund && o.refund.status === 2)
+          || (o.orderItems || []).some(i => i.refundStatus > 0));
         this.orders = recs;
       } catch (e) { this.orders = []; }
       this.loading = false;
@@ -241,18 +287,63 @@ export default {
         this.loadOrders();
       } catch (e) { if (e !== 'cancel') this.$message.error(e.message || "支付失败"); }
     },
-    async cancelOrder(order) {
+    async cancelOrder(order, orderItemId) {
       try {
-        const { value } = await this.$prompt("取消原因：", "取消订单", { inputValue: "不想要了" });
-        await cancelOrder(order.id, value); this.$message.success("已取消"); this.loadOrders();
+        const activeItems = (order.orderItems || []).filter(i =>
+            (!i.cancelStatus || i.cancelStatus === 0) && (!i.refundStatus || i.refundStatus === 0));
+        if (!orderItemId && activeItems.length > 1) {
+          this.cancelSelectOrder = order;
+          this.cancelSelectItems = activeItems;
+          this.showCancelSelect = true;
+          return;
+        }
+        const { value } = await this.$prompt("取消原因：", orderItemId ? "取消商品" : "取消订单", { inputValue: "不想要了" });
+        await cancelOrder(order.id, value, orderItemId || null);
+        this.$message.success(orderItemId ? "商品已取消" : "已取消");
+        this.loadOrders();
       } catch (e) { if (e !== 'cancel') this.$message.error(e.message || "取消失败"); }
+    },
+    selectCancelItem(item) {
+      this.showCancelSelect = false;
+      this.cancelOrder(this.cancelSelectOrder, item.id);
+    },
+    cancelWholeOrder() {
+      this.showCancelSelect = false;
+      const order = this.cancelSelectOrder;
+      this.$prompt("取消原因：", "取消整个订单", { inputValue: "不想要了" }).then(({ value }) => {
+        cancelOrder(order.id, value).then(() => {
+          this.$message.success("已取消"); this.loadOrders();
+        }).catch(e => this.$message.error(e.message || "取消失败"));
+      }).catch(() => {});
     },
     async receiveOrder(order) {
       await this.$confirm("确认收到商品？", "确认收货", { type: "warning" });
       try { await receiveOrder(order.id); this.$message.success("收货成功"); await this.refreshBalance(); this.loadOrders(); }
       catch (e) { if (e !== 'cancel') this.$message.error(e.message || "操作失败"); }
     },
-    openRefund(order) { this.$router.push(`/refund?orderId=${order.id}`); },
+    openRefund(order) {
+      const items = (order.orderItems || []).filter(i =>
+          (!i.refundStatus || i.refundStatus === 0) && (!i.cancelStatus || i.cancelStatus === 0));
+      if (items.length === 0) return this.$message.warning("该订单无可退款的商品");
+      if (items.length === 1) {
+        this.$router.push(`/refund?orderId=${order.id}&itemId=${items[0].id}`);
+      } else {
+        this.refundSelectOrder = order;
+        this.refundSelectItems = items;
+        this.showRefundSelect = true;
+      }
+    },
+    selectRefundItem(item) {
+      this.showRefundSelect = false;
+      this.$router.push(`/refund?orderId=${this.refundSelectOrder.id}&itemId=${item.id}`);
+    },
+    hasItemInRefund(order) {
+      return (order.orderItems || []).some(i => i.refundStatus === 1);
+    },
+    hasReviewableItems(order) {
+      return (order.orderItems || []).some(i =>
+          (!i.refundStatus || i.refundStatus === 0) && (!i.cancelStatus || i.cancelStatus === 0));
+    },
     openLogistics(order) {
       this.$refs.logisticsDialog.open({
         title: "物流信息",
@@ -397,4 +488,16 @@ export default {
 .pager span:hover { border-color: #2a69d4; }
 .pager span.on { background: #2a69d4; border-color: #2a69d4; color: #fff; }
 .pager span.disabled { opacity: .3; cursor: not-allowed; }
+
+/* 退款商品选择弹窗 */
+.refund-select-item {
+  display: flex; align-items: center; gap: 10px; padding: 12px;
+  border: 1px solid #eef0f3; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: .15s;
+}
+.refund-select-item:hover { border-color: #2a69d4; background: #f7f9fc; }
+.cancel-whole-btn {
+  text-align: center; padding: 10px; margin-top: 8px; border: 1px dashed #c0392b;
+  border-radius: 8px; color: #c0392b; cursor: pointer; font-size: 13px; transition: .15s;
+}
+.cancel-whole-btn:hover { background: #fbe7e6; }
 </style>

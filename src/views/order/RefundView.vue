@@ -232,7 +232,7 @@ export default {
       this.submitting = true;
       try {
         const { postJson } = await import("@/api/axios.js");
-        await postJson("/refunds", {
+        const payload = {
           orderId: this.$route.query.orderId,
           amount: this.form.amount,
           reason: this.form.reason,
@@ -240,7 +240,11 @@ export default {
           refundType: this.form.type,
           received: this.form.received,
           images: this.form.images,
-        });
+        };
+        if (this.orderItem && this.orderItem.id) {
+          payload.orderItemId = this.orderItem.id;
+        }
+        await postJson("/refunds", payload);
         this.$message.success("退款申请已提交，等待商家处理");
         this.$router.push("/orders");
       } catch (e) {

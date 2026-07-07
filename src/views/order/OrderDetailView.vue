@@ -65,7 +65,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in items" :key="item.id">
+              <tr v-for="item in activeItems" :key="item.id">
                 <td>
                   <div class="prod-cell">
                     <div class="prod-img"><img :src="item.productImage || '/logo.png'" :alt="item.productName" /></div>
@@ -80,6 +80,20 @@
               </tr>
             </tbody>
           </table>
+          <div v-if="cancelledItems.length" class="refunded-note">
+            <span class="small muted">已取消商品（{{ cancelledItems.length }}件）：</span>
+            <span v-for="ci in cancelledItems" :key="ci.id" class="refunded-tag">
+              {{ ci.productName }} ¥{{ (ci.realPayAmount || 0).toFixed(2) }}（已取消）
+            </span>
+          </div>
+          <div v-if="refundedItems.length" class="refunded-note">
+            <span class="small muted">已退款商品（{{ refundedItems.length }}件）：</span>
+            <span v-for="ri in refundedItems" :key="ri.id" class="refunded-tag">
+              {{ ri.productName }} ¥{{ (ri.realPayAmount || 0).toFixed(2) }}
+              <template v-if="ri.refundStatus === 1">（退款中）</template>
+              <template v-else>（已退款）</template>
+            </span>
+          </div>
         </div>
 
         <!-- 付款信息 -->
@@ -108,14 +122,28 @@
             <span v-if="order.status === 0" class="btn primary lg" @click="payOrder" :class="{ disabled: paying }">{{ paying ? '支付中…' : '立即支付' }}</span>
             <span v-if="order.status === 2" class="btn lg" @click="openRefund">申请退款</span>
             <span v-if="order.status === 2" class="btn primary lg" @click="receiveOrder">确认收货</span>
-            <span v-if="order.status === 3" class="btn lg" @click="openRefund">申请退款</span>
-            <span v-if="order.status === 3" class="btn primary lg" @click="goReview">去评价</span>
+            <span v-if="order.status === 3 && activeItems.length" class="btn lg" @click="openRefund">申请退款</span>
+            <span v-if="order.status === 3 && activeItems.length" class="btn primary lg" @click="goReview">去评价</span>
             <span v-if="order.status >= 4" class="btn lg" @click="buyAgain">再次购买</span>
             <span v-if="order.status < 0 && order.status > -4" class="btn lg" disabled>已取消/已退款</span>
           </div>
         </div>
       </template>
     </div>
+
+    <!-- 选择取消商品弹窗 -->
+    <el-dialog title="选择要取消的商品" :visible.sync="showCancelSelect" width="460px">
+      <div v-for="item in cancelSelectItems" :key="item.id" class="cancel-select-item" @click="selectCancelItem(item)">
+        <div class="prod-img" style="width:44px;height:44px"><img :src="item.productImage || '/logo.png'" /></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600">{{ item.productName }}</div>
+          <div class="small muted" v-if="item.specName">{{ item.specName }}</div>
+        </div>
+        <div class="small">× {{ item.quantity }}</div>
+        <div class="price" style="margin-left:8px">¥{{ (item.realPayAmount || item.price || 0).toFixed(2) }}</div>
+      </div>
+      <div class="cancel-whole-btn" @click="cancelWholeOrder">取消整个订单</div>
+    </el-dialog>
 
     <!-- 模拟物流轨迹弹窗 -->
     <LogisticsDialog ref="logisticsDialog" />
@@ -142,9 +170,21 @@ export default {
       loading: true,
       loadError: "",
       paying: false,
+      showCancelSelect: false,
+      cancelSelectItems: [],
     };
   },
   computed: {
+    activeItems() {
+      return this.items.filter(i =>
+          (!i.refundStatus || i.refundStatus === 0) && (!i.cancelStatus || i.cancelStatus === 0));
+    },
+    refundedItems() {
+      return this.items.filter(i => i.refundStatus && i.refundStatus > 0);
+    },
+    cancelledItems() {
+      return this.items.filter(i => i.cancelStatus && i.cancelStatus > 0);
+    },
     isTerminal() {
       const s = this.order?.status;
       return s === -1 || s === 4 || s === -3 || s === -4;
@@ -246,6 +286,12 @@ export default {
     },
 
     async cancelOrder() {
+      const active = this.activeItems;
+      if (active.length > 1) {
+        this.cancelSelectItems = active;
+        this.showCancelSelect = true;
+        return;
+      }
       try {
         const { value } = await this.$prompt("取消原因：", "取消订单", { inputValue: "不想要了" });
         await cancelOrder(this.order.id, value);
@@ -254,6 +300,30 @@ export default {
       } catch (e) {
         if (e !== 'cancel') this.$message.error(e.message || "取消失败");
       }
+    },
+    async doCancelItem(orderItemId) {
+      try {
+        const { value } = await this.$prompt("取消原因：", "取消商品", { inputValue: "不想要了" });
+        await cancelOrder(this.order.id, value, orderItemId);
+        this.$message.success("商品已取消");
+        this.loadDetail();
+      } catch (e) {
+        if (e !== 'cancel') this.$message.error(e.message || "取消失败");
+      }
+    },
+    selectCancelItem(item) {
+      this.showCancelSelect = false;
+      this.doCancelItem(item.id);
+    },
+    cancelWholeOrder() {
+      this.showCancelSelect = false;
+      this.$prompt("取消原因：", "取消整个订单", { inputValue: "不想要了" }).then(async ({ value }) => {
+        try {
+          await cancelOrder(this.order.id, value);
+          this.$message.success("已取消");
+          this.loadDetail();
+        } catch (e) { this.$message.error(e.message || "取消失败"); }
+      }).catch(() => {});
     },
 
     async receiveOrder() {
@@ -394,4 +464,21 @@ export default {
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .copy-link { color: #2a69d4; cursor: pointer; }
+
+/* 已退款商品提示 */
+.refunded-note { margin-top: 12px; padding-top: 10px; border-top: 1px dashed #eef0f3; }
+.refunded-tag {
+  display: inline-block; background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 4px;
+  padding: 2px 8px; font-size: 12px; color: #999; margin: 4px 4px 0 0; text-decoration: line-through;
+}
+.cancel-select-item {
+  display: flex; align-items: center; gap: 10px; padding: 12px;
+  border: 1px solid #eef0f3; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: .15s;
+}
+.cancel-select-item:hover { border-color: #2a69d4; background: #f7f9fc; }
+.cancel-whole-btn {
+  text-align: center; padding: 10px; margin-top: 8px; border: 1px dashed #c0392b;
+  border-radius: 8px; color: #c0392b; cursor: pointer; font-size: 13px; transition: .15s;
+}
+.cancel-whole-btn:hover { background: #fbe7e6; }
 </style>

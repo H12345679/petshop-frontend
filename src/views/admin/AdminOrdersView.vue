@@ -120,12 +120,16 @@
         <!-- 商品清单 -->
         <div class="di-section">
           <div class="di-label">📦 商品清单</div>
-          <div v-for="item in (detailOrder.orderItems || [])" :key="item.id" class="di-item">
+          <div v-for="item in (detailOrder.orderItems || [])" :key="item.id"
+               class="di-item" :class="{ 'di-item-off': item.cancelStatus === 1 || (item.refundStatus && item.refundStatus > 0) }">
             <img :src="item.productImage || '/logo.png'" class="di-img" />
             <div class="di-info">
               <div class="di-name">{{ item.productName }}</div>
               <div v-if="item.specName" class="di-spec">{{ item.specName }}</div>
             </div>
+            <span v-if="item.cancelStatus === 1" class="tag danger" style="font-size:11px;margin-right:6px">已取消</span>
+            <span v-else-if="item.refundStatus === 1" class="tag warn" style="font-size:11px;margin-right:6px">退款中</span>
+            <span v-else-if="item.refundStatus === 2" class="tag ok" style="font-size:11px;margin-right:6px">已退款</span>
             <div class="di-price">¥{{ Number(item.price || 0).toFixed(2) }} × {{ item.quantity }}</div>
           </div>
         </div>
@@ -282,10 +286,14 @@ export default {
     },
 
     productSummary(order) {
-      const items = order.orderItems || [];
-      if (items.length === 0) return "—";
-      const first = items[0].productName || "商品";
-      return items.length === 1 ? first : first + " 等" + items.length + "件";
+      const all = order.orderItems || [];
+      const active = all.filter(i => !i.cancelStatus);
+      if (active.length === 0) return all.length > 0 ? "（全部已取消）" : "—";
+      const first = active[0].productName || "商品";
+      const cancelled = all.length - active.length;
+      let text = active.length === 1 ? first : first + " 等" + active.length + "件";
+      if (cancelled > 0) text += "（" + cancelled + "件已取消）";
+      return text;
     },
 
     fmtTime(t) {
@@ -470,4 +478,6 @@ export default {
 .di-row.total { border-top: 1px solid #eee; padding-top: 8px; margin-top: 4px; }
 .di-val.discount { color: #27ae60; }
 .di-val.pay { font-size: 16px; font-weight: 700; color: #c0392b; }
+.di-item-off { opacity: .5; text-decoration: line-through; }
+.di-item-off .tag { text-decoration: none; }
 </style>

@@ -31,9 +31,11 @@ export function getOrderById(id) {
   return get(`/orders/${id}`);
 }
 
-/** 取消订单 PUT /api/orders/{id}/cancel body { cancelReason } */
-export function cancelOrder(id, reason) {
-  return put(`/orders/${id}/cancel`, { cancelReason: reason });
+/** 取消订单 PUT /api/orders/{id}/cancel body { cancelReason, orderItemId? } */
+export function cancelOrder(id, reason, orderItemId) {
+  const body = { cancelReason: reason };
+  if (orderItemId) body.orderItemId = orderItemId;
+  return put(`/orders/${id}/cancel`, body);
 }
 
 /** 确认收货 PUT /api/orders/{id}/receive */

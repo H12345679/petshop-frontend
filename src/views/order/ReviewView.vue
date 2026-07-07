@@ -127,7 +127,8 @@ export default {
           if (String(o.id) === String(orderId)) {
             this.orderId = o.id;
             this.orderNo = o.orderNo || "";
-            const items = o.orderItems || [];
+            const items = (o.orderItems || []).filter(i =>
+                (!i.refundStatus || i.refundStatus === 0) && (!i.cancelStatus || i.cancelStatus === 0));
             this.orderItem = itemId
               ? items.find(i => String(i.id) === String(itemId))
               : items[0];
