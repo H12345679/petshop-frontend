@@ -94,6 +94,7 @@
 </template>
 
 <script>
+import DOMPurify from "dompurify";
 import AppHeader from "@/components/AppHeader.vue";
 import { getAiHistory, getAiSessions } from "@/api/modules/ai.js";
 import { getStore } from "@/libs/storage.js";
@@ -202,7 +203,7 @@ export default {
         .replace(/\*\*([^*<>\n]+)\*\*/g, '<strong>$1</strong>')
         // 5. 换行
         .replaceAll("\n", "<br/>");
-      return html;
+      return DOMPurify.sanitize(html, { ADD_ATTR: ['data-link'] });
     },
     handleChatClick(e) {
       const target = e.target;
