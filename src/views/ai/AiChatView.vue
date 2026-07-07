@@ -51,7 +51,7 @@
               
               <div class="avatar" v-if="msg.role === 'ai'">AI</div>
               <div class="bubble">
-                <div v-html="formatText(msg.content)" @click="handleChatClick"></div>
+                <div v-safe-html="formatText(msg.content)" @click="handleChatClick"></div>
               </div>
             </div>
             
@@ -63,7 +63,7 @@
             <div class="msg-row" v-if="currentAiMessage">
               <div class="avatar">AI</div>
               <div class="bubble">
-                <div v-html="formatText(currentAiMessage)" @click="handleChatClick"></div>
+                <div v-safe-html="formatText(currentAiMessage)" @click="handleChatClick"></div>
               </div>
             </div>
           </div>
@@ -94,7 +94,6 @@
 </template>
 
 <script>
-import DOMPurify from "dompurify";
 import AppHeader from "@/components/AppHeader.vue";
 import { getAiHistory, getAiSessions } from "@/api/modules/ai.js";
 import { getStore } from "@/libs/storage.js";
@@ -203,7 +202,7 @@ export default {
         .replace(/\*\*([^*<>\n]+)\*\*/g, '<strong>$1</strong>')
         // 5. 换行
         .replaceAll("\n", "<br/>");
-      return DOMPurify.sanitize(html, { ADD_ATTR: ['data-link'] });
+      return html;
     },
     handleChatClick(e) {
       const target = e.target;

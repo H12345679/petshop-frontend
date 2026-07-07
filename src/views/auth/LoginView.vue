@@ -127,7 +127,7 @@ export default {
         this.error = "请输入邮箱地址";
         return;
       }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
         this.error = "邮箱格式不正确";
         return;
       }

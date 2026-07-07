@@ -93,7 +93,7 @@ export default {
       if (this.form.password.length < 6) return "密码至少 6 位";
       if (this.form.password !== this.confirm) return "两次输入的密码不一致";
       if (this.form.phone && !/^1[3-9]\d{9}$/.test(this.form.phone)) return "手机号格式不正确";
-      if (this.form.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(this.form.email)) return "邮箱格式不正确";
+      if (this.form.email && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(this.form.email)) return "邮箱格式不正确";
       return "";
     },
     async onSubmit() {

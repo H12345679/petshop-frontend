@@ -11,6 +11,7 @@
 })();
 
 import Vue from 'vue'
+import DOMPurify from 'dompurify'
 import App from './App.vue'
 import './registerServiceWorker'
 import router from './router'
@@ -24,6 +25,17 @@ Vue.config.productionTip = false
 Vue.component('AppFooter', AppFooter)
 Vue.component('AppHeader', AppHeader)
 Vue.use(ElementUI)
+
+Vue.directive('safe-html', {
+  bind(el, binding) {
+    el.innerHTML = DOMPurify.sanitize(binding.value, { ADD_ATTR: ['data-link'] });
+  },
+  update(el, binding) {
+    if (binding.value !== binding.oldValue) {
+      el.innerHTML = DOMPurify.sanitize(binding.value, { ADD_ATTR: ['data-link'] });
+    }
+  }
+})
 
 new Vue({
   router,

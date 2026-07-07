@@ -29,7 +29,7 @@
             :class="{ 'is-user': msg.role === 'user' }">
             <div class="avatar" v-if="msg.role === 'ai'">AI</div>
             <div class="bubble">
-              <div v-html="formatText(msg.content)" @click="handleChatClick"></div>
+              <div v-safe-html="formatText(msg.content)" @click="handleChatClick"></div>
             </div>
           </div>
 
@@ -37,7 +37,7 @@
           <div class="msg-row" v-if="currentAiMessage">
             <div class="avatar">AI</div>
             <div class="bubble">
-              <div v-html="formatText(currentAiMessage)" @click="handleChatClick"></div>
+              <div v-safe-html="formatText(currentAiMessage)" @click="handleChatClick"></div>
             </div>
           </div>
 
@@ -67,7 +67,6 @@
 </template>
 
 <script>
-import DOMPurify from "dompurify";
 import { getAiHistory } from "@/api/modules/ai.js";
 import { getStore } from "@/libs/storage.js";
 
@@ -125,7 +124,7 @@ export default {
         .replace(/(【[^【】\n]+】)[ \t]*[（(][ \t]*(\/product\/\d+)[ \t]*[）)]/g, '<a data-link="$2" class="ai-product-link" style="color:#2a69d4;cursor:pointer;text-decoration:underline;">$1</a>')
         .replace(/\*\*([^*<>\n]+)\*\*/g, '<strong>$1</strong>')
         .replaceAll("\n", "<br/>");
-      return DOMPurify.sanitize(html, { ADD_ATTR: ['data-link'] });
+      return html;
     },
     handleChatClick(e) {
       const target = e.target;
