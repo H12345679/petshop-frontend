@@ -72,7 +72,8 @@
         <div class="card">
           <h3>收货信息</h3>
           <div class="small">
-            {{ order.receiverName }} {{ order.receiverPhone }}
+            {{ order.receiverName }} 
+            {{ order.receiverPhone }}
           </div>
           <div class="small muted mt8">
             {{ order.receiverAddress }}
@@ -395,9 +396,21 @@ export default {
     }
   },
   methods: {
+    // ==============================
+    // 核心流转：加载、支付与倒计时
+    // ==============================
+
+    /**
+     * 启动 30 分钟支付倒计时
+     * 解析后端的 createTime（兼容字符串和数组），动态计算剩余时间，超时后自动刷新状态触发 RabbitMQ 自动取消联动
+     */
     startCountdown() {
-      if (this.countdownTimer) clearInterval(this.countdownTimer);
-      if (this.order?.status !== 0 || !this.order?.createTime) return;
+      if (this.countdownTimer) {
+        clearInterval(this.countdownTimer);
+      }
+      if (this.order?.status !== 0 || !this.order?.createTime) {
+        return;
+      }
       
       let createDate;
       const ct = this.order.createTime;
@@ -432,6 +445,10 @@ export default {
       update();
       this.countdownTimer = setInterval(update, 1000);
     },
+    /**
+     * 加载订单详情
+     * 包含异常兜底逻辑：如果 ID 直查失败，会去订单列表缓存中寻找，增强稳定性
+     */
     async loadDetail() {
       const id = this.$route.params.id;
       if (!id) {
@@ -454,7 +471,10 @@ export default {
         this.loadError = e.message || "订单加载失败，请稍后再试";
         try {
           const { myOrders } = await import("@/api/modules/order.js");
-          const fallbackRes = await myOrders({ current: 1, size: 200 });
+          const fallbackRes = await myOrders({ 
+            current: 1, 
+            size: 200 
+          });
           const records = fallbackRes.data?.records || [];
           const found = records.find(o => String(o.id) === String(id));
           if (found) {
@@ -462,7 +482,9 @@ export default {
             this.items = found.orderItems || [];
             this.loadError = "";
           }
-        } catch (e2) { /* ignore */ }
+        } catch (e2) { 
+          /* ignore */ 
+        }
       } finally {
         this.loading = false;
         this.startCountdown();
@@ -473,16 +495,24 @@ export default {
       try {
         const res = await getUserInfo();
         if (res && res.data) setStore("userInfo", JSON.stringify(res.data));
-      } catch (e) { /* 静默刷新 */ }
+      } catch (e) { 
+        /* 静默刷新 */
+      }
     },
 
+    /**
+     * 发起订单支付
+     * 包含防连点锁 (paying)、用户拦截跳过机制，以及成功后的订单和用户余额联动刷新
+     */
     async payOrder() {
       if (this.paying) return;
       if (!this.order || this.order.status !== 0) {
         return this.$message.warning("当前订单状态不可支付");
       }
       await this.$confirm("确定使用余额支付？", "支付确认", {
-        confirmButtonText: "支付", cancelButtonText: "取消", type: "info",
+        confirmButtonText: "支付", 
+        cancelButtonText: "取消", 
+        type: "info",
       });
       this.paying = true;
       try {
@@ -491,12 +521,22 @@ export default {
         await this.refreshBalance();
         this.loadDetail();
       } catch (e) {
-        if (e !== 'cancel') this.$message.error(e.message || "支付失败");
+        if (e !== 'cancel') {
+          this.$message.error(e.message || "支付失败");
+        }
       } finally {
         this.paying = false;
       }
     },
 
+    // ==============================
+    // 订单取消逻辑（支持子订单拆分取消）
+    // ==============================
+
+    /**
+     * 取消订单统一入口
+     * 如果订单内有多个商品，会触发子项选择弹窗（支持仅取消某一单品）；否则直接进入整单取消
+     */
     async cancelOrder() {
       const active = this.activeItems;
       if (active.length > 1) {
@@ -538,6 +578,14 @@ export default {
       }).catch(() => {});
     },
 
+    // ==============================
+    // 订单结束流转：收货与删除
+    // ==============================
+
+    /**
+     * 确认收货
+     * 收货成功后静默刷新用户信息，以便让导航栏立即显示收货赠送的新增积分
+     */
     async receiveOrder() {
       await this.$confirm("确认收到商品？", "确认收货", { type: "warning" });
       try {
@@ -571,7 +619,9 @@ export default {
       }
     },
 
-    openRefund() { this.$router.push(`/refund?orderId=${this.order.id}`); },
+    openRefund() { 
+      this.$router.push(`/refund?orderId=${this.order.id}`); 
+    },
     openLogistics() {
       this.$refs.logisticsDialog.open({
         title: "物流信息",
@@ -627,6 +677,14 @@ export default {
         destName: "商家仓库",
       });
     },
+    // ==============================
+    // 售后与退货逻辑
+    // ==============================
+
+    /**
+     * 提交退货物流信息
+     * 用户在弹窗中填写快递公司和单号后，将退货凭证提交给后端
+     */
     async submitReturn() {
       const d = this.returnDialog;
       if (!d.trackingNumber.trim()) return this.$message.warning("请输入退货快递单号");
