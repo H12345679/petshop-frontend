@@ -62,10 +62,15 @@
 
 <script>
 import { recharge, getMe } from "@/api/modules/user.js";
+import AppHeader from "@/components/AppHeader.vue";
+import AppFooter from "@/components/AppFooter.vue";
 
 export default {
   name: "RechargeView",
-  components: { AppHeader: () => import("@/components/AppHeader.vue"), AppFooter: () => import("@/components/AppFooter.vue") },
+  components: { 
+    AppHeader, 
+    AppFooter 
+  },
   data() {
     return {
       currentBalance: 0,
@@ -94,7 +99,9 @@ export default {
       try {
         const res = await getMe();
         this.currentBalance = res.data?.balance || 0;
-      } catch (e) { /* ignore */ }
+      } catch (e) { 
+        /* ignore */ 
+      }
     },
     selectAmount(amt) {
       this.selectedAmount = amt;

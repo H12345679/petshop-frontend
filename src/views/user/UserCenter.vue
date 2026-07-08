@@ -45,22 +45,22 @@
           <div class="kpi-card" @click="$router.push('/recharge')">
             <div class="kpi-label">账户余额</div>
             <div class="kpi-val">¥{{ userInfo ? userInfo.balance : '--' }}</div>
-            <div class="kpi-act">充值 ›</div>
+            <div class="kpi-act">充值 ></div>
           </div>
           <div class="kpi-card" @click="switchTab('membership')">
             <div class="kpi-label">积分</div>
             <div class="kpi-val">{{ userInfo ? userInfo.points : '--' }}</div>
-            <div class="kpi-act">兑换 ›</div>
+            <div class="kpi-act">兑换 ></div>
           </div>
           <div class="kpi-card" @click="switchTab('coupons')">
             <div class="kpi-label">优惠券</div>
             <div class="kpi-val">{{ couponCount }}</div>
-            <div class="kpi-act">查看 ›</div>
+            <div class="kpi-act">查看 ></div>
           </div>
           <div class="kpi-card" @click="switchTab('favorites')">
             <div class="kpi-label">收藏商品</div>
             <div class="kpi-val">{{ favoriteTotal }}</div>
-            <div class="kpi-act">查看 ›</div>
+            <div class="kpi-act">查看 ></div>
           </div>
         </div>
 
@@ -68,7 +68,7 @@
         <div class="order-bar">
           <div class="order-head">
             <span class="section-title">我的订单</span>
-            <span class="more" @click="switchTab('orders')">全部订单 ›</span>
+            <span class="more" @click="switchTabOrders('')">全部订单 ></span>
           </div>
           <div class="order-icons">
             <div class="order-item" @click="switchTabOrders('0')">
@@ -86,10 +86,6 @@
             <div class="order-item" @click="switchTabOrders('3')">
               <span class="order-emoji">⭐</span>
               <span class="order-label">待评价</span>
-            </div>
-            <div class="order-item" @click="switchTab('orders')">
-              <span class="order-emoji">↩</span>
-              <span class="order-label">退款/售后</span>
             </div>
           </div>
         </div>
@@ -295,8 +291,11 @@ export default {
       }
     },
     switchTabOrders(status) {
-      this.orderStatusFilter = status;
-      this.currentTab = "orders";
+      if (status !== '') {
+        this.$router.push({ path: '/orders', query: { status } });
+      } else {
+        this.$router.push('/orders');
+      }
     },
 
     // ========== 通知 ==========

@@ -32,7 +32,7 @@
                 </div>
                 <div class="addr-detail">{{ addr.province }}{{ addr.city }}{{ addr.district }} {{ addr.detail }}</div>
               </div>
-              <div class="addr-add" @click="showAddressDialog = true">＋ 新增</div>
+              <div class="addr-add" @click="showAddressDialog = true">+ 新增</div>
             </div>
           </div>
 

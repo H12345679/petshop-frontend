@@ -6,21 +6,31 @@
     <div v-else class="fav-grid">
       <div v-for="shop in favorites" :key="shop.id" class="fav-card" @click="$router.push('/shop/' + shop.id)">
         <div class="fav-img" :style="shop.logo ? { backgroundImage: 'url(' + shop.logo + ')' } : null">
-          <span v-if="!shop.logo">{{ shop.name ? shop.name[0] : '店' }}</span>
+          <span v-if="!shop.logo">
+            {{ shop.name ? shop.name[0] : '店' }}
+          </span>
         </div>
         <div class="fav-body" style="text-align: center; padding: 12px 0;">
-          <div class="fav-name" style="margin-bottom: 8px;">{{ shop.name }}</div>
+          <div class="fav-name" style="margin-bottom: 8px;">
+            {{ shop.name }}
+          </div>
           <div class="fav-status" :class="shop.status === 1 ? 'status-ok' : 'status-stopped'">
             {{ shop.status === 1 ? '营业中' : '已停业' }}
           </div>
         </div>
-        <span class="fav-del" title="取消关注" @click.stop="doRemoveFavorite(shop.id)">✕</span>
+        <span class="fav-del" title="取消关注" @click.stop="doRemoveFavorite(shop.id)">
+          ✕
+        </span>
       </div>
     </div>
     <div class="pager" v-if="favoritePages > 1">
-      <button class="btn sm" :disabled="favoritePage <= 1" @click="loadFavorites(favoritePage - 1)">上一页</button>
+      <button class="btn sm" :disabled="favoritePage <= 1" @click="loadFavorites(favoritePage - 1)">
+        上一页
+      </button>
       <span class="pager-info">{{ favoritePage }} / {{ favoritePages }}</span>
-      <button class="btn sm" :disabled="favoritePage >= favoritePages" @click="loadFavorites(favoritePage + 1)">下一页</button>
+      <button class="btn sm" :disabled="favoritePage >= favoritePages" @click="loadFavorites(favoritePage + 1)">
+        下一页
+      </button>
     </div>
   </div>
 </template>

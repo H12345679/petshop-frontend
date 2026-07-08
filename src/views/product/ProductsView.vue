@@ -50,12 +50,18 @@
               </template>
               
               <span class="small muted label" style="margin-left:20px">排序：</span>
-              <span class="tag" :class="{ accent: query.sort === '' || query.sort === 'recommend' }" @click="selectSort('recommend')">综合</span>
-              <span class="tag" :class="{ accent: query.sort === 'sales_desc' }" @click="selectSort('sales_desc')">销量</span>
+              <span class="tag" :class="{ accent: query.sort === '' || query.sort === 'recommend' }" @click="selectSort('recommend')">
+                综合
+              </span>
+              <span class="tag" :class="{ accent: query.sort === 'sales_desc' }" @click="selectSort('sales_desc')">
+                销量
+              </span>
               <span class="tag" :class="{ accent: query.sort === 'price_asc' || query.sort === 'price_desc' }" @click="togglePriceSort">
                 价格 {{ query.sort === 'price_asc' ? '↑' : (query.sort === 'price_desc' ? '↓' : '↑↓') }}
               </span>
-              <span class="tag" :class="{ accent: query.sort === 'new' }" @click="selectSort('new')">最新</span>
+              <span class="tag" :class="{ accent: query.sort === 'new' }" @click="selectSort('new')">
+                最新
+              </span>
               
               <span class="spacer"></span>
               
@@ -95,16 +101,31 @@
           <div class="product-grid" v-else-if="products.length">
             <div class="pcard" v-for="p in products" :key="p.id" @click="goToDetail(p.id)">
               <div class="pimg" :class="{ ph: !p.mainImage }" :style="p.mainImage ? { backgroundImage: 'url(' + p.mainImage + ')' } : null">
-                <span v-if="!p.mainImage">商品主图</span>
+                <span v-if="!p.mainImage">
+                  商品主图
+                </span>
               </div>
               <div class="pbody">
-                <div class="pname">{{ p.name }}</div>
-                <div class="price-row">
-                  <span class="price"><span class="cur">¥</span>{{ Number(p.price).toFixed(2) }}</span>
-                  <span v-if="p.userDiscount < 1" class="del">¥{{ (p.price / p.userDiscount).toFixed(2) }}</span>
-                  <span v-else-if="p.originalPrice && p.originalPrice > p.price" class="del">¥{{ p.originalPrice }}</span>
+                <div class="pname">
+                  {{ p.name }}
                 </div>
-                <div class="small muted sales">已售 {{ p.sales || 0 }} 件</div>
+                <div class="price-row">
+                  <span class="price">
+                    <span class="cur">
+                      ¥
+                    </span>
+                    {{ Number(p.price).toFixed(2) }}
+                  </span>
+                  <span v-if="p.userDiscount < 1" class="del">
+                    ¥{{ (p.price / p.userDiscount).toFixed(2) }}
+                  </span>
+                  <span v-else-if="p.originalPrice && p.originalPrice > p.price" class="del">
+                    ¥{{ p.originalPrice }}
+                  </span>
+                </div>
+                <div class="small muted sales">
+                  已售 {{ p.sales || 0 }}件
+                </div>
               </div>
             </div>
           </div>
@@ -116,10 +137,18 @@
 
           <!-- 分页 -->
           <div class="pager" v-if="total > 0 && !loading">
-            <span class="arrow" @click="changePage(query.page - 1)" :class="{ disabled: query.page <= 1 }">‹</span>
-            <span class="num" v-for="p in totalPages" :key="p" :class="{ on: query.page === p }" @click="changePage(p)">{{ p }}</span>
-            <span class="arrow" @click="changePage(query.page + 1)" :class="{ disabled: query.page >= totalPages }">›</span>
-            <span class="total-text">共 {{ total }} 条</span>
+            <span class="arrow" @click="changePage(query.page - 1)" :class="{ disabled: query.page <= 1 }">
+              <
+            </span>
+            <span class="num" v-for="p in totalPages" :key="p" :class="{ on: query.page === p }" @click="changePage(p)">
+              {{ p }}
+            </span>
+            <span class="arrow" @click="changePage(query.page + 1)" :class="{ disabled: query.page >= totalPages }">
+              >
+            </span>
+            <span class="total-text">
+              共 {{ total }} 条
+            </span>
           </div>
         </main>
       </div>
@@ -172,9 +201,15 @@ export default {
     }
 
     // 初始化参数
-    if (this.$route.query.categoryId) this.query.categoryId = Number(this.$route.query.categoryId) || this.$route.query.categoryId;
-    if (this.$route.query.name) this.query.name = this.$route.query.name;
-    if (this.$route.query.type) this.query.type = Number(this.$route.query.type);
+    if (this.$route.query.categoryId) {
+      this.query.categoryId = Number(this.$route.query.categoryId) || this.$route.query.categoryId;
+    }
+    if (this.$route.query.name) {
+      this.query.name = this.$route.query.name;
+    }
+    if (this.$route.query.type) {
+      this.query.type = Number(this.$route.query.type);
+    }
     
     this.loadCategories();
     this.doSearch();
@@ -204,12 +239,24 @@ export default {
           size: this.query.size,
           status: 1 // 只查上架
         };
-        if (this.query.categoryId) params.categoryId = this.query.categoryId;
-        if (this.query.name) params.name = this.query.name;
-        if (this.query.type) params.type = this.query.type;
-        if (this.query.minPrice != null) params.minPrice = this.query.minPrice;
-        if (this.query.maxPrice != null) params.maxPrice = this.query.maxPrice;
-        if (this.query.sort) params.sort = this.query.sort;
+        if (this.query.categoryId) { 
+          params.categoryId = this.query.categoryId;
+        }
+        if (this.query.name) { 
+          params.name = this.query.name;
+        }
+        if (this.query.type) { 
+          params.type = this.query.type;
+        }
+        if (this.query.minPrice != null) {
+          params.minPrice = this.query.minPrice;
+        }
+        if (this.query.maxPrice != null) {
+          params.maxPrice = this.query.maxPrice;
+        }
+        if (this.query.sort) {
+          params.sort = this.query.sort;
+        }
 
         const res = await searchProducts(params);
         // 如果后端有数据返回 (PageResult 的结构中有 records 和 total)
@@ -230,7 +277,9 @@ export default {
     },
     selectCategory(id, name) {
       this.query.categoryId = id;
-      if (id !== '') this.query.type = ''; // 清除类型筛选，因为具体分类下不展示类型筛选
+      if (id !== '') {
+        this.query.type = ''; // 清除类型筛选，因为具体分类下不展示类型筛选
+      }
       this.currentCategoryName = id === '' ? '' : name;
       this.query.page = 1;
       this.doSearch();
@@ -253,16 +302,24 @@ export default {
       }
     },
     changePage(p) {
-      if (p < 1 || p > this.totalPages) return;
+      if (p < 1 || p > this.totalPages) {
+        return;
+      }
       this.query.page = p;
       this.doSearch();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     updateUrl() {
       const q = {};
-      if (this.query.categoryId !== "") q.categoryId = this.query.categoryId;
-      if (this.query.name) q.name = this.query.name;
-      if (this.query.type !== "") q.type = this.query.type;
+      if (this.query.categoryId !== "") {
+        q.categoryId = this.query.categoryId;
+      }
+      if (this.query.name) {
+        q.name = this.query.name;
+      }
+      if (this.query.type !== "") {
+        q.type = this.query.type;
+      }
       
       const currentQuery = this.$route.query;
       const isSame = Object.keys(q).length === Object.keys(currentQuery).length && 

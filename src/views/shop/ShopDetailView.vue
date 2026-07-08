@@ -133,7 +133,11 @@ export default {
   },
   created() {
     const u = getStore("userInfo");
-    try { this.userInfo = u ? JSON.parse(u) : null; } catch(e) { this.userInfo = null; }
+    try { 
+      this.userInfo = u ? JSON.parse(u) : null; 
+    } catch(e) { 
+      this.userInfo = null; 
+    }
     this.shopId = this.$route.params.id;
     this.fetchShopData();
   },
@@ -156,8 +160,11 @@ export default {
         this.loading = false;
       }
     },
+    // 获取店铺商品数据
     async fetchProducts() {
-      if (!this.shop) return;
+      if (!this.shop) {
+        return;
+      }
       this.loading = true;
       try {
         const params = {
@@ -166,9 +173,12 @@ export default {
           shopId: this.shop.id,
           status: 1 // 店铺里只展示上架商品
         };
-        if (this.query.name) params.name = this.query.name;
-        if (this.query.type) params.type = this.query.type;
-
+        if (this.query.name) {
+          params.name = this.query.name;
+        }
+        if (this.query.type) {
+          params.type = this.query.type;
+        }
         const res = await searchProducts(params);
         if (res.data && res.data.records) {
           this.products = res.data.records;
@@ -180,17 +190,23 @@ export default {
         this.loading = false;
       }
     },
+
     selectTab(tab) {
       this.activeTab = tab;
-      if (tab === 'intro') return;
-      
-      if (tab === 'all') this.query.type = "";
-      else if (tab === 'pets') this.query.type = 1;
-      else if (tab === 'items') this.query.type = 2;
-      
+      if (tab === 'intro') {
+        return;
+      }
+      if (tab === 'all'){
+        this.query.type = "";
+      } else if (tab === 'pets'){
+        this.query.type = 1;
+      } else if (tab === 'items'){
+        this.query.type = 2;
+      }
       this.query.page = 1;
       this.fetchProducts();
     },
+    // 搜索
     onSearch() {
       this.activeTab = 'all';
       this.query.type = "";
@@ -198,13 +214,19 @@ export default {
       this.query.page = 1;
       this.fetchProducts();
     },
+    // 切换页码
     changePage(p) {
-      if (p < 1 || p > this.totalPages || p === this.query.page) return;
+      if (p < 1 || p > this.totalPages || p === this.query.page){
+        return;
+      }
       this.query.page = p;
       this.fetchProducts();
     },
+    // 检查关注状态
     async checkFollowStatus() {
-      if (!this.userInfo || !this.shop) return;
+      if (!this.userInfo || !this.shop) {
+        return;
+      }
       try {
         const res = await checkShopFavorite(this.shop.id);
         this.isFollowed = res.data;
@@ -212,8 +234,11 @@ export default {
         console.warn("检查关注状态失败", e);
       }
     },
+    // 切换关注状态
     async toggleFollow() {
-      if (!this.shop || this.followLoading) return;
+      if (!this.shop || this.followLoading) {
+        return;
+      }
       this.followLoading = true;
       try {
         if (this.isFollowed) {

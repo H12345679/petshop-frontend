@@ -67,7 +67,13 @@ export default {
   },
   data() {
     return {
-      profileForm: { nickname: "", avatar: "", phone: "", email: "", gender: 0 },
+      profileForm: { 
+        nickname: "", 
+        avatar: "", 
+        phone: "", 
+        email: "", 
+        gender: 0 
+      },
       savingProfile: false,
     };
   },
@@ -110,7 +116,9 @@ export default {
       }
     },
     async saveProfile() {
-      if (!this.profileForm.nickname.trim()) return this.$emit('notify', "error", "昵称不能为空");
+      if (!this.profileForm.nickname.trim()){
+        return this.$emit('notify', "error", "昵称不能为空");
+      } 
       this.savingProfile = true;
       try {
         const payload = {
@@ -122,7 +130,7 @@ export default {
         };
         await updateUserInfo(payload);
         
-        // Notify parent to refresh user info or update it locally
+        // 头像传完后直接触发保存，更新全局 userInfo，避免用户忘记点保存按钮
         const updatedUser = { ...this.userInfo, ...payload };
         setStore("userInfo", JSON.stringify(updatedUser));
         

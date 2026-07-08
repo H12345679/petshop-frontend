@@ -32,17 +32,35 @@ export default {
     };
   },
   methods: {
+    // 保存密码
     async savePassword() {
-      const { oldPassword, newPassword, confirmPassword } = this.form;
-      if (!oldPassword) return this.$emit('notify', "error", "请输入当前密码");
-      if (!newPassword || newPassword.length < 6) return this.$emit('notify', "error", "新密码至少 6 位");
-      if (newPassword !== confirmPassword) return this.$emit('notify', "error", "两次输入的新密码不一致");
+      const { 
+        oldPassword, 
+        newPassword, 
+        confirmPassword 
+      } = this.form;
+      if (!oldPassword){
+        return this.$emit('notify', "error", "请输入当前密码");
+      }
+      if (!newPassword || newPassword.length < 6){
+        return this.$emit('notify', "error", "新密码至少 6 位");
+      }
+      if (newPassword !== confirmPassword){
+        return this.$emit('notify', "error", "两次输入的新密码不一致");
+      }
 
       this.saving = true;
       try {
-        await changePassword({ oldPassword, newPassword });
+        await changePassword({ 
+          oldPassword, 
+          newPassword 
+        });
         this.$emit('notify', "success", "密码修改成功，请重新登录");
-        this.form = { oldPassword: "", newPassword: "", confirmPassword: "" };
+        this.form = { 
+          oldPassword: "", 
+          newPassword: "", 
+          confirmPassword: "" 
+        };
         setTimeout(() => this.$emit('logout'), 1500);
       } catch (e) {
         this.$emit('notify', "error", e.message || "密码修改失败");

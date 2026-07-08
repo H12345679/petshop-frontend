@@ -8,29 +8,51 @@
       <!-- 加载失败 -->
       <div v-if="!loading && loadError" class="empty-state">
         <p>{{ loadError }}</p>
-        <router-link to="/orders" class="back-link">← 返回订单列表</router-link>
+        <router-link to="/orders" class="back-link">
+          ← 返回订单列表
+        </router-link>
       </div>
 
       <template v-if="!loading && !loadError && order">
         <!-- 顶部返回 -->
         <div class="top-bar">
-          <router-link to="/orders" class="back-link">← 返回订单列表</router-link>
-          <span class="top-order-no">订单号：{{ order.orderNo }}</span>
+          <router-link to="/orders" class="back-link">
+            ← 返回订单列表
+          </router-link>
+          <span class="top-order-no">
+            订单号：{{ order.orderNo }}
+          </span>
         </div>
 
         <!-- 状态横幅 -->
         <div class="banner" :class="bannerClass">
-          <div class="banner-icon">{{ statusIcon }}</div>
+          <div class="banner-icon">
+            {{ statusIcon }}
+          </div>
           <div>
-            <div class="banner-title">{{ order.statusName }}</div>
-            <div v-if="order.status === 0" class="banner-sub">请尽快完成支付，超时订单自动取消并释放库存</div>
+            <div class="banner-title">
+              {{ order.statusName }}
+            </div>
+            <div v-if="order.status === 0" class="banner-sub">
+              请在 <span v-if="countdownText" style="color: #ff4d4f; font-weight: bold; padding: 0 4px;">
+                {{ countdownText }}
+              </span> 内完成支付，超时订单自动取消并释放库存
+            </div>
             <!-- 退款被驳回：订单恢复原状态后优先展示驳回原因 -->
             <div v-else-if="order.status > 0 && order.refund && order.refund.status === 2" class="banner-sub">
-              ❌ 退款申请已被驳回{{ order.refund.auditRemark ? '：' + order.refund.auditRemark : '' }}，如有需要可重新申请退款
+              ❌ 退款申请已被驳回
+              {{ order.refund.auditRemark ? ':' + order.refund.auditRemark : '' }}
+              ，如有需要可重新申请退款
             </div>
-            <div v-else-if="order.status === 2" class="banner-sub">商品已发出，请注意查收</div>
-            <div v-else-if="order.status === 3" class="banner-sub">收到货了吗？去评价一下吧</div>
-            <div v-else-if="order.status < 0" class="banner-sub">{{ order.cancelReason || '退款处理中' }}</div>
+            <div v-else-if="order.status === 2" class="banner-sub">
+              商品已发出，请注意查收
+            </div>
+            <div v-else-if="order.status === 3" class="banner-sub">
+              收到货了吗？去评价一下吧
+            </div>
+            <div v-else-if="order.status < 0" class="banner-sub">
+              {{ order.cancelReason || '退款处理中' }}
+            </div>
           </div>
         </div>
 
@@ -38,7 +60,10 @@
         <div class="card">
           <div class="steps">
             <span v-for="(s, i) in progressSteps" :key="i" class="step" :class="{ on: s.on }">
-              <span class="dot">{{ s.done ? '✓' : s.num }}</span>{{ s.label }}
+              <span class="dot">
+                {{ s.done ? '✓' : s.num }}
+              </span>
+              {{ s.label }}
             </span>
           </div>
         </div>
@@ -46,13 +71,21 @@
         <!-- 收货信息 -->
         <div class="card">
           <h3>收货信息</h3>
-          <div class="small">{{ order.receiverName }}　{{ order.receiverPhone }}</div>
-          <div class="small muted mt8">{{ order.receiverAddress }}</div>
+          <div class="small">
+            {{ order.receiverName }} {{ order.receiverPhone }}
+          </div>
+          <div class="small muted mt8">
+            {{ order.receiverAddress }}
+          </div>
         </div>
 
         <!-- 商品明细（同店商品合并在一个卡片内，table 样式） -->
         <div class="card">
-          <h3>商品明细　<span class="small muted">{{ order.shopName || '店铺' }}</span></h3>
+          <h3>商品明细
+            <span class="small muted">
+              {{ order.shopName || '店铺' }}
+            </span>
+          </h3>
           <table class="tbl">
             <thead>
               <tr>
@@ -69,28 +102,48 @@
               <tr v-for="item in items" :key="item.id" :class="{ 'row-refunding': item.refundStatus === 1, 'row-refunded': item.refundStatus === 2 || item.cancelStatus === 1 }">
                 <td>
                   <div class="prod-cell">
-                    <div class="prod-img"><img :src="item.productImage || '/logo.png'" :alt="item.productName" /></div>
+                    <div class="prod-img">
+                      <img :src="item.productImage || '/logo.png'" :alt="item.productName" />
+                    </div>
                     {{ item.productName }}
                   </div>
                 </td>
-                <td class="small muted">{{ item.specName || '—' }}</td>
-                <td>¥{{ (item.price || 0).toFixed(2) }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>¥{{ ((item.price || 0) * item.quantity).toFixed(2) }}</td>
-                <td class="price">¥{{ (item.realPayAmount || 0).toFixed(2) }}</td>
+                <td class="small muted">
+                  {{ item.specName || '—' }}
+                </td>
+                <td>
+                  ¥{{ (item.price || 0).toFixed(2) }}
+                </td>
+                <td>
+                  {{ item.quantity }}
+                </td>
+                <td>
+                  ¥{{ ((item.price || 0) * item.quantity).toFixed(2) }}
+                </td>
+                <td class="price">
+                  ¥{{ (item.realPayAmount || 0).toFixed(2) }}
+                </td>
                 <td>
                   <template v-if="item.cancelStatus === 1">
-                    <span class="item-refund-status" style="color: #999;">已取消</span>
+                    <span class="item-refund-status" style="color: #999;">
+                      已取消
+                    </span>
                   </template>
                   <template v-else-if="item.refundStatus === 2">
-                    <span class="item-refund-status" style="color: #999;">已退款</span>
+                    <span class="item-refund-status" style="color: #999;">
+                      已退款
+                    </span>
                   </template>
                   <template v-else-if="item.refundStatus === 1">
-                    <span class="item-refund-status">{{ itemRefundLabel(item) }}</span>
-                    <span v-if="itemRefundObj(item) && itemRefundObj(item).status === 3"
-                          class="btn-inline primary" @click="openItemReturnDialog(item)">填写退货单号</span>
-                    <span v-else-if="itemRefundObj(item) && itemRefundObj(item).status === 4"
-                          class="btn-inline" @click="openItemReturnLogistics(item)">查看退货物流</span>
+                    <span class="item-refund-status">
+                      {{ itemRefundLabel(item) }}
+                    </span>
+                    <span v-if="itemRefundObj(item) && itemRefundObj(item).status === 3" class="btn-inline primary" @click="openItemReturnDialog(item)">
+                      填写退货单号
+                    </span>
+                    <span v-else-if="itemRefundObj(item) && itemRefundObj(item).status === 4" class="btn-inline" @click="openItemReturnLogistics(item)">
+                      查看退货物流
+                    </span>
                   </template>
                   <span v-else class="small muted">—</span>
                 </td>
@@ -102,35 +155,80 @@
         <!-- 付款信息 -->
         <div class="card">
           <h3>付款信息</h3>
-          <div class="price-row"><span class="muted">商品总额</span><span>¥{{ (order.totalAmount || 0).toFixed(2) }}</span></div>
-          <div class="price-row" v-if="order.discountAmount > 0"><span class="muted">优惠合计（会员 + 券）</span><span class="discount">−¥{{ (order.discountAmount || 0).toFixed(2) }}</span></div>
-          <div class="total-row"><span>实付款</span><span class="total-price">¥{{ (order.payAmount || 0).toFixed(2) }}</span></div>
+          <div class="price-row">
+            <span class="muted">商品总额</span>
+            <span>¥{{ (order.totalAmount || 0).toFixed(2) }}</span>
+          </div>
+          <div class="price-row" v-if="order.discountAmount > 0">
+            <span class="muted">优惠合计（会员 + 券）</span>
+            <span class="discount">−¥{{ (order.discountAmount || 0).toFixed(2) }}</span>
+          </div>
+          <div class="total-row">
+            <span>实付款</span>
+            <span class="total-price">¥{{ (order.payAmount || 0).toFixed(2) }}</span>
+          </div>
         </div>
 
         <!-- 订单信息 -->
         <div class="card">
           <h3>订单信息</h3>
-          <div class="small muted mb8">订单编号：{{ order.orderNo }}　<span class="copy-link" @click="copyOrderNo">复制</span></div>
-          <div class="small muted mb8">创建时间：{{ order.createTime }}</div>
-          <div class="small muted">支付方式：余额支付 / 模拟快捷支付</div>
+          <div class="small muted mb8">
+            订单编号：{{ order.orderNo }}
+            <span class="copy-link" @click="copyOrderNo">复制</span>
+          </div>
+          <div class="small muted mb8">
+            创建时间：{{ order.createTime }}
+          </div>
+          <div class="small muted">
+            支付方式：余额支付 / 模拟快捷支付
+          </div>
         </div>
 
         <!-- 底部操作栏 -->
         <div class="bottom-bar">
-          <span class="small muted">应付：<span class="price" style="font-size:20px">¥{{ (order.payAmount || 0).toFixed(2) }}</span></span>
+          <span class="small muted">
+            应付：
+            <span class="price" style="font-size:20px">
+              ¥{{ (order.payAmount || 0).toFixed(2) }}
+            </span>
+          </span>
           <div class="bottom-actions">
-            <span v-if="order.trackingNumber" class="btn lg" @click="openLogistics">查看物流</span>
-            <span v-if="isTerminal" class="btn lg" @click="deleteOrderConfirm">删除订单</span>
-            <span v-if="order.status === 0 || order.status === 1" class="btn lg" @click="cancelOrder">取消订单</span>
-            <span v-if="order.status === 0" class="btn primary lg" @click="payOrder" :class="{ disabled: paying }">{{ paying ? '支付中…' : '立即支付' }}</span>
-            <span v-if="order.status === 2" class="btn lg" @click="openRefund">申请退款</span>
-            <span v-if="order.status === 2" class="btn primary lg" @click="receiveOrder">确认收货</span>
-            <span v-if="order.status === 3 && activeItems.length" class="btn lg" @click="openRefund">申请退款</span>
-            <span v-if="order.status === 3 && activeItems.length" class="btn primary lg" @click="goReview">去评价</span>
-            <span v-if="order.status >= 4" class="btn lg" @click="buyAgain">再次购买</span>
-            <span v-if="order.status === -1" class="btn lg" disabled>已取消</span>
-            <span v-if="order.status === -2" class="btn lg" disabled>退款处理中</span>
-            <span v-if="order.status === -3 || order.status === -4" class="btn lg" disabled>已退款</span>
+            <span v-if="order.trackingNumber" class="btn lg" @click="openLogistics">
+              查看物流
+            </span>
+            <span v-if="isTerminal" class="btn lg" @click="deleteOrderConfirm">
+              删除订单
+            </span>
+            <span v-if="order.status === 0 || order.status === 1" class="btn lg" @click="cancelOrder">
+              取消订单
+            </span>
+            <span v-if="order.status === 0" class="btn primary lg" @click="payOrder" :class="{ disabled: paying }">
+              {{ paying ? '支付中…' : '立即支付' }}
+            </span>
+            <span v-if="order.status === 2" class="btn lg" @click="openRefund">
+              申请退款
+            </span>
+            <span v-if="order.status === 2" class="btn primary lg" @click="receiveOrder">
+              确认收货
+            </span>
+            <span v-if="order.status === 3 && activeItems.length" class="btn lg" @click="openRefund">
+              申请退款
+            </span>
+            <span v-if="order.status === 3 && activeItems.length" class="btn primary lg" @click="goReview">
+              去评价
+            </span>
+            <span v-if="order.status >= 4" class="btn lg" @click="buyAgain">
+              再次购买
+            </span>
+            <span v-if="order.status === -1" class="btn lg" disabled>
+              已取消
+            </span>
+            <span v-if="order.status === -2" class="btn lg" disabled>
+              退款处理中
+            </span>
+            <span v-if="order.status === -3 || order.status === -4" class="btn lg" disabled>
+              已退款
+            </span>
           </div>
         </div>
       </template>
@@ -139,13 +237,23 @@
     <!-- 选择取消商品弹窗 -->
     <el-dialog title="选择要取消的商品" :visible.sync="showCancelSelect" width="460px">
       <div v-for="item in cancelSelectItems" :key="item.id" class="cancel-select-item" @click="selectCancelItem(item)">
-        <div class="prod-img" style="width:44px;height:44px"><img :src="item.productImage || '/logo.png'" /></div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:600">{{ item.productName }}</div>
-          <div class="small muted" v-if="item.specName">{{ item.specName }}</div>
+        <div class="prod-img" style="width:44px;height:44px">
+          <img :src="item.productImage || '/logo.png'" />
         </div>
-        <div class="small">× {{ item.quantity }}</div>
-        <div class="price" style="margin-left:8px">¥{{ (item.realPayAmount || item.price || 0).toFixed(2) }}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600">
+            {{ item.productName }}
+          </div>
+          <div class="small muted" v-if="item.specName">
+            {{ item.specName }}
+          </div>
+        </div>
+        <div class="small">
+          x {{ item.quantity }}
+        </div>
+        <div class="price" style="margin-left:8px">
+          ¥{{ (item.realPayAmount || item.price || 0).toFixed(2) }}
+        </div>
       </div>
       <div class="cancel-whole-btn" @click="cancelWholeOrder">取消整个订单</div>
     </el-dialog>
@@ -153,12 +261,20 @@
     <!-- 选择评价商品弹窗 -->
     <el-dialog title="选择要评价的商品" :visible.sync="showReviewSelect" width="460px">
       <div v-for="item in reviewSelectItems" :key="item.id" class="cancel-select-item" @click="selectReviewItem(item)">
-        <div class="prod-img" style="width:44px;height:44px"><img :src="item.productImage || '/logo.png'" /></div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:600">{{ item.productName }}</div>
-          <div class="small muted" v-if="item.specName">{{ item.specName }}</div>
+        <div class="prod-img" style="width:44px;height:44px">
+          <img :src="item.productImage || '/logo.png'" />
         </div>
-        <div class="small">× {{ item.quantity }}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600">
+            {{ item.productName }}
+          </div>
+          <div class="small muted" v-if="item.specName">
+            {{ item.specName }}
+          </div>
+        </div>
+        <div class="small">
+          x {{ item.quantity }}
+        </div>
       </div>
     </el-dialog>
 
@@ -211,34 +327,45 @@ export default {
       returnDialog: { show: false, refundId: null, courierCompany: "顺丰速运", trackingNumber: "", loading: false },
       showReviewSelect: false,
       reviewSelectItems: [],
+      countdownText: "",
+      countdownTimer: null,
     };
   },
   computed: {
+    // 正常商品：没有被退款 (!==2) 且 没有被取消 (===0 或未设置) 的商品
     activeItems() {
       return this.items.filter(i => i.refundStatus !== 2 && (!i.cancelStatus || i.cancelStatus === 0));
     },
+    // 已退款商品：退款状态为 2 (已退款完毕) 的商品
     refundedItems() {
       return this.items.filter(i => i.refundStatus === 2);
     },
+    // 已取消商品：取消状态大于 0 的商品
     cancelledItems() {
       return this.items.filter(i => i.cancelStatus && i.cancelStatus > 0);
     },
+    // 判断订单是否处于“终态”（生命周期彻底结束），用于控制底层按钮的显示与隐藏
+    // -1:已取消, 4:已完成, -3/-4:已退款
     isTerminal() {
       const s = this.order?.status;
       return s === -1 || s === 4 || s === -3 || s === -4;
     },
+    // 根据订单状态数字，映射出对应的顶部横幅 Emoji 图标
     statusIcon() {
       const m = { 0:'●', 1:'📦', 2:'🚚', 3:'⭐', 4:'✅', '-1':'❌', '-2':'🔁', '-3':'✅', '-4':'✅' };
       return m[this.order?.status] || '📄';
     },
+    // 根据订单状态数字，映射出对应的顶部横幅背景 CSS 类名（决定底色）
     bannerClass() {
       const m = { 0:'b-pending', 1:'b-ship', 2:'b-receive', 3:'b-review', 4:'b-done', '-1':'b-cancel', '-2':'b-refund', '-3':'b-refunded', '-4':'b-refunded' };
       return m[this.order?.status] || '';
     },
+    // 进度条生成器：负责渲染页面中间的横向步骤节点
     progressSteps() {
       const s = this.order ? this.order.status : null;
       if (s === null) return [];
       
+      // 如果是进入了退款流程的订单，抛弃常规购物进度，展示 3步 退款专属进度条
       if (s === -2 || s === -3 || s === -4) {
         return [
           { num: 1, label: '申请退款', done: true, on: false },
@@ -247,6 +374,8 @@ export default {
         ];
       }
 
+      // 如果是常规购物订单，展示 5步 常规进度条
+      // Math.max 确保在异常状态(如取消)时进度条节点正常计算
       const es = s < 0 ? Math.max(0, s + 5) : s;
       return [
         { num: 1, label: '提交订单', done: es >= 0, on: es === 0 },
@@ -257,8 +386,52 @@ export default {
       ];
     },
   },
-  created() { this.loadDetail(); },
+  created() { 
+    this.loadDetail(); 
+  },
+  beforeDestroy() {
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+    }
+  },
   methods: {
+    startCountdown() {
+      if (this.countdownTimer) clearInterval(this.countdownTimer);
+      if (this.order?.status !== 0 || !this.order?.createTime) return;
+      
+      let createDate;
+      const ct = this.order.createTime;
+      if (Array.isArray(ct)) {
+        createDate = new Date(ct[0], ct[1] - 1, ct[2] || 1, ct[3] || 0, ct[4] || 0, ct[5] || 0);
+      } else if (typeof ct === 'string') {
+        createDate = new Date(ct.includes('T') ? ct : ct.replace(/-/g, '/'));
+      } else {
+        createDate = new Date(ct);
+      }
+      const expireDate = new Date(createDate.getTime() + 30 * 60 * 1000);
+      
+      const update = () => {
+        const now = new Date();
+        const diff = Math.floor((expireDate - now) / 1000);
+        if (diff <= 0) {
+          this.countdownText = "即将自动取消";
+          clearInterval(this.countdownTimer);
+          // 为防止死循环，这里只在超时3秒后尝试请求一次最新状态
+          setTimeout(() => {
+            if (this.order && this.order.status === 0) {
+              this.loadDetail();
+            }
+          }, 3000);
+        } else {
+          const m = String(Math.floor(diff / 60)).padStart(2, '0');
+          const s = String(diff % 60).padStart(2, '0');
+          this.countdownText = `${m}分${s}秒`;
+        }
+      };
+      
+      update();
+      this.countdownTimer = setInterval(update, 1000);
+    },
     async loadDetail() {
       const id = this.$route.params.id;
       if (!id) {
@@ -292,6 +465,7 @@ export default {
         } catch (e2) { /* ignore */ }
       } finally {
         this.loading = false;
+        this.startCountdown();
       }
     },
 
