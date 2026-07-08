@@ -94,9 +94,9 @@
 
         <!-- 分页 -->
         <div class="pager" v-if="total > 0">
-          <span @click="changePage(query.page - 1)" :class="{ disabled: query.page <= 1 }">‹</span>
+          <span @click="changePage(query.page - 1)" :class="{ disabled: query.page <= 1 }"><</span>
           <span v-for="p in totalPages" :key="p" :class="{ on: query.page === p }" @click="changePage(p)">{{ p }}</span>
-          <span @click="changePage(query.page + 1)" :class="{ disabled: query.page >= totalPages }">›</span>
+          <span @click="changePage(query.page + 1)" :class="{ disabled: query.page >= totalPages }">></span>
           <span class="total-text">共 {{ total }} 件</span>
         </div>
 
@@ -111,10 +111,17 @@
           <div class="modal-body">
             <div class="row gap16 mb16">
               <div class="field col flex1">
-                <label><span class="req">*</span> 所属门店</label>
+                <label>
+                  <span class="req">
+                    *
+                  </span> 
+                  所属门店
+                </label>
                 <div class="input-wrap select-wrap">
                   <select aria-label="select" v-model="formData.shopId">
-                    <option v-for="s in shopOptions" :key="s.id" :value="s.id">{{ s.name }}</option>
+                    <option v-for="s in shopOptions" :key="s.id" :value="s.id">
+                      {{ s.name }}
+                    </option>
                   </select>
                 </div>
                 <div v-if="formErrors.shopId" style="color:#c0392b; font-size:12px; margin-top:4px;">{{formErrors.shopId}}</div>
@@ -131,10 +138,16 @@
                     </template>
                   </select>
                 </div>
-                <div v-if="formErrors.categoryId" style="color:#c0392b; font-size:12px; margin-top:4px;">{{formErrors.categoryId}}</div>
+                <div v-if="formErrors.categoryId" style="color:#c0392b; font-size:12px; margin-top:4px;">
+                  {{formErrors.categoryId}}
+                </div>
               </div>
               <div class="field col flex1">
-                <label><span class="req">*</span> 商品类型</label>
+                <label>
+                  <span class="req">
+                    *
+                  </span> 商品类型
+                </label>
                 <div class="input-wrap select-wrap">
                   <select aria-label="select" v-model="formData.type">
                     <option :value="1">1 宠物（唯一）</option>
@@ -145,20 +158,34 @@
             </div>
 
             <div class="field mb16">
-              <label><span class="req">*</span> 商品名称</label>
+              <label>
+                <span class="req">
+                  *
+                </span> 
+                商品名称
+              </label>
               <div class="input-wrap">
                 <input aria-label="input" v-model="formData.name" placeholder="如：英国短毛猫 蓝猫 纯种健康" />
               </div>
-              <div v-if="formErrors.name" style="color:#c0392b; font-size:12px; margin-top:4px;">{{formErrors.name}}</div>
+              <div v-if="formErrors.name" style="color:#c0392b; font-size:12px; margin-top:4px;">
+                {{formErrors.name}}
+              </div>
             </div>
 
             <div class="row gap16 mb16">
               <div class="field col flex1">
-                <label><span class="req">*</span> 售价</label>
+                <label>
+                  <span class="req">
+                    *
+                  </span> 
+                  售价
+                </label>
                 <div class="input-wrap">
                   <input aria-label="input" type="number" v-model.number="formData.price" placeholder="¥2500" />
                 </div>
-                <div v-if="formErrors.price" style="color:#c0392b; font-size:12px; margin-top:4px;">{{formErrors.price}}</div>
+                <div v-if="formErrors.price" style="color:#c0392b; font-size:12px; margin-top:4px;">
+                  {{formErrors.price}}
+                </div>
               </div>
               <div class="field col flex1">
                 <label>原价</label>
@@ -167,7 +194,9 @@
                 </div>
               </div>
               <div class="field col flex1">
-                <div style="font-size:13px; font-weight:600; margin-bottom:8px">库存(宠物锁定为1)</div>
+                <label>
+                  <div style="font-size:13px; font-weight:600; margin-bottom:8px">库存(宠物锁定为1)</div>
+                </label>
                 <div class="input-wrap">
                   <input aria-label="input" type="number" v-model.number="formData.stock" placeholder="1" :disabled="formData.type === 1" />
                 </div>
@@ -179,7 +208,7 @@
                 <label>主图</label>
                 <div class="img-upload-box" @click="triggerUpload('mainImage')">
                   <div class="img-preview" v-if="formData.mainImage" :style="{backgroundImage: 'url(' + formData.mainImage + ')'}"></div>
-                  <span v-else>＋ 上传</span>
+                  <span v-else>+ 上传</span>
                 </div>
               </div>
               <div class="field col" style="flex:2">
@@ -189,7 +218,7 @@
                     <div class="del-btn" @click.stop="formData.imagesList.splice(idx, 1)">×</div>
                   </div>
                   <div class="img-upload-box small" @click="triggerUpload('imagesList')">
-                    <span>＋</span>
+                    <span>+</span>
                   </div>
                 </div>
               </div>
@@ -204,7 +233,12 @@
 
             <!-- SKU 表格 (仅商品 type=2 显示) -->
             <div class="field" v-if="formData.type === 2">
-              <label>规格 SKU <span class="btn sm" style="margin-left:8px" @click="addSku">＋ 添加规格</span></label>
+              <label>
+                规格 SKU 
+                <span class="btn sm" style="margin-left:8px" @click="addSku">
+                  + 添加规格
+                </span>
+              </label>
               <table class="tbl" style="border:1px solid #eee; margin-top: 8px;">
                 <thead>
                   <tr>
@@ -349,7 +383,12 @@ export default {
   },
   async created() {
     const u = getStore("userInfo");
-    try { this.userInfo = u ? JSON.parse(u) : null; } catch (e) { this.userInfo = null; }
+    try { 
+      this.userInfo = u ? JSON.parse(u) : null; 
+    }
+    catch (e) { 
+      this.userInfo = null; 
+    }
     
     await this.loadDependencies();
     this.fetchData();

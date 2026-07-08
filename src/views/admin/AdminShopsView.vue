@@ -45,14 +45,7 @@
         <tbody>
           <tr v-for="shop in shops" :key="shop.id">
             <td>
-              <div
-                class="img"
-                :style="
-                  shop.logo
-                    ? { backgroundImage: 'url(' + shop.logo + ')' }
-                    : null
-                "
-              >
+              <div class="img" :style="{ backgroundImage: 'url(' + shop.logo + ')' }">
                 <span v-if="!shop.logo">图</span>
               </div>
             </td>
@@ -123,7 +116,7 @@
         <div class="modal-container">
           <div class="modal-header">
             <h3>{{ isEdit ? "编辑门店" : "新增门店" }}</h3>
-            <span class="close-btn" @click="modalVisible = false">×</span>
+            <span class="close-btn" @click="modalVisible = false">x</span>
           </div>
           <div class="modal-body">
             <div class="row gap16 mb16">
@@ -148,27 +141,36 @@
                 <div class="input-wrap">
                   <input aria-label="input" v-model="formData.phone" placeholder="0755-xxxxxxxx" />
                 </div>
+                <div
+                  v-if="formErrors.phone"
+                  style="color: #c0392b; font-size: 12px; margin-top: 4px"
+                >
+                  {{ formErrors.phone }}
+                </div>
               </div>
             </div>
 
             <div class="row gap16 mb16">
               <div class="field col flex1">
-                <label>省</label>
+                <label><span class="req">*</span> 省</label>
                 <div class="input-wrap">
                   <input aria-label="input" v-model="formData.province" placeholder="省" />
                 </div>
+                <div v-if="formErrors.province" style="color: #c0392b; font-size: 12px; margin-top: 4px">{{ formErrors.province }}</div>
               </div>
               <div class="field col flex1">
-                <label>市</label>
+                <label><span class="req">*</span> 市</label>
                 <div class="input-wrap">
                   <input aria-label="input" v-model="formData.city" placeholder="市" />
                 </div>
+                <div v-if="formErrors.city" style="color: #c0392b; font-size: 12px; margin-top: 4px">{{ formErrors.city }}</div>
               </div>
               <div class="field col flex1">
-                <label>区</label>
+                <label><span class="req">*</span> 区</label>
                 <div class="input-wrap">
                   <input aria-label="input" v-model="formData.district" placeholder="区" />
                 </div>
+                <div v-if="formErrors.district" style="color: #c0392b; font-size: 12px; margin-top: 4px">{{ formErrors.district }}</div>
               </div>
             </div>
 
@@ -503,10 +505,35 @@ export default {
     },
     async saveShop() {
       this.formErrors = {};
+      let hasError = false;
+
       if (!this.formData.name || !this.formData.name.trim()) {
-        this.formErrors = { name: "请输入门店名称" };
-        return;
+        this.formErrors = { ...this.formErrors, name: "请输入门店名称" };
+        hasError = true;
       }
+
+      if (this.formData.phone && this.formData.phone.trim()) {
+        const phoneReg = /^1[3-9]\d{9}$|^0\d{2,3}-\d{7,8}$/;
+        if (!phoneReg.test(this.formData.phone.trim())) {
+          this.formErrors = { ...this.formErrors, phone: "请输入正确的联系电话格式" };
+          hasError = true;
+        }
+      }
+
+      if (!this.formData.province || !this.formData.province.trim()) {
+        this.formErrors = { ...this.formErrors, province: "请输入省份" };
+        hasError = true;
+      }
+      if (!this.formData.city || !this.formData.city.trim()) {
+        this.formErrors = { ...this.formErrors, city: "请输入城市" };
+        hasError = true;
+      }
+      if (!this.formData.district || !this.formData.district.trim()) {
+        this.formErrors = { ...this.formErrors, district: "请输入区县" };
+        hasError = true;
+      }
+
+      if (hasError) return;
 
       try {
         if (this.isEdit) {
