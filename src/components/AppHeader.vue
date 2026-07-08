@@ -18,8 +18,12 @@
       <router-link to="/messages" class="link">🔔 消息</router-link>
       <template v-if="userInfo">
         <router-link to="/orders" class="link" style="font-weight: 500;">📄 我的订单</router-link>
-        <router-link to="/user/center" style="text-decoration: none; color: inherit; cursor: pointer;">
-          <span>👤 {{ userInfo.nickname || userInfo.username }}</span>
+        <router-link to="/user/center" class="user-link">
+          <div class="header-avatar">
+            <img v-if="userInfo.avatar" :src="userInfo.avatar" class="header-avatar-img" />
+            <span v-else class="header-avatar-txt">{{ (userInfo.nickname || userInfo.username || '我')[0] }}</span>
+          </div>
+          <span>{{ userInfo.nickname || userInfo.username }}</span>
         </router-link>
         <router-link v-if="userInfo.role === 'ADMIN' || userInfo.role === 'MERCHANT'" to="/admin/dashboard" class="link"
           style="color: #ff5000; font-weight: 600;">管理后台</router-link>
@@ -235,5 +239,44 @@ export default {
 
 .muted {
   color: #595959;
+}
+
+.user-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.user-link:hover {
+  color: #6B8DD6;
+}
+
+.header-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6B8DD6 0%, #8E37D7 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1.5px solid #e7eefc;
+}
+
+.header-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.header-avatar-txt {
+  font-size: 13px;
+  font-weight: bold;
 }
 </style>

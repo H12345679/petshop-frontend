@@ -31,7 +31,10 @@
 
           <aside class="user-card" :class="{ logged: userInfo }" aria-label="用户信息">
             <div class="u-top">
-              <div class="avatar">{{ userInfo ? (userInfo.nickname || userInfo.username || '我')[0] : '🐾' }}</div>
+              <div class="avatar">
+                <img v-if="userInfo && userInfo.avatar" :src="userInfo.avatar" class="avatar-img" />
+                <span v-else>{{ userInfo ? (userInfo.nickname || userInfo.username || '我')[0] : '🐾' }}</span>
+              </div>
               <div v-if="userInfo" class="u-info">
                 <div class="u-name">{{ userInfo.nickname || userInfo.username }}</div>
                 <div class="u-bal">余额 <span>¥{{ userInfo.balance != null ? userInfo.balance : 0 }}</span> <router-link to="/recharge" class="recharge-link">充值</router-link></div>
@@ -246,6 +249,10 @@ export default {
   background: linear-gradient(135deg, #eef2fb, #dce4f7); color: #6B8DD6;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   font-size: 24px; font-weight: 700; box-shadow: 0 4px 12px rgba(107, 141, 214, 0.2);
+  overflow: hidden;
+}
+.avatar-img {
+  width: 100%; height: 100%; object-fit: cover;
 }
 .u-info { flex: 1; }
 .u-name { font-weight: 700; font-size: 16px; color: #222; margin-bottom: 4px; }

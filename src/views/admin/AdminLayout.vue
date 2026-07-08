@@ -1,31 +1,71 @@
 <template>
   <div class="admin-layout">
     <div class="aside">
-      <div class="brand">🐾 宠物商城后台</div>
-      <div class="menu-group">数据</div>
-      <router-link to="/admin/dashboard">📊 数据看板</router-link>
-      <div class="menu-group">商品</div>
-      <router-link to="/admin/shops">🏬 商店管理</router-link>
-      <router-link to="/admin/products">📦 商品管理</router-link>
-      <router-link to="/admin/reviews">⭐ 评价管理</router-link>
-      <div class="menu-group">交易</div>
-      <router-link to="/admin/orders">🧾 订单管理</router-link>
-      <router-link to="/admin/refunds">↩ 退单审核</router-link>
-      <router-link to="/admin/coupons" v-if="userInfo && userInfo.role === 'ADMIN'">🎫 优惠券管理</router-link>
-      <div class="menu-group">运营</div>
-      <router-link to="/admin/videos">🎬 视频管理</router-link>
-      <router-link to="/admin/messages" v-if="userInfo && ['ADMIN', 'MERCHANT'].includes(userInfo.role)">🔔 消息推送</router-link>
-      <router-link to="/admin/my-messages">📩 我的消息</router-link>
+      <div class="brand">
+        🐾 宠物商城后台
+      </div>
+      <div class="menu-group">
+        数据
+      </div>
+      <router-link to="/admin/dashboard">
+        📊 数据看板
+      </router-link>
+      <div class="menu-group">
+        商品
+      </div>
+      <router-link to="/admin/shops">
+        🏬 商店管理
+      </router-link>
+      <router-link to="/admin/products">
+        📦 商品管理
+      </router-link>
+      <router-link to="/admin/reviews">
+        ⭐ 评价管理
+      </router-link>
+      <div class="menu-group">
+        交易
+      </div>
+      <router-link to="/admin/orders">
+        🧾 订单管理
+      </router-link>
+      <router-link to="/admin/refunds">
+        ↩ 退单审核
+      </router-link>
+      <router-link to="/admin/coupons" v-if="userInfo && userInfo.role === 'ADMIN'">
+        🎫 优惠券管理
+      </router-link>
+      <div class="menu-group">
+        运营
+      </div>
+      <router-link to="/admin/videos">
+        🎬 视频管理
+      </router-link>
+      <router-link to="/admin/messages" v-if="userInfo && ['ADMIN', 'MERCHANT'].includes(userInfo.role)">
+        🔔 消息推送
+      </router-link>
+      <router-link to="/admin/my-messages">
+        📩 我的消息
+      </router-link>
       <template v-if="userInfo && userInfo.role === 'ADMIN'">
-        <div class="menu-group">用户</div>
-        <router-link to="/admin/users">👥 用户与会员</router-link>
+        <div class="menu-group">
+          用户
+        </div>
+        <router-link to="/admin/users">
+          👥 用户与会员
+        </router-link>
       </template>
       <template v-if="userInfo && userInfo.role === 'ADMIN'">
-        <div class="menu-group">系统</div>
-        <router-link to="/admin/logs">📝 日志审核</router-link>
+        <div class="menu-group">
+          系统
+        </div>
+        <router-link to="/admin/logs">
+          📝 日志审核
+        </router-link>
       </template>
       <div style="flex: 1;"></div>
-      <router-link to="/" class="menu-group" style="margin-bottom: 20px; color: #595959;">← 返回前台</router-link>
+      <router-link to="/" class="menu-group" style="margin-bottom: 20px; color: #595959;">
+        ← 返回前台
+      </router-link>
     </div>
 
     <div class="amain">

@@ -41,7 +41,7 @@
           <div class="btn sm" @click="resetQuery">重置</div>
           
           <div class="spacer"></div>
-          <div class="btn primary" @click="openAddModal">＋ 发布商品</div>
+          <div class="btn primary" @click="openAddModal">+ 发布商品</div>
         </div>
 
         <!-- 列表 -->

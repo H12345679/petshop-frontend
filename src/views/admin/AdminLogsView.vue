@@ -6,8 +6,12 @@
 
     <!-- Tab 切换 -->
     <div class="tabs">
-      <span :class="['tab', { on: activeTab === 'sys' }]" @click="switchTab('sys')">系统操作日志</span>
-      <span :class="['tab', { on: activeTab === 'order' }]" @click="switchTab('order')">订单流转日志</span>
+      <span :class="['tab', { on: activeTab === 'sys' }]" @click="switchTab('sys')">
+        系统操作日志
+      </span>
+      <span :class="['tab', { on: activeTab === 'order' }]" @click="switchTab('order')">
+        订单流转日志
+      </span>
     </div>
 
     <!-- ====== 系统操作日志 ====== -->
@@ -15,7 +19,9 @@
       <div class="search-bar">
         <el-input v-model="sysQuery.username" placeholder="操作人用户名" style="width: 200px" clearable />
         <el-input v-model="sysQuery.operation" placeholder="操作描述" style="width: 200px; margin-left: 10px;" clearable />
-        <el-button type="primary" style="margin-left: 10px;" @click="sysQuery.current = 1; fetchSysLogs()">查询</el-button>
+        <el-button type="primary" style="margin-left: 10px;" @click="sysQuery.current = 1; fetchSysLogs()">
+          查询
+        </el-button>
       </div>
 
       <el-table :data="sysData" v-loading="sysLoading" border stripe style="width: 100%; margin-top: 20px;">
@@ -26,7 +32,9 @@
         <el-table-column prop="ip" label="IP地址" width="150" />
         <el-table-column prop="time" label="耗时(ms)" width="100" />
         <el-table-column prop="createTime" label="操作时间" width="200">
-          <template slot-scope="scope">{{ formatDate(scope.row.createTime) }}</template>
+          <template slot-scope="scope">
+            {{ formatDate(scope.row.createTime) }}
+          </template>
         </el-table-column>
       </el-table>
 
@@ -40,26 +48,33 @@
     <!-- ====== 订单流转日志 ====== -->
     <template v-if="activeTab === 'order'">
       <div class="search-bar">
-        <el-input v-model="orderQuery.orderId" placeholder="订单ID（模糊）" style="width: 180px" clearable />
+        <el-input v-model="orderQuery.orderId" placeholder="订单ID(模糊)" style="width: 180px" clearable />
         <el-select v-model="orderQuery.operatorRole" placeholder="操作人角色" style="width: 140px; margin-left: 10px;" clearable>
           <el-option label="用户" value="USER" />
           <el-option label="管理员" value="ADMIN" />
           <el-option label="商家" value="MERCHANT" />
         </el-select>
         <el-input v-model="orderQuery.remark" placeholder="备注关键词" style="width: 200px; margin-left: 10px;" clearable />
-        <el-button type="primary" style="margin-left: 10px;" @click="orderQuery.current = 1; fetchOrderLogs()">查询</el-button>
+        <el-button type="primary" style="margin-left: 10px;" @click="orderQuery.current = 1; fetchOrderLogs()">
+          查询
+        </el-button>
       </div>
 
+      <!-- 订单流转日志表格：展示订单被谁、在什么时候、改成了什么状态 -->
       <el-table :data="orderData" v-loading="orderLoading" border stripe style="width: 100%; margin-top: 20px;">
         <el-table-column prop="id" label="ID" width="180" />
         <el-table-column prop="orderId" label="订单ID" width="180" />
+        
+        <!-- 核心列：状态变更可视化 -->
         <el-table-column label="状态变更" width="220">
           <template slot-scope="scope">
+            <!-- 场景1：如果操作前后状态一致（通常是仅添加备注等操作，没有真正流转订单状态） -->
             <template v-if="scope.row.fromStatus === scope.row.toStatus">
               <span class="tag accent" style="background: #f0f0f0; color: #666; border-color: #dcdcdc;">
                 {{ statusText(scope.row.toStatus) }} (操作)
               </span>
             </template>
+            <!-- 场景2：如果发生了状态流转变更（例如：待支付 -> 待发货） -->
             <template v-else>
               <span class="tag">{{ statusText(scope.row.fromStatus) }}</span>
               <span style="margin: 0 4px;">→</span>
@@ -67,18 +82,27 @@
             </template>
           </template>
         </el-table-column>
+        
+        <!-- 操作人信息展示 -->
         <el-table-column prop="operatorName" label="操作人" width="120" />
         <el-table-column prop="operatorRole" label="角色" width="90">
           <template slot-scope="scope">
-            <span :class="['tag', roleClass(scope.row.operatorRole)]">{{ roleText(scope.row.operatorRole) }}</span>
+            <!-- 根据不同角色赋予不同的标签颜色（如：SYSTEM蓝色、ADMIN紫色、USER绿色等） -->
+            <span :class="['tag', roleClass(scope.row.operatorRole)]">
+              {{ roleText(scope.row.operatorRole) }}
+            </span>
           </template>
         </el-table-column>
+        
         <el-table-column prop="remark" label="备注" show-overflow-tooltip />
         <el-table-column prop="createTime" label="时间" width="200">
-          <template slot-scope="scope">{{ formatDate(scope.row.createTime) }}</template>
+          <template slot-scope="scope">
+            {{ formatDate(scope.row.createTime) }}
+          </template>
         </el-table-column>
       </el-table>
 
+      <!-- 底部分页器：每次翻页或切换当前页，会自动触发 fetchOrderLogs 重新向后端拉取新数据 -->
       <div style="margin-top: 20px; text-align: right;">
         <el-pagination background layout="prev, pager, next, total"
           :total="orderTotal" :page-size="orderQuery.size"

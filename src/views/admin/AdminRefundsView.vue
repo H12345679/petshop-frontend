@@ -216,15 +216,6 @@ export default {
   data() {
     return {
       activeTab: null,
-      statusTabs: [
-        { label: "全部", value: null, count: null },
-        { label: "待审核", value: 0, count: null },
-        { label: "待用户退货", value: 3, count: null },
-        { label: "待确认收货", value: 4, count: null },
-        { label: "已退款", value: 1, count: null },
-        { label: "已驳回", value: 2, count: null },
-        { label: "管理员直退", value: "direct", count: null, adminOnly: true },
-      ].filter(t => !t.adminOnly || this.isAdmin),
       list: [],
       loading: true,
       current: 1,
@@ -250,6 +241,17 @@ export default {
     };
   },
   computed: {
+    statusTabs() {
+      return [
+        { label: "全部", value: null, count: null },
+        { label: "待审核", value: 0, count: null },
+        { label: "待用户退货", value: 3, count: null },
+        { label: "待确认收货", value: 4, count: null },
+        { label: "已退款", value: 1, count: null },
+        { label: "已驳回", value: 2, count: null },
+        { label: "管理员直退", value: "direct", count: null, adminOnly: true },
+      ].filter(t => !t.adminOnly || this.isAdmin);
+    },
     totalPages() { return Math.max(1, Math.ceil(this.total / this.pageSize)); },
     pageRange() {
       const pages = [];
