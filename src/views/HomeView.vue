@@ -136,7 +136,9 @@ export default {
   created() {
     // 读本地登录态
     const u = getStore("userInfo");
-    try { this.userInfo = u ? JSON.parse(u) : null; } catch (e) { console.warn(e); this.userInfo = null; }
+    try { this.userInfo = u ? JSON.parse(u) : null; } catch (e) {
+      console.warn(e); this.userInfo = null;
+    }
     // 从 API 刷新最新用户信息（余额同步）
     if (this.userInfo) {
       this.refreshUserInfo();
@@ -155,7 +157,9 @@ export default {
           this.userInfo = res.data;
           setStore("userInfo", JSON.stringify(res.data));
         }
-      } catch (e) { console.warn("ignored", e); /* 使用本地缓存兜底 */ }
+      } catch (e) {
+        console.warn("ignored", e); /* 使用本地缓存兜底 */
+      }
     },
     async loadCategories() {
       try {

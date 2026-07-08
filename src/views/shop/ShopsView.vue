@@ -36,7 +36,7 @@
           <div class="row between center small">
             <span>☎ {{ shop.phone || '暂无电话' }}</span>
             <span class="btn sm outline" :class="{ primary: shop.status === 1, disabled: shop.status === 0 }" style="width: auto; padding: 0 12px;" @click="goToShop(shop)">
-              {{ shop.status === 1 ? '进店逛逛 ›' : '暂停营业' }}
+              {{ shop.status === 1 ? '进店逛逛 >' : '暂停营业' }}
             </span>
           </div>
         </div>
@@ -53,9 +53,9 @@
       </div>
 
       <div class="pager" v-if="total > 0">
-        <span @click="changePage(query.page - 1)" :class="{ disabled: query.page <= 1 }">‹</span>
+        <span @click="changePage(query.page - 1)" :class="{ disabled: query.page <= 1 }"><</span>
         <span v-for="p in totalPages" :key="p" :class="{ on: query.page === p }" @click="changePage(p)">{{ p }}</span>
-        <span @click="changePage(query.page + 1)" :class="{ disabled: query.page >= totalPages }">›</span>
+        <span @click="changePage(query.page + 1)" :class="{ disabled: query.page >= totalPages }">></span>
         <span class="total-text">共 {{ total }} 家</span>
       </div>
     </div>
@@ -98,9 +98,12 @@ export default {
           current: this.query.page,
           size: this.query.size
         };
-        if (this.query.name) params.name = this.query.name;
-        if (this.query.status !== "") params.status = this.query.status;
-
+        if (this.query.name) {
+          params.name = this.query.name;
+        } 
+        if (this.query.status !== "") {
+          params.status = this.query.status;
+        }
         const res = await searchShops(params);
         if (res.data && res.data.records) {
           this.shops = res.data.records;
@@ -118,12 +121,16 @@ export default {
       this.doSearch();
     },
     changePage(p) {
-      if (p < 1 || p > this.totalPages || p === this.query.page) return;
+      if (p < 1 || p > this.totalPages || p === this.query.page) {
+        return;
+      }
       this.query.page = p;
       this.doSearch();
     },
     goToShop(shop) {
-      if (shop.status === 0) return;
+      if (shop.status === 0) {
+        return;
+      }
       this.$router.push('/shop/' + shop.id);
     }
   }

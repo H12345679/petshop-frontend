@@ -14,14 +14,14 @@
             <span class="tag-sm" :class="shop.status === 1 ? 'ok' : 'stopped'">{{ shop.status === 1 ? '营业中' : '已停业' }}</span>
           </div>
           <div class="small muted mt8">{{ shop.description || '暂无店铺简介' }} · 在售商品 {{ total }} 件</div>
-          <div class="small muted mt8">📍 {{ shop.address || '暂无地址信息' }}　☎ {{ shop.phone || '暂无联系电话' }}</div>
+          <div class="small muted mt8">📍 {{ shop.address || '暂无地址信息' }} ☎ {{ shop.phone || '暂无联系电话' }}</div>
         </div>
         <div style="text-align: center;">
           <div v-if="userInfo" class="btn primary-btn mb8" :class="{ outline: isFollowed }" @click="toggleFollow" :style="{ opacity: followLoading ? 0.7 : 1 }">
-            {{ isFollowed ? '已关注店铺' : '＋ 关注店铺' }}
+            {{ isFollowed ? '已关注店铺' : '+ 关注店铺' }}
           </div>
           <div v-else class="btn primary-btn mb8" @click="$router.push('/login')">
-            ＋ 关注店铺
+            + 关注店铺
           </div>
           <div class="btn sm outline" @click="$router.push({ path: '/map', query: { shopId: shop.id } })">🗺 查看地图</div>
         </div>
@@ -64,9 +64,9 @@
 
         <!-- 分页 -->
         <div class="pager" v-if="total > 0">
-          <span @click="changePage(query.page - 1)" :class="{ disabled: query.page <= 1 }">‹</span>
+          <span @click="changePage(query.page - 1)" :class="{ disabled: query.page <= 1 }"><</span>
           <span v-for="p in totalPages" :key="p" :class="{ on: query.page === p }" @click="changePage(p)">{{ p }}</span>
-          <span @click="changePage(query.page + 1)" :class="{ disabled: query.page >= totalPages }">›</span>
+          <span @click="changePage(query.page + 1)" :class="{ disabled: query.page >= totalPages }">></span>
           <span class="total-text">共 {{ total }} 件</span>
         </div>
       </div>
